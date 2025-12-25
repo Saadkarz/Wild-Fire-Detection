@@ -1,0 +1,545 @@
+% ============================================
+% PRÉSENTATION PFE AMÉLIORÉE - AI SENTINEL
+% ============================================
+\documentclass[aspectratio=169, 10pt]{beamer}
+
+% ============================================
+% PACKAGES ET CONFIGURATION
+% ============================================
+\usetheme{metropolis}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc, shadows, decorations.pathreplacing, backgrounds, shapes.arrows, matrix, fit}
+\usepackage{fontawesome5}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{animate}
+\usepackage{tcolorbox}
+
+% ============================================
+% PALETTE DE COULEURS AVANCÉE
+% ============================================
+% Verts - Nature & Croissance
+\definecolor{forestGreen}{HTML}{2E7D32}
+\definecolor{emerald}{HTML}{00695C}
+\definecolor{lime}{HTML}{CDDC39}
+\definecolor{mint}{HTML}{E0F2F1}
+
+% Rouges/Oranges - Feu & Alerte
+\definecolor{fireRed}{HTML}{D32F2F}
+\definecolor{ember}{HTML}{FF6F00}
+\definecolor{warning}{HTML}{FBC02D}
+
+% Bleus/Gris - Tech & Structure
+\definecolor{techBlue}{HTML}{0277BD}
+\definecolor{slate}{HTML}{37474F}
+\definecolor{silver}{HTML}{CFD8DC}
+
+% Configuration Metropolis
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=slate}
+\setbeamercolor{alerted text}{fg=fireRed}
+\setbeamercolor{example text}{fg=forestGreen}
+\setbeamercolor{frametitle}{fg=white, bg=forestGreen}
+\setbeamercolor{title separator}{fg=ember}
+\setbeamercolor{progress bar}{fg=ember, bg=mint}
+
+% ============================================
+% STYLES TIKZ PERSONNALISÉS
+% ============================================
+\tikzset{
+    block/.style={
+        draw=forestGreen, 
+        fill=mint, 
+        text=slate, 
+        rectangle, 
+        rounded corners=4pt, 
+        minimum height=2em, 
+        minimum width=4em, 
+        font=\small,
+        align=center,
+        drop shadow
+    },
+    decision/.style={
+        draw=ember, 
+        fill=warning!20, 
+        diamond, 
+        aspect=2, 
+        font=\small,
+        align=center
+    },
+    cloud/.style={
+        draw=techBlue, 
+        fill=techBlue!10, 
+        ellipse, 
+        minimum height=2em, 
+        font=\small,
+        align=center
+    },
+    line/.style={
+        draw=slate, 
+        -latex', 
+        thick
+    }
+}
+
+% ============================================
+% METADATA
+% ============================================
+\title{\textbf{\faLeaf~AI SENTINEL}}
+\subtitle{Système Intelligent de Détection et Prévention des Incendies de Forêt}
+\author{\textbf{Présenté par :} [Nom de l'Étudiant]}
+\institute{
+    \textbf{Université / École}\\
+    Département d'Informatique
+}
+\date{Année Universitaire 2024-2025}
+
+% ============================================
+% DOCUMENT
+% ============================================
+\begin{document}
+
+% --------------------------------------------
+% PAGE DE TITRE
+% --------------------------------------------
+{
+\setbeamertemplate{footline}{}
+\begin{frame}[plain]
+    \begin{tikzpicture}[remember picture, overlay]
+        % Fond avec dégradé sophistiqué
+        \shade[top color=forestGreen!90!black, bottom color=emerald!80!black] 
+            (current page.north west) rectangle (current page.south east);
+        
+        % Éléments graphiques de fond
+        \begin{scope}[opacity=0.1]
+            \fill[white] (-2, -5) -- (0, -2) -- (2, -5) -- cycle;
+            \fill[white] (-6, -6) -- (-4, -3) -- (-2, -6) -- cycle;
+            \fill[white] (2, -5.5) -- (4, -2.5) -- (6, -5.5) -- cycle;
+            \node at (6, 2) {\fontsize{120}{120}\selectfont\faSatellite};
+            \node at (-6, 2) {\fontsize{100}{100}\selectfont\faBrain};
+        \end{scope}
+        
+        % Logo Central
+        \node[
+            circle, 
+            fill=white, 
+            minimum size=3.5cm,
+            drop shadow={opacity=0.5, shadow xshift=2pt, shadow yshift=-2pt}
+        ] at (0, 1.5) {
+            \fontsize{60}{60}\selectfont\textcolor{forestGreen}{\faLeaf}
+        };
+        
+        % Titre et informations
+        \node[text=white, font=\bfseries\Huge] at (0, -1) {AI SENTINEL};
+        \node[text=warning, font=\large] at (0, -1.8) {Intelligence Artificielle pour la Protection des Forêts};
+        
+        \draw[white, line width=1pt] (-4, -2.5) -- (4, -2.5);
+        
+        \node[text=mint, font=\small] at (0, -3.2) {
+            Projet de Fin d'Études \textbullet~ 2024-2025
+        };
+        
+        \node[text=white!80, font=\footnotesize] at (0, -4) {
+             [Nom de l'Étudiant] \quad|\quad Encadrant : [Nom de l'Encadrant]
+        };
+    \end{tikzpicture}
+\end{frame}
+}
+
+% --------------------------------------------
+% PLAN
+% --------------------------------------------
+\begin{frame}{Sommaire}
+    \setbeamertemplate{section in toc}[sections numbered]
+    \tableofcontents[hideallsubsections]
+\end{frame}
+
+% ============================================
+% 1. INTRODUCTION & CONTEXTE
+% ============================================
+\section{Introduction et Contexte}
+
+\begin{frame}{Problématique : L'Urgence Incendie}
+    \begin{columns}[T]
+        \begin{column}{0.6\textwidth}
+            \begin{alertblock}{\faExclamationTriangle~Le Constat}
+                Les méthodes traditionnelles de détection (tours de guet, patrouilles) montrent leurs limites face à l'augmentation des incendies.
+            \end{alertblock}
+            
+            \vspace{0.4cm}
+            
+            \textbf{Défis majeurs :}
+            \begin{itemize}
+                \item[\textcolor{fireRed}{\faClock}] \textbf{Latence :} Détection souvent trop tardive
+                \item[\textcolor{fireRed}{\faEyeSlash}] \textbf{Couverture :} Zones inaccessibles non surveillées
+                \item[\textcolor{fireRed}{\faTimesCircle}] \textbf{Faux Positifs :} Erreurs humaines fréquentes
+                \item[\textcolor{fireRed}{\faMoneyBillWave}] \textbf{Coût :} Surveillance 24/7 onéreuse
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.38\textwidth}
+            % Graphique d'impact
+             \begin{tikzpicture}
+                \begin{axis}[
+                    width=5.5cm, height=5cm,
+                    ybar, bar width=10pt,
+                    ylabel={Hectares détruits (k)},
+                    title={\small Impact Annuel},
+                    symbolic x coords={2020, 2021, 2022, 2023},
+                    xtick=data,
+                    nodes near coords,
+                    nodes near coords style={font=\tiny},
+                    every axis plot/.append style={fill=fireRed}
+                ]
+                \addplot coordinates {(2020,35) (2021,42) (2022,55) (2023,48)};
+                \end{axis}
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Notre Solution : Approche Hybride}
+    \begin{center}
+    \begin{tikzpicture}[node distance=2.5cm, auto]
+        % Nodes
+        \node [block, fill=forestGreen, text=white] (center) {AI SENTINEL};
+        
+        \node [block, above left=of center] (cam) {\faVideo\\Caméras\\Locales};
+        \node [block, above right=of center] (sat) {\faSatellite\\Satellites\\Globaux};
+        \node [block, below=of center, text width=4cm] (platform) {\faLaptopCode\\Plateforme Unifiée\\(Web/Mobile)};
+        
+        % Arrows
+        \path [line, dashed] (cam) -- node [midway, left, font=\tiny] {Temps Réel} (center);
+        \path [line, dashed] (sat) -- node [midway, right, font=\tiny] {Large Échelle} (center);
+        \path [line, ultra thick] (center) -- (platform);
+        
+        % AI Models
+        \node [cloud, left=0.5cm of center] (yolo) {YOLOv8};
+        \node [cloud, right=0.5cm of center] (cam_model) {CAM Model};
+        
+        \draw [line, dotted] (yolo) -- (center);
+        \draw [line, dotted] (cam_model) -- (center);
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+% ============================================
+% 2. ARCHITECTURE TECHNIQUE
+% ============================================
+\section{Architecture Technique}
+
+\begin{frame}[fragile]{Architecture Globale Microservices}
+    \begin{center}
+    \resizebox{0.95\textwidth}{!}{
+    \begin{tikzpicture}[node distance=1.5cm]
+        % Frontend Layer
+        \node[font=\bfseries\color{forestGreen}] at (-5, 1) {FRONTEND};
+        \node[block, fill=white, draw=techBlue] (react) at (-5, 0) {\faReact\\React App};
+        
+        % API Gateway / Backend
+        \node[font=\bfseries\color{forestGreen}] at (0, 2) {BACKEND (FastAPI)};
+        \node[block, fill=mint, minimum width=8cm, minimum height=3cm] (backend) at (0, 0) {};
+        
+        \node[block, fill=white] (api) at (-2, 0.5) {API Router};
+        \node[block, fill=white] (auth) at (-2, -0.5) {Auth Service};
+        \node[block, fill=white] (ia_service) at (2, 0.5) {IA Service};
+        \node[block, fill=white] (notif) at (2, -0.5) {Notification};
+        
+        % AI Engines
+        \node[font=\bfseries\color{forestGreen}] at (0, -2.5) {MOTEURS IA};
+        \node[block, fill=warning!20] (yolo) at (-2, -3.5) {\textbf{YOLOv8}\\Dét. Objet};
+        \node[block, fill=warning!20] (mobilenet) at (0, -3.5) {\textbf{MobileNet}\\Classif.};
+        \node[block, fill=warning!20] (sat_mod) at (2, -3.5) {\textbf{CAM}\\Satellite};
+        
+        % External
+        \node[cloud] (nasa) at (5, 1) {NASA FIRMS};
+        \node[cloud] (sentinel) at (5, -1) {Sentinel Hub};
+        
+        % Connections
+        \draw[<->, thick] (react) -- (backend);
+        \draw[->] (ia_service) -- (yolo);
+        \draw[->] (ia_service) -- (mobilenet);
+        \draw[->] (ia_service) -- (sat_mod);
+        \draw[<->, dashed] (backend) -- (nasa);
+        \draw[<->, dashed] (backend) -- (sentinel);
+        
+    \end{tikzpicture}
+    }
+    \end{center}
+\end{frame}
+
+% ============================================
+% 3. INTELLIGENCE ARTIFICIELLE (DÉTAILLÉ)
+% ============================================
+\section{Intelligence Artificielle : Au Cœur du Système}
+
+\begin{frame}{Vue d'Ensemble des Modèles}
+    \begin{columns}[T]
+        \begin{column}{0.32\textwidth}
+            \begin{tcolorbox}[title=\faVideo~Détection Vidéo, colback=white, colframe=forestGreen]
+                \textbf{Modèle :} YOLOv8 Nano\\
+                \textbf{Rôle :} Détection Objets\\
+                \textbf{Cible :} Feu, Fumée\\
+                \textbf{Vitesse :} Temps Réel
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \begin{tcolorbox}[title=\faImage~Classification, colback=white, colframe=techBlue]
+                \textbf{Modèle :} MobileNetV2\\
+                \textbf{Rôle :} Vérification\\
+                \textbf{Classes :} Fire, Smoke, Safe\\
+                \textbf{Précision :} Haute
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \begin{tcolorbox}[title=\faSatellite~Analyse Sat, colback=white, colframe=ember]
+                \textbf{Modèle :} CAM CNN\\
+                \textbf{Rôle :} Zones à risque\\
+                \textbf{Input :} Images Sentinel-2\\
+                \textbf{Sortie :} Heatmap
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- YOLO SECTION ---
+\begin{frame}{1. YOLOv8 : Architecture Profonde}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \textbf{Pourquoi YOLOv8 ?}
+            \begin{itemize}
+                \item Architecture \textit{Anchor-Free} (plus rapide, plus précis pour petits objets).
+                \item \textbf{Backbone :} CSPDarknet53 modifié (extraction caractéristiques).
+                \item \textbf{Neck :} PANet (fusion multi-échelles).
+                \item \textbf{Head :} Découplée (Classification + Bbox regression séparées).
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{tikzpicture}[scale=0.6, transform shape]
+                % Backbone
+                \node[draw, fill=blue!10, minimum width=2cm, minimum height=6cm, label=above:Backbone] (back) {};
+                % Neck
+                \node[draw, fill=green!10, minimum width=1.5cm, minimum height=4cm, right=1cm of back, label=above:Neck] (neck) {};
+                % Head
+                \node[draw, fill=red!10, minimum width=1.5cm, minimum height=2cm, right=1cm of neck, label=above:Head] (head) {};
+                
+                \draw[->, thick] (back) -- (neck);
+                \draw[->, thick] (neck) -- (head);
+                \node[right=0.5cm of head] {Output};
+            \end{tikzpicture}
+            
+            \vspace{0.2cm}
+            \begin{exampleblock}{Métriques Entraînement}
+                \begin{itemize}
+                    \item \textbf{mAP@50 :} 91.6\%
+                    \item \textbf{FPS :} 45 (sur GPU T4)
+                    \item \textbf{Taille :} 6.2 MB (Nano)
+                \end{itemize}
+            \end{exampleblock}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- MOBILENET SECTION ---
+\begin{frame}{2. MobileNetV2 : Transfer Learning}
+    \textbf{Stratégie d'Entraînement :}
+    \begin{enumerate}
+        \item \textbf{Base :} Modèle pré-entraîné sur ImageNet (poids gelés).
+        \item \textbf{Top Layer :} Remplacement de la tête de classification (1000 classes $\to$ 3 classes).
+        \item \textbf{Fine-Tuning :} Dégel des 20 dernières couches pour spécialisation "Feu".
+    \end{enumerate}
+
+    \vspace{0.4cm}
+    
+    \begin{center}
+    \begin{tikzpicture}[scale=0.8]
+        \node[block, fill=white] (input) {Image Input};
+        \node[block, fill=blue!10, right=0.5cm of input, text width=2.5cm] (conv) {Conv Layers\\(Frozen)};
+        \node[block, fill=green!10, right=0.5cm of conv, text width=2.5cm] (fine) {To Layers\\(Trainable)};
+        \node[block, fill=red!10, right=0.5cm of fine] (out) {Softmax\\(3 Classes)};
+        
+        \draw[->] (input) -- (conv);
+        \draw[->] (conv) -- (fine);
+        \draw[->] (fine) -- (out);
+    \end{tikzpicture}
+    \end{center}
+    
+    \vspace{0.2cm}
+    \centering \textbf{Précision Finale :} 97.8\%
+\end{frame}
+
+% --- CAM SECTION ---
+\begin{frame}{3. Modèle CAM et Imagerie Satellite}
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \textbf{Class Activation Mapping (CAM)}
+            \begin{itemize}
+                \item Permet l'interprétabilité des modèles CNN.
+                \item Identifie \textit{quelles} parties de l'image ont déclenché la détection.
+                \item Génère une \textbf{Heatmap} superposable.
+            \end{itemize}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Utilisation Sentinel-2 :}
+            \begin{itemize}
+                \item Bandes SWIR (B11, B12) très sensibles à la chaleur.
+                \item Fusion avec bandes RGB pour visualisation.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+             % Simulation visuelle Heatmap
+            \begin{tikzpicture}
+                \fill[gray!20] (0,0) rectangle (4,3);
+                \node at (2,1.5) {Image Satellite};
+                
+                % Heatmap simulation
+                \fill[red, opacity=0.3] (2,2) circle (0.8cm);
+                \fill[yellow, opacity=0.4] (2,2) circle (0.4cm);
+                \node[font=\footnotesize, text=red] at (2, 2.9) {Zone Activée};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- PREDICTION SECTION ---
+\begin{frame}{4. Algorithme de Prédiction de Propagation}
+    \textbf{Modèle Mathématique Simplifié (Rothermel adapté)}
+    
+    $$ R = R_0 \times (1 + \phi_W + \phi_S) $$
+    
+    Où :
+    \begin{itemize}
+        \item $R$ : Vitesse de propagation estimée.
+        \item $R_0$ : Vitesse de base (type de végétation).
+        \item $\phi_W$ : \textbf{Facteur Vent} (Vitesse, Direction via Open-Meteo API).
+        \item $\phi_S$ : \textbf{Facteur Pente} (Terrain, Topographie).
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \begin{block}{\faCode~Implémentation}
+        Code Python personnalisé intégrant les données météo en temps réel pour calculer le rayon de danger futur (t+1h, t+3h).
+    \end{block}
+\end{frame}
+
+% ============================================
+% 4. DÉMONSTRATION ET RÉSULTATS
+% ============================================
+\section{Démonstration et Résultats}
+
+\begin{frame}[fragile]{Pipeline de Détection Temps Réel}
+    \begin{center}
+    \begin{tikzpicture}[node distance=1.5cm, auto]
+        \node [block] (cam) {Webcam Stream};
+        \node [cloud, right=of cam] (frame) {Frame Extraction};
+        \node [decision, right=of frame] (detect) {YOLO Detect?};
+        \node [block, below=of detect, fill=fireRed!20] (alert) {ALERTE};
+        \node [block, right=of alert, fill=mint] (notif) {Telegram/Mail};
+        
+        \path [line] (cam) -- (frame);
+        \path [line] (frame) -- (detect);
+        \path [line] (detect) -- node [near start] {Oui (>0.5)} (alert);
+        \path [line] (detect) -- node [near start] {Non} +(0,1.5) -| (frame);
+        \path [line] (alert) -- (notif);
+        
+        \node [right=0.5cm of detect, font=\tiny, text width=2cm] {Traitement: 45ms\\Anti-Spam: 30s};
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Interfaces Utilisateur (React + Leaflet)}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Dashboard de Supervision}
+            \begin{itemize}
+                \item Carte interactive des Hotspots (NASA).
+                \item Statistiques en temps réel.
+                \item Liste des dernières alertes.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            % Placeholder visuel pour screenshot
+            \begin{tikzpicture}
+                \draw[fill=slate!10, rounded corners] (0,0) rectangle (5,3);
+                \node at (2.5, 1.5) {\faDesktop~Interface Web};
+                \draw[fill=white] (0.2, 0.2) rectangle (4.8, 2.8);
+                \fill[forestGreen] (0.5, 0.5) circle (2pt);
+                \fill[fireRed] (3.5, 2.0) circle (2pt);
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+
+% ============================================
+% 5. CONCLUSION
+% ============================================
+\section{Conclusion et Perspectives}
+
+\begin{frame}{Bilan du Projet}
+    \begin{table}
+        \centering
+        \begin{tabular}{l l}
+            \toprule
+            \textbf{Objectif} & \textbf{Statut} \\
+            \midrule
+            Détection Feu/Fumée & \textcolor{forestGreen}{\faCheck~Accompli (91.6\%)} \\
+            Surveillance Satellite & \textcolor{forestGreen}{\faCheck~Intégré (Sentinel/FIRMS)} \\
+            Temps Réel & \textcolor{forestGreen}{\faCheck~Optimisé (45ms)} \\
+            Interface Utilisateur & \textcolor{forestGreen}{\faCheck~Moderne & Responsive} \\
+            Système d'Alerte & \textcolor{forestGreen}{\faCheck~Multi-canal} \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    
+    \vspace{0.2cm}
+    \textbf{Valeur Ajoutée :} Une solution \textbf{tout-en-un} accessible et performante.
+\end{frame}
+
+\begin{frame}{Perspectives Futures}
+    \begin{description}
+        \item[\faMobileAlt~\textbf{Application Mobile}] Version native pour les gardes forestiers sur le terrain.
+        \item[\faPlane~\textbf{Drones Autonomes}] Intégration de flottes de drones pour vérification automatique des alertes satellites.
+        \item[\faDatabase~\textbf{Big Data}] Analyse historique pour prédire les saisons à haut risque (Machine Learning prédictif).
+    \end{description}
+\end{frame}
+
+% --------------------------------------------
+% SLIDE DE FIN
+% --------------------------------------------
+{
+\setbeamertemplate{footline}{}
+\begin{frame}[plain]
+    \centering
+    \vspace{1cm}
+    
+    \fontsize{40}{50}\selectfont \textcolor{forestGreen}{\faLeaf}
+    
+    \vspace{0.5cm}
+    
+    \textcolor{slate}{\Huge \textbf{Merci de votre attention}}
+    
+    \vspace{1cm}
+    
+    \begin{tcolorbox}[colback=mint, colframe=forestGreen, width=0.6\textwidth, align=center]
+        \large \textbf{Questions ?}
+    \end{tcolorbox}
+    
+    \vspace{1cm}
+    
+    \footnotesize
+    \faGithub~ github.com/username/WildFireDetection \quad|\quad \faEnvelope~ contact@aisentinel.com
+\end{frame}
+}
+
+\end{document}
