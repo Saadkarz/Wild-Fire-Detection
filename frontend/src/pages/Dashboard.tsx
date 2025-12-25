@@ -1,7 +1,74 @@
 
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// Fix for default marker icon
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+const LocationMarker = () => {
+    const map = useMap();
+    const [position, setPosition] = useState<[number, number] | null>(null);
+
+    useEffect(() => {
+        map.locate().on("locationfound", function (e) {
+            setPosition([e.latlng.lat, e.latlng.lng]);
+            map.flyTo(e.latlng, map.getZoom());
+        });
+    }, [map]);
+
+    return position === null ? null : (
+        <Marker position={position}>
+            <Popup>You are here</Popup>
+        </Marker>
+    );
+};
+
+interface WildfireEvent {
+    id: string;
+    title: string;
+    geometries: {
+        date: string;
+        coordinates: [number, number]; // Long, Lat
+    }[];
+}
 
 const Dashboard = () => {
+    const [logs, setLogs] = useState<WildfireEvent[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchWildfires = async () => {
+            try {
+                // Fetch wildfires (category 8)
+                const response = await fetch('https://eonet.gsfc.nasa.gov/api/v2.1/events?categories=8&limit=20');
+                const data = await response.json();
+                if (data.events) {
+                    setLogs(data.events);
+                }
+            } catch (error) {
+                console.error("Failed to fetch wildfires:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchWildfires();
+        // Poll every 5 minutes
+        const interval = setInterval(fetchWildfires, 300000);
+        return () => clearInterval(interval);
+    }, []);
+
     return (
         <div className="relative flex h-screen w-full flex-col bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display overflow-x-hidden antialiased selection:bg-primary selection:text-black">
             {/* Top Navigation */}
@@ -169,38 +236,47 @@ const Dashboard = () => {
                             </div>
                         </div>
                         {/* Map Image Container */}
-                        <div className="flex-1 relative bg-surface-darker w-full h-full">
-                            {/* Grid Overlay */}
-                            <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#13ec5b 1px, transparent 1px), linear-gradient(90deg, #13ec5b 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
+                        {/* Map Image Container replaced with Dynamic Map */}
+                        <div className="flex-1 relative bg-surface-darker w-full h-full z-0">
+                            <MapContainer center={[36.7783, -119.4179]} zoom={10} style={{ height: '100%', width: '100%' }} zoomControl={false} scrollWheelZoom={true}>
+                                <TileLayer
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                                />
+                                <LocationMarker />
+
+                                {/* Hotspot 1: Heat Spike */}
+                                <Marker position={[36.85, -119.5]}>
+                                    <div className="absolute -inset-4 bg-red-500/20 rounded-full blur-md animate-pulse pointer-events-none"></div>
+                                    <Popup className="custom-popup">
+                                        <div className="bg-surface-darker border border-red-500/50 p-2 rounded text-xs">
+                                            <p className="text-red-400 font-bold mb-1">ALERT: HEAT SPIKE</p>
+                                            <p className="text-white/80">Temp: 840°C</p>
+                                            <p className="text-white/80">Confidence: 98%</p>
+                                        </div>
+                                    </Popup>
+                                </Marker>
+                                <Circle center={[36.85, -119.5]} pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: 0.4 }} radius={500} />
+
+                                {/* Hotspot 2: Minor */}
+                                <Marker position={[36.70, -119.35]}>
+                                    <Popup>
+                                        <div className="text-xs text-orange-400">Potential hotspot</div>
+                                    </Popup>
+                                </Marker>
+                                <Circle center={[36.70, -119.35]} pathOptions={{ color: 'orange', fillColor: 'orange', fillOpacity: 0.4 }} radius={300} />
+                            </MapContainer>
+
+                            {/* Grid Overlay - pointer events none to allow map interaction */}
+                            <div className="absolute inset-0 z-10 opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(#13ec5b 1px, transparent 1px), linear-gradient(90deg, #13ec5b 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
                             </div>
-                            {/* The Map Image */}
-                            <div className="w-full h-full bg-cover bg-center opacity-80 mix-blend-screen" data-alt="Futuristic dark topographical map with glowing green grid lines and red heat signatures indicating wildfire locations" data-location="California Forests" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuClFJ7OgTftlzxj_rYF0cNchbAJbQUap4R7euuLRkN0dn10XYFA_9Oruys-SexRpdWVSS4j0R-q0jekw__nfTKKDNocSFxeXwK5Jb62Gvs1qMmN9EyxBAMZUzpSGFPry82QV7B__OwDuXAuYQ8-XC86JXXXt4NS8ENLX1h6t2vBAmMbLX4Hm6XO_8ZwYo6V72kQaLZW8zaLAVG5tYuQR3sbb5u_-ULROO00SmDY2YP3rsPK9_VdPL8QjMMb3oBtyynTkFWPamASKFo')" }}>
-                            </div>
-                            {/* Central Radar Scan Effect (CSS Only approximation) */}
-                            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+
+                            {/* Central Radar Scan Effect - pointer events none */}
+                            <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
                                 <div className="w-[500px] h-[500px] border border-primary/10 rounded-full flex items-center justify-center">
                                     <div className="w-[300px] h-[300px] border border-primary/20 rounded-full flex items-center justify-center">
                                         <div className="w-[100px] h-[100px] border border-primary/30 rounded-full animate-pulse"></div>
                                     </div>
-                                </div>
-                            </div>
-                            {/* Hotspots */}
-                            <div className="absolute top-1/3 left-1/4">
-                                <div className="relative group cursor-pointer">
-                                    <div className="absolute -inset-4 bg-red-500/20 rounded-full blur-md animate-pulse"></div>
-                                    <div className="size-3 bg-red-500 rounded-full border-2 border-white relative z-10"></div>
-                                    {/* Tooltip */}
-                                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 bg-surface-darker border border-red-500/50 p-2 rounded text-xs hidden group-hover:block z-20">
-                                        <p className="text-red-400 font-bold mb-1">ALERT: HEAT SPIKE</p>
-                                        <p className="text-white/80">Temp: 840°C</p>
-                                        <p className="text-white/80">Confidence: 98%</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="absolute bottom-1/3 right-1/3">
-                                <div className="relative group cursor-pointer">
-                                    <div className="absolute -inset-6 bg-orange-500/20 rounded-full blur-md"></div>
-                                    <div className="size-3 bg-orange-500 rounded-full border-2 border-white relative z-10"></div>
                                 </div>
                             </div>
                         </div>
@@ -220,80 +296,48 @@ const Dashboard = () => {
                     <div className="lg:col-span-1 bg-surface-dark rounded-xl border border-white/10 flex flex-col overflow-hidden max-h-[600px] lg:max-h-none">
                         <div className="p-4 border-b border-white/5 bg-surface-darker flex justify-between items-center">
                             <h3 className="text-white font-bold tracking-wide text-sm uppercase flex items-center gap-2">
-                                <span className="material-symbols-outlined text-primary text-lg">terminal</span> System Log
+                                <span className="material-symbols-outlined text-primary text-lg">public</span> Global Fire Feed
                             </h3>
-                            <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded text-white/50 border border-white/5">REAL-TIME</span>
+                            <div className="flex items-center gap-2">
+                                {loading && <span className="size-2 rounded-full bg-primary animate-ping"></span>}
+                                <span className="text-[10px] bg-white/5 px-2 py-0.5 rounded text-white/50 border border-white/5">NASA EONET LIVE</span>
+                            </div>
                         </div>
                         <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1 font-mono text-xs">
-                            {/* Log Entry */}
-                            <div className="p-2 hover:bg-white/5 rounded transition-colors border-l-2 border-transparent hover:border-primary/50 group">
+                            {/* Dynamic Logs from API */}
+                            {logs.map((log) => (
+                                <div key={log.id} className="p-2 hover:bg-white/5 rounded transition-colors border-l-2 border-transparent hover:border-primary/50 group border-b border-white/5 last:border-0">
+                                    <div className="flex justify-between text-white/40 mb-1">
+                                        <span>{new Date(log.geometries[0].date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                        <span>#{log.id.split('_')[1]}</span>
+                                    </div>
+                                    <p className="text-white/90 leading-relaxed">
+                                        <span className="text-red-400 font-bold">DETECTED:</span> {log.title}
+                                        {/* Calculate simple relative time msg */}
+                                    </p>
+                                    <div className="flex justify-between mt-1 opacity-50 text-[10px]">
+                                        <span>Lat: {log.geometries[0].coordinates[1].toFixed(2)}</span>
+                                        <span>Long: {log.geometries[0].coordinates[0].toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {/* Fallback/Static log if API empty or loading errors, or just to keep list populated */}
+                            {!loading && logs.length === 0 && (
+                                <div className="p-4 text-center text-white/30 italic">
+                                    No recent major wildfire events returned by NASA EONET.
+                                </div>
+                            )}
+
+                            {/* Keeping a few static system logs at the bottom for flavor/simulation context if desired, or can remove them entirely. 
+                                Let's keep one "System nominal" log at the bottom. */}
+                            <div className="p-2 hover:bg-white/5 rounded transition-colors border-l-2 border-transparent hover:border-primary/50 group opacity-50">
                                 <div className="flex justify-between text-white/40 mb-1">
-                                    <span>14:02:45</span>
-                                    <span>#LOG-8921</span>
+                                    <span>SYSTEM</span>
+                                    <span>#LOC-001</span>
                                 </div>
                                 <p className="text-white/90 leading-relaxed">
-                                    <span className="text-primary group-hover:underline">Scan Complete.</span> Sector 7G nominal. No anomalies detected.
-                                </p>
-                            </div>
-                            {/* Log Entry Warning */}
-                            <div className="p-2 bg-red-500/5 rounded border-l-2 border-red-500/50">
-                                <div className="flex justify-between text-red-400/70 mb-1">
-                                    <span>14:02:05</span>
-                                    <span>#LOG-8920</span>
-                                </div>
-                                <p className="text-red-200 leading-relaxed">
-                                    <span className="text-red-400 font-bold">ALERT:</span> Thermal Anomaly detected at Sector North-East.
-                                    <br /><span className="opacity-50 text-[10px]">Lat: 34.11, Long: -118.19</span>
-                                </p>
-                            </div>
-                            {/* Log Entry */}
-                            <div className="p-2 hover:bg-white/5 rounded transition-colors border-l-2 border-transparent hover:border-primary/50 group">
-                                <div className="flex justify-between text-white/40 mb-1">
-                                    <span>14:01:55</span>
-                                    <span>#LOG-8919</span>
-                                </div>
-                                <p className="text-white/90 leading-relaxed">
-                                    <span className="text-blue-400">Wind Shift.</span> Velocity increase detected. 12mph NW to 18mph N.
-                                </p>
-                            </div>
-                            {/* Log Entry */}
-                            <div className="p-2 hover:bg-white/5 rounded transition-colors border-l-2 border-transparent hover:border-primary/50 group">
-                                <div className="flex justify-between text-white/40 mb-1">
-                                    <span>14:01:22</span>
-                                    <span>#LOG-8918</span>
-                                </div>
-                                <p className="text-white/90 leading-relaxed">
-                                    <span className="text-primary">Drone 04</span> deployed to sector Alpha for visual confirmation.
-                                </p>
-                            </div>
-                            {/* Log Entry */}
-                            <div className="p-2 hover:bg-white/5 rounded transition-colors border-l-2 border-transparent hover:border-primary/50 group">
-                                <div className="flex justify-between text-white/40 mb-1">
-                                    <span>14:00:10</span>
-                                    <span>#LOG-8917</span>
-                                </div>
-                                <p className="text-white/90 leading-relaxed">
-                                    System calibration check. All sensors green.
-                                </p>
-                            </div>
-                            {/* Log Entry */}
-                            <div className="p-2 hover:bg-white/5 rounded transition-colors border-l-2 border-transparent hover:border-primary/50 group">
-                                <div className="flex justify-between text-white/40 mb-1">
-                                    <span>13:59:45</span>
-                                    <span>#LOG-8916</span>
-                                </div>
-                                <p className="text-white/90 leading-relaxed">
-                                    Data packet received from Satellite Uplink V4.
-                                </p>
-                            </div>
-                            {/* Log Entry */}
-                            <div className="p-2 hover:bg-white/5 rounded transition-colors border-l-2 border-transparent hover:border-primary/50 group">
-                                <div className="flex justify-between text-white/40 mb-1">
-                                    <span>13:58:12</span>
-                                    <span>#LOG-8915</span>
-                                </div>
-                                <p className="text-white/90 leading-relaxed">
-                                    <span className="text-primary">Routine Scan.</span> Sector 4B clear.
+                                    Local Scanning Grid Active.
                                 </p>
                             </div>
                         </div>
@@ -301,7 +345,7 @@ const Dashboard = () => {
                         <div className="p-3 bg-surface-darker border-t border-white/5">
                             <div className="flex items-center bg-surface-dark rounded border border-white/10 px-3 py-2">
                                 <span className="material-symbols-outlined text-white/30 text-sm mr-2">chevron_right</span>
-                                <input className="bg-transparent border-none p-0 text-xs text-white placeholder-white/20 w-full focus:ring-0 font-mono" placeholder="Enter command..." type="text" />
+                                <input className="bg-transparent border-none p-0 text-xs text-white placeholder-white/20 w-full focus:ring-0 font-mono" placeholder="Filter feed..." type="text" />
                             </div>
                         </div>
                     </div>

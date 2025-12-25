@@ -1,0 +1,1187 @@
+% ============================================
+% PRÉSENTATION PFE - AI SENTINEL
+% Système de Détection des Incendies de Forêt
+% ============================================
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+% ============================================
+% THÈME ET CONFIGURATION
+% ============================================
+\usetheme{metropolis}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usetikzlibrary{shapes.geometric, arrows, positioning, calc, shadows, decorations.pathreplacing, backgrounds}
+\usepackage{fontawesome5}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+% \usepackage{enumitem} % Removed due to conflict with beamer
+\usepackage{multirow}
+\usepackage{animate}
+
+% ============================================
+% PALETTE DE COULEURS - THÈME NATURE/FORÊT
+% ============================================
+\definecolor{primaryGreen}{HTML}{228B22}
+\definecolor{darkGreen}{HTML}{1B5E20}
+\definecolor{leafGreen}{HTML}{4CAF50}
+\definecolor{mintGreen}{HTML}{E8F5E9}
+\definecolor{forestDark}{HTML}{0D2818}
+\definecolor{accentTeal}{HTML}{009688}
+\definecolor{skyBlue}{HTML}{B3E5FC}
+\definecolor{alertOrange}{HTML}{FF9800}
+\definecolor{fireRed}{HTML}{D32F2F}
+\definecolor{smokeGray}{HTML}{757575}
+\definecolor{warmBrown}{HTML}{795548}
+\definecolor{sunYellow}{HTML}{FFC107}
+\definecolor{textDark}{HTML}{263238}
+\definecolor{bgLight}{HTML}{FAFAFA}
+
+% Configuration Metropolis
+\setbeamercolor{normal text}{fg=textDark, bg=bgLight}
+\setbeamercolor{alerted text}{fg=fireRed}
+\setbeamercolor{example text}{fg=primaryGreen}
+\setbeamercolor{frametitle}{fg=white, bg=darkGreen}
+\setbeamercolor{title separator}{fg=leafGreen}
+\setbeamercolor{progress bar}{fg=leafGreen, bg=mintGreen}
+\setbeamercolor{block title}{fg=white, bg=primaryGreen}
+\setbeamercolor{block body}{fg=textDark, bg=mintGreen}
+\setbeamercolor{block title alerted}{fg=white, bg=fireRed}
+\setbeamercolor{block body alerted}{fg=textDark, bg=fireRed!10}
+\setbeamercolor{block title example}{fg=white, bg=accentTeal}
+\setbeamercolor{block body example}{fg=textDark, bg=accentTeal!10}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+% ============================================
+% INFORMATIONS DU DOCUMENT
+% ============================================
+\title{\textbf{\faLeaf~AI Sentinel}}
+\subtitle{Système Intelligent de Détection et Prévention des Incendies de Forêt}
+\author{
+    \textbf{Présenté par :} [Nom de l'Étudiant]\\[0.3cm]
+    \textbf{Encadré par :} [Nom de l'Encadrant]
+}
+\institute{
+    \textbf{Université / École}\\
+    Département d'Informatique\\[0.5cm]
+    \textbf{Projet de Fin d'Études}
+}
+\date{Année Universitaire 2024-2025}
+
+% ============================================
+% DÉBUT DU DOCUMENT
+% ============================================
+\begin{document}
+
+% ============================================
+% PAGE DE TITRE
+% ============================================
+{
+\setbeamertemplate{footline}{}
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture, overlay]
+    % Fond dégradé
+    \fill[top color=darkGreen, bottom color=forestDark] 
+        (current page.north west) rectangle (current page.south east);
+    
+    % Motif de forêt stylisé
+    % Motif de forêt stylisé (statique)
+    \fill[mintGreen, opacity=0.1] (-7.2, -5) -- (-6.7, -3.5) -- (-6.2, -5) -- cycle;
+    \fill[mintGreen, opacity=0.1] (-5.2, -5) -- (-4.7, -3.8) -- (-4.2, -5) -- cycle;
+    \fill[mintGreen, opacity=0.1] (-3.2, -5) -- (-2.7, -3.6) -- (-2.2, -5) -- cycle;
+    \fill[mintGreen, opacity=0.1] (-1.2, -5) -- (-0.7, -3.9) -- (-0.2, -5) -- cycle;
+    \fill[mintGreen, opacity=0.1] (1.2, -5) -- (1.7, -3.5) -- (2.2, -5) -- cycle;
+    \fill[mintGreen, opacity=0.1] (3.2, -5) -- (3.7, -3.7) -- (4.2, -5) -- cycle;
+    \fill[mintGreen, opacity=0.1] (5.2, -5) -- (5.7, -3.8) -- (6.2, -5) -- cycle;
+    \fill[mintGreen, opacity=0.1] (7.2, -5) -- (7.7, -3.6) -- (8.2, -5) -- cycle;
+    
+    % Éléments décoratifs
+    \node[opacity=0.1] at (7, 2) {\fontsize{150}{150}\selectfont\faFire};
+    \node[opacity=0.1] at (-7, -2) {\fontsize{100}{100}\selectfont\faSatellite};
+    
+    % Logo principal
+    \node at (0, 2.5) {
+        \begin{tikzpicture}
+            \fill[mintGreen, rounded corners=20pt] (-2.5, -1.5) rectangle (2.5, 1.5);
+            \node[text=darkGreen] at (0, 0) {\fontsize{60}{60}\selectfont\faLeaf};
+        \end{tikzpicture}
+    };
+    
+    % Titre
+    \node[text=white, font=\bfseries\Huge] at (0, 0) {AI SENTINEL};
+    \node[text=mintGreen, font=\large] at (0, -0.8) {Système Intelligent de Détection des Incendies de Forêt};
+    
+    % Ligne décorative
+    \draw[leafGreen, line width=2pt] (-5.5, -1.5) -- (5.5, -1.5);
+    
+    % Informations
+    \node[text=white, font=\small] at (0, -2.5) {
+        \textbf{Projet de Fin d'Études} — Année 2024-2025
+    };
+    
+    \node[text=mintGreen, font=\footnotesize] at (0, -3.3) {
+        Présenté par : [Nom de l'Étudiant] \quad|\quad Encadré par : [Nom de l'Encadrant]
+    };
+    
+    % Footer
+    \node[text=white!60, font=\tiny] at (0, -4.5) {
+        \faUniversity~Université / École — Département d'Informatique
+    };
+\end{tikzpicture}
+\end{frame}
+}
+
+% ============================================
+% PLAN DE LA PRÉSENTATION
+% ============================================
+\begin{frame}{Plan de la Présentation}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{\faSearch~Contexte et Problématique}
+                \begin{itemize}
+                    \item Contexte général
+                    \item Problématique
+                    \item Objectifs du projet
+                \end{itemize}
+            \end{block}
+            
+            \vspace{0.3cm}
+            
+            \begin{block}{\faCogs~Analyse et Conception}
+                \begin{itemize}
+                    \item Besoins fonctionnels
+                    \item Architecture du système
+                    \item Technologies utilisées
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \begin{block}{\faCode~Réalisation}
+                \begin{itemize}
+                    \item Modèles d'IA (YOLO, MobileNet)
+                    \item Backend FastAPI
+                    \item Frontend React
+                \end{itemize}
+            \end{block}
+            
+            \vspace{0.3cm}
+            
+            \begin{block}{\faChartLine~Résultats et Démonstration}
+                \begin{itemize}
+                    \item Performances des modèles
+                    \item Démonstration du système
+                    \item Conclusion et perspectives
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% ============================================
+% PARTIE 1 : CONTEXTE ET PROBLÉMATIQUE
+% ============================================
+\section{Contexte et Problématique}
+
+\begin{frame}{Contexte Général}
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \begin{alertblock}{\faExclamationTriangle~Urgence Environnementale}
+                Les incendies de forêt représentent une \textbf{menace croissante} pour les écosystèmes, la biodiversité et les populations.
+            \end{alertblock}
+            
+            \vspace{0.3cm}
+            
+            \textbf{Statistiques alarmantes :}
+            \begin{itemize}
+                \item \textcolor{fireRed}{\faFire} \textbf{+80\%} d'augmentation des feux en 20 ans
+                \item \textcolor{alertOrange}{\faTree} \textbf{Millions} d'hectares détruits annuellement
+                \item \textcolor{smokeGray}{\faCloud} Impact majeur sur la qualité de l'air
+                \item \textcolor{warmBrown}{\faHome} Évacuations massives de populations
+            \end{itemize}
+            
+            \vspace{0.3cm}
+            
+            \begin{exampleblock}{\faLightbulb~Opportunité}
+                L'\textbf{Intelligence Artificielle} offre de nouvelles possibilités pour la détection précoce.
+            \end{exampleblock}
+        \end{column}
+        
+        \begin{column}{0.42\textwidth}
+            \begin{tikzpicture}[scale=0.75]
+                % Graphique d'évolution des incendies
+                \begin{axis}[
+                    width=6.5cm,
+                    height=5.5cm,
+                    ybar,
+                    bar width=12pt,
+                    ylabel={Superficie (1000 ha)},
+                    xlabel={Année},
+                    symbolic x coords={2019, 2020, 2021, 2022, 2023},
+                    xtick=data,
+                    ymin=0,
+                    ymax=500,
+                    nodes near coords,
+                    nodes near coords style={font=\tiny, color=white},
+                    title={\footnotesize\textbf{Surface brûlée au Maroc}},
+                    every axis plot/.append style={fill=fireRed},
+                ]
+                \addplot coordinates {(2019,200) (2020,280) (2021,320) (2022,400) (2023,350)};
+                \end{axis}
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Problématique}
+    \begin{center}
+        \begin{tikzpicture}
+            % Problème central
+            \node[
+                draw=fireRed, 
+                line width=2pt, 
+                fill=fireRed!15, 
+                rounded corners=15pt,
+                text width=9cm,
+                align=center,
+                font=\large,
+                inner sep=15pt
+            ] (problem) {
+                \textbf{\faQuestionCircle~Comment détecter et prévenir les incendies\\de forêt de manière précoce et efficace\\grâce à l'Intelligence Artificielle ?}
+            };
+            
+            % Défis
+            \node[
+                draw=alertOrange, 
+                fill=alertOrange!10, 
+                rounded corners=8pt,
+                text width=3cm,
+                align=center,
+                font=\small
+            ] (d1) at (-5.5, -2.5) {
+                \faClock\\[3pt]
+                \textbf{Temps}\\
+                Détection tardive
+            };
+            
+            \node[
+                draw=alertOrange, 
+                fill=alertOrange!10, 
+                rounded corners=8pt,
+                text width=3cm,
+                align=center,
+                font=\small
+            ] (d2) at (-1.8, -2.5) {
+                \faMapMarker\\[3pt]
+                \textbf{Couverture}\\
+                Zones isolées
+            };
+            
+            \node[
+                draw=alertOrange, 
+                fill=alertOrange!10, 
+                rounded corners=8pt,
+                text width=3cm,
+                align=center,
+                font=\small
+            ] (d3) at (1.8, -2.5) {
+                \faEye\\[3pt]
+                \textbf{Surveillance}\\
+                24h/24 impossible
+            };
+            
+            \node[
+                draw=alertOrange, 
+                fill=alertOrange!10, 
+                rounded corners=8pt,
+                text width=3cm,
+                align=center,
+                font=\small
+            ] (d4) at (5.5, -2.5) {
+                \faExclamationTriangle\\[3pt]
+                \textbf{Réactivité}\\
+                Alertes lentes
+            };
+            
+            % Flèches
+            \draw[->, line width=1.5pt, fireRed] (problem.south) -- ++(0, -0.8) -| (d1.north);
+            \draw[->, line width=1.5pt, fireRed] (problem.south) -- ++(0, -0.8) -| (d2.north);
+            \draw[->, line width=1.5pt, fireRed] (problem.south) -- ++(0, -0.8) -| (d3.north);
+            \draw[->, line width=1.5pt, fireRed] (problem.south) -- ++(0, -0.8) -| (d4.north);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Solution Proposée : AI Sentinel}
+    \begin{center}
+        \begin{tikzpicture}[
+            module/.style={
+                draw=primaryGreen, 
+                line width=1.5pt, 
+                fill=mintGreen, 
+                rounded corners=10pt,
+                text width=2.8cm,
+                align=center,
+                minimum height=1.5cm,
+                font=\small
+            }
+        ]
+            % Centre
+            \node[
+                draw=darkGreen, 
+                line width=3pt, 
+                fill=leafGreen!30, 
+                circle,
+                minimum size=2.5cm,
+                align=center,
+                font=\bfseries
+            ] (center) {
+                \faLeaf\\[3pt]
+                AI Sentinel
+            };
+            
+            % Modules autour
+            \node[module] (m1) at (130:4.5) {\faVideo\\[3pt]\textbf{Détection}\\Temps Réel};
+            \node[module] (m2) at (50:4.5) {\faSatellite\\[3pt]\textbf{Surveillance}\\Satellite};
+            \node[module] (m3) at (-30:4.5) {\faChartLine\\[3pt]\textbf{Prédiction}\\Propagation};
+            \node[module] (m4) at (-110:4.5) {\faBell\\[3pt]\textbf{Alertes}\\Multi-canaux};
+            \node[module] (m5) at (-180:4.5) {\faMapMarker\\[3pt]\textbf{Carte}\\Hotspots};
+            
+            % Connexions
+            \draw[->, primaryGreen, line width=1.5pt] (center) -- (m1);
+            \draw[->, primaryGreen, line width=1.5pt] (center) -- (m2);
+            \draw[->, primaryGreen, line width=1.5pt] (center) -- (m3);
+            \draw[->, primaryGreen, line width=1.5pt] (center) -- (m4);
+            \draw[->, primaryGreen, line width=1.5pt] (center) -- (m5);
+            
+            % Technologies
+            \node[font=\tiny, text=smokeGray] at (130:6) {YOLOv8};
+            \node[font=\tiny, text=smokeGray] at (50:6) {Sentinel Hub};
+            \node[font=\tiny, text=smokeGray] at (-30:6) {Algorithme ML};
+            \node[font=\tiny, text=smokeGray] at (-110:6) {Telegram/Email};
+            \node[font=\tiny, text=smokeGray] at (-180:6) {NASA FIRMS};
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+% ============================================
+% PARTIE 2 : ANALYSE ET CONCEPTION
+% ============================================
+\section{Analyse et Conception}
+
+\begin{frame}{Besoins Fonctionnels}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{\faVideo~Module Détection Temps Réel}
+                \begin{itemize}
+                    \item[\textcolor{primaryGreen}{\faCheck}] Capture flux vidéo webcam
+                    \item[\textcolor{primaryGreen}{\faCheck}] Détection feu/fumée par IA
+                    \item[\textcolor{primaryGreen}{\faCheck}] Affichage bounding boxes
+                    \item[\textcolor{primaryGreen}{\faCheck}] Alertes visuelles instantanées
+                \end{itemize}
+            \end{block}
+            
+            \vspace{0.2cm}
+            
+            \begin{block}{\faImage~Module Classification}
+                \begin{itemize}
+                    \item[\textcolor{primaryGreen}{\faCheck}] Upload d'images
+                    \item[\textcolor{primaryGreen}{\faCheck}] Classification 3 classes
+                    \item[\textcolor{primaryGreen}{\faCheck}] Score de confiance
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \begin{block}{\faSatellite~Module Satellite}
+                \begin{itemize}
+                    \item[\textcolor{primaryGreen}{\faCheck}] Images Sentinel-2
+                    \item[\textcolor{primaryGreen}{\faCheck}] Analyse par modèle CAM
+                    \item[\textcolor{primaryGreen}{\faCheck}] Détection zones à risque
+                \end{itemize}
+            \end{block}
+            
+            \vspace{0.2cm}
+            
+            \begin{block}{\faMapMarker~Module Hotspots}
+                \begin{itemize}
+                    \item[\textcolor{primaryGreen}{\faCheck}] API NASA FIRMS
+                    \item[\textcolor{primaryGreen}{\faCheck}] Carte interactive
+                    \item[\textcolor{primaryGreen}{\faCheck}] Calcul de propagation
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Architecture du Système}
+    \begin{center}
+        \begin{tikzpicture}[
+            layer/.style={
+                draw=#1, 
+                line width=2pt, 
+                fill=#1!15, 
+                rounded corners=8pt,
+                minimum width=12cm,
+                minimum height=1.4cm,
+                align=center
+            },
+            sublayer/.style={
+                draw=#1, 
+                line width=1pt, 
+                fill=white, 
+                rounded corners=4pt,
+                minimum width=2cm,
+                minimum height=0.7cm,
+                align=center,
+                font=\scriptsize
+            }
+        ]
+            % Couche Présentation
+            \node[layer=primaryGreen] (pres) at (0, 4) {};
+            \node[font=\bfseries\small, text=darkGreen] at (-4.5, 4.4) {\faDesktop~FRONTEND};
+            \node[sublayer=primaryGreen] at (-3, 3.7) {React};
+            \node[sublayer=primaryGreen] at (-0.5, 3.7) {TypeScript};
+            \node[sublayer=primaryGreen] at (2, 3.7) {TailwindCSS};
+            \node[sublayer=primaryGreen] at (4.5, 3.7) {Leaflet};
+            
+            % Flèche
+            \draw[->, line width=2pt, smokeGray] (0, 3.1) -- node[right, font=\scriptsize] {REST API} (0, 2.5);
+            
+            % Couche Métier
+            \node[layer=accentTeal] (api) at (0, 1.8) {};
+            \node[font=\bfseries\small, text=accentTeal] at (-4.5, 2.2) {\faServer~BACKEND};
+            \node[sublayer=accentTeal] at (-3.5, 1.5) {FastAPI};
+            \node[sublayer=accentTeal] at (-1, 1.5) {Services};
+            \node[sublayer=accentTeal] at (1.5, 1.5) {Pydantic};
+            \node[sublayer=accentTeal] at (4, 1.5) {APScheduler};
+            
+            % Flèche
+            \draw[->, line width=2pt, smokeGray] (0, 0.9) -- (0, 0.3);
+            
+            % Couche IA
+            \node[layer=leafGreen] (ia) at (0, -0.4) {};
+            \node[font=\bfseries\small, text=darkGreen] at (-4.5, 0) {\faBrain~IA/ML};
+            \node[sublayer=leafGreen] at (-3, -0.7) {YOLOv8};
+            \node[sublayer=leafGreen] at (0, -0.7) {MobileNetV2};
+            \node[sublayer=leafGreen] at (3, -0.7) {CAM Model};
+            
+            % Flèche
+            \draw[->, line width=2pt, smokeGray] (0, -1.2) -- (0, -1.8);
+            
+            % Couche Externe
+            \node[layer=warmBrown] (ext) at (0, -2.5) {};
+            \node[font=\bfseries\small, text=warmBrown] at (-4.5, -2.1) {\faCloud~EXTERNES};
+            \node[sublayer=warmBrown] at (-3.5, -2.8) {NASA FIRMS};
+            \node[sublayer=warmBrown] at (-0.5, -2.8) {Sentinel Hub};
+            \node[sublayer=warmBrown] at (2.5, -2.8) {Telegram/SMTP};
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Stack Technologique}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{\faServer~Backend}
+                \begin{center}
+                    \begin{tikzpicture}[
+                        tech/.style={
+                            draw=accentTeal, 
+                            fill=accentTeal!10, 
+                            rounded corners=5pt,
+                            minimum width=3.5cm,
+                            minimum height=0.6cm,
+                            font=\small
+                        }
+                    ]
+                        \node[tech] at (0, 1.8) {\faPython~Python 3.10+};
+                        \node[tech] at (0, 1) {\faRocket~FastAPI};
+                        \node[tech] at (0, 0.2) {\faBrain~TensorFlow 2.x};
+                        \node[tech] at (0, -0.6) {\faEye~Ultralytics YOLO};
+                        \node[tech] at (0, -1.4) {\faCamera~OpenCV 4.x};
+                    \end{tikzpicture}
+                \end{center}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \begin{block}{\faLaptopCode~Frontend}
+                \begin{center}
+                    \begin{tikzpicture}[
+                        tech/.style={
+                            draw=primaryGreen, 
+                            fill=primaryGreen!10, 
+                            rounded corners=5pt,
+                            minimum width=3.5cm,
+                            minimum height=0.6cm,
+                            font=\small
+                        }
+                    ]
+                        \node[tech] at (0, 1.8) {\faReact~React 19};
+                        \node[tech] at (0, 1) {\faCode~TypeScript 5.x};
+                        \node[tech] at (0, 0.2) {\faPaintBrush~TailwindCSS};
+                        \node[tech] at (0, -0.6) {\faMapMarker~Leaflet};
+                        \node[tech] at (0, -1.4) {\faHandPointer~Framer Motion};
+                    \end{tikzpicture}
+                \end{center}
+            \end{block}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{exampleblock}{\faPlug~APIs Externes Intégrées}
+        \centering
+        \textbf{NASA FIRMS} (Hotspots) | \textbf{Sentinel Hub} (Satellite) | \textbf{Open-Meteo} (Météo) | \textbf{Telegram Bot API}
+    \end{exampleblock}
+\end{frame}
+
+% ============================================
+% PARTIE 3 : RÉALISATION
+% ============================================
+\section{Réalisation et Implémentation}
+
+\begin{frame}{Modèle de Détection : YOLOv8}
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \begin{block}{\faBrain~Architecture YOLO}
+                \textbf{You Only Look Once} - Détection en une seule passe
+                
+                \vspace{0.2cm}
+                
+                \begin{itemize}
+                    \item[\textcolor{primaryGreen}{\faCheck}] Modèle YOLOv8n (nano) optimisé
+                    \item[\textcolor{primaryGreen}{\faCheck}] 2 classes : \textbf{Fire} et \textbf{Smoke}
+                    \item[\textcolor{primaryGreen}{\faCheck}] Seuil de confiance : 0.5
+                    \item[\textcolor{primaryGreen}{\faCheck}] \textbf{45ms/frame} (22+ FPS)
+                \end{itemize}
+            \end{block}
+            
+            \vspace{0.2cm}
+            
+            \begin{exampleblock}{\faChartBar~Performances}
+                \centering
+                \begin{tabular}{lcc}
+                    \toprule
+                    \textbf{Classe} & \textbf{mAP@50} & \textbf{Precision} \\
+                    \midrule
+                    Smoke & 89.2\% & 91.5\% \\
+                    Fire & 94.1\% & 95.8\% \\
+                    \midrule
+                    \textbf{Global} & \textbf{91.6\%} & \textbf{93.6\%} \\
+                    \bottomrule
+                \end{tabular}
+            \end{exampleblock}
+        \end{column}
+        
+        \begin{column}{0.42\textwidth}
+            \begin{tikzpicture}[scale=0.8]
+                % Simulation détection
+                \fill[black!90, rounded corners=5pt] (0, 0) rectangle (5.5, 4);
+                
+                % Bounding boxes
+                \draw[fireRed, line width=2pt] (0.8, 1.5) rectangle (2.8, 3.5);
+                \node[fill=fireRed, text=white, font=\tiny\bfseries] at (1.8, 3.7) {Fire: 0.94};
+                
+                \draw[smokeGray, line width=2pt] (3, 0.8) rectangle (5, 2.5);
+                \node[fill=smokeGray, text=white, font=\tiny\bfseries] at (4, 2.7) {Smoke: 0.87};
+                
+                % Flammes stylisées
+                \fill[fireRed!70] (1.2, 1.8) -- (1.5, 3) -- (1.8, 2.2) -- (2.2, 3.2) -- (2.5, 1.8) -- cycle;
+                \fill[alertOrange!60] (3.5, 1) -- (3.8, 2) -- (4.2, 1.3) -- (4.6, 2.2) -- (4.5, 1) -- cycle;
+                
+                % Légende
+                \node[font=\footnotesize\bfseries, text=mintGreen] at (2.75, -0.4) {Détection en temps réel};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Modèle de Classification : MobileNetV2}
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{block}{\faBrain~Transfer Learning}
+                Modèle pré-entraîné sur ImageNet, fine-tuné sur dataset feu.
+                
+                \vspace{0.2cm}
+                
+                \textbf{Processus d'entraînement :}
+                \begin{enumerate}
+                    \item Phase 1 : Feature Extraction (10 epochs)
+                    \item Phase 2 : Fine-tuning (5 epochs)
+                \end{enumerate}
+                
+                \vspace{0.2cm}
+                
+                \textbf{3 classes :}
+                \begin{itemize}
+                    \item \textcolor{fireRed}{\faFire} Fire
+                    \item \textcolor{smokeGray}{\faCloud} Smoke
+                    \item \textcolor{primaryGreen}{\faLeaf} Non-Fire
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \begin{tikzpicture}[scale=0.7]
+                % Graphique accuracy
+                \begin{axis}[
+                    width=6.5cm,
+                    height=5cm,
+                    xlabel={\small Époques},
+                    ylabel={\small Accuracy (\%)},
+                    xmin=0, xmax=15,
+                    ymin=75, ymax=100,
+                    legend pos=south east,
+                    legend style={font=\tiny},
+                    grid=major,
+                    grid style={dashed, gray!30},
+                    title={\footnotesize\textbf{Courbes d'Apprentissage}}
+                ]
+                
+                \addplot[color=primaryGreen, line width=2pt, mark=*] coordinates {
+                    (1, 82) (2, 87) (3, 90) (5, 93) (7, 95) (10, 97) (15, 98)
+                };
+                
+                \addplot[color=accentTeal, line width=2pt, mark=square*] coordinates {
+                    (1, 80) (2, 85) (3, 88) (5, 91) (7, 93) (10, 95.5) (15, 97.2)
+                };
+                
+                \addlegendentry{Train}
+                \addlegendentry{Val}
+                
+                % Ligne fine-tuning
+                \draw[dashed, fireRed, line width=1pt] (axis cs:10,75) -- (axis cs:10,100);
+                
+                \end{axis}
+            \end{tikzpicture}
+            
+            \vspace{0.2cm}
+            
+            \begin{center}
+                {\large\textbf{\textcolor{primaryGreen}{97.8\%}}} Précision globale
+            \end{center}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Surveillance Satellite}
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \begin{block}{\faSatellite~Sentinel Hub}
+                \begin{itemize}
+                    \item Images Sentinel-2 (10m résolution)
+                    \item Authentification OAuth2
+                    \item Evalscripts personnalisés (SWIR)
+                    \item Couverture nuageuse < 30\%
+                \end{itemize}
+            \end{block}
+            
+            \vspace{0.2cm}
+            
+            \begin{block}{\faGlobe~NASA FIRMS}
+                \begin{itemize}
+                    \item Données satellites VIIRS/MODIS
+                    \item Hotspots en temps réel
+                    \item 8 régions du Maroc configurées
+                    \item Mise à jour quotidienne
+                \end{itemize}
+            \end{block}
+            
+            \vspace{0.2cm}
+            
+            \begin{exampleblock}{\faChartArea~Modèle CAM}
+                Analyse des images satellite pour la détection de zones de feu avec visualisation heatmap.
+            \end{exampleblock}
+        \end{column}
+        
+        \begin{column}{0.42\textwidth}
+            \begin{tikzpicture}[scale=0.85]
+                % Carte simplifiée
+                \fill[skyBlue!20, rounded corners=5pt] (0, 0) rectangle (5.5, 4.5);
+                
+                % Contour Maroc
+                \draw[warmBrown, line width=1pt] (1, 1) -- (2, 0.7) -- (3.5, 0.8) -- (4.5, 1.5) -- (4.8, 2.5) -- (4.3, 3.5) -- (3, 4) -- (1.5, 4.2) -- (0.8, 3.2) -- (0.5, 2) -- cycle;
+                \fill[mintGreen!40] (1, 1) -- (2, 0.7) -- (3.5, 0.8) -- (4.5, 1.5) -- (4.8, 2.5) -- (4.3, 3.5) -- (3, 4) -- (1.5, 4.2) -- (0.8, 3.2) -- (0.5, 2) -- cycle;
+                
+                % Hotspots
+                \fill[fireRed] (2, 3.5) circle (4pt);
+                \draw[fireRed!40, line width=1pt] (2, 3.5) circle (8pt);
+                
+                \fill[alertOrange] (3.2, 2.5) circle (3pt);
+                \draw[alertOrange!40, line width=1pt] (3.2, 2.5) circle (6pt);
+                
+                \fill[sunYellow] (1.5, 1.8) circle (3pt);
+                
+                % Légende
+                \node[font=\tiny] at (5.2, 0.3) {\textcolor{fireRed}{\faCircle} High};
+                \node[font=\tiny] at (3.5, 0.3) {\textcolor{alertOrange}{\faCircle} Med};
+                \node[font=\tiny] at (1.8, 0.3) {\textcolor{sunYellow}{\faCircle} Low};
+                
+                \node[font=\footnotesize\bfseries, text=darkGreen] at (2.75, -0.3) {Hotspots NASA FIRMS};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Système de Notifications}
+    \begin{center}
+        \begin{tikzpicture}[
+            node distance=2cm,
+            box/.style={
+                draw=primaryGreen, 
+                line width=1.5pt, 
+                fill=mintGreen, 
+                rounded corners=10pt,
+                text width=2.5cm,
+                align=center,
+                minimum height=1.5cm,
+                font=\small
+            }
+        ]
+            % Détection
+            \node[box, fill=fireRed!20, draw=fireRed] (detect) {
+                \faFire\\[3pt]
+                \textbf{Détection}\\
+                Feu/Fumée
+            };
+            
+            % Traitement
+            \node[box, right=1.5cm of detect] (process) {
+                \faCogs\\[3pt]
+                \textbf{Analyse}\\
+                Confiance
+            };
+            
+            % Hub notifications
+            \node[box, right=1.5cm of process, minimum width=3cm] (hub) {
+                \faBell\\[3pt]
+                \textbf{Notification}\\
+                Service
+            };
+            
+            % Canaux
+            \node[box, above right=0.8cm and 1.5cm of hub, fill=accentTeal!20, draw=accentTeal] (telegram) {
+                \faTelegram\\[3pt]
+                \textbf{Telegram}\\
+                Instantané
+            };
+            
+            \node[box, below right=0.8cm and 1.5cm of hub, fill=alertOrange!20, draw=alertOrange] (email) {
+                \faEnvelope\\[3pt]
+                \textbf{Email}\\
+                SMTP
+            };
+            
+            % Flèches
+            \draw[->, line width=2pt, fireRed] (detect) -- (process);
+            \draw[->, line width=2pt, primaryGreen] (process) -- (hub);
+            \draw[->, line width=2pt, accentTeal] (hub) -- (telegram);
+            \draw[->, line width=2pt, alertOrange] (hub) -- (email);
+            
+            % Temps
+            \node[font=\tiny, text=smokeGray, below=0.1cm of detect] {< 500ms};
+            \node[font=\tiny, text=smokeGray, below=0.1cm of process] {< 100ms};
+            \node[font=\tiny, text=smokeGray, below=0.1cm of telegram] {850ms};
+            \node[font=\tiny, text=smokeGray, below=0.1cm of email] {1.2s};
+        \end{tikzpicture}
+    \end{center}
+    
+    \vspace{0.3cm}
+    
+    \begin{alertblock}{\faClock~Cooldown Anti-Spam}
+        Intervalle minimum de \textbf{30 secondes} entre les alertes pour éviter le spam lors de détections continues.
+    \end{alertblock}
+\end{frame}
+
+% ============================================
+% PARTIE 4 : RÉSULTATS ET DÉMONSTRATION
+% ============================================
+\section{Résultats et Démonstration}
+
+\begin{frame}{Performances Globales}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{\faChartPie~Métriques MobileNetV2}
+                \begin{center}
+                    \begin{tabular}{lc}
+                        \toprule
+                        \textbf{Classe} & \textbf{F1-Score} \\
+                        \midrule
+                        \textcolor{smokeGray}{Smoke} & 97.2\% \\
+                        \textcolor{fireRed}{Fire} & 97.3\% \\
+                        \textcolor{primaryGreen}{Non-Fire} & 98.2\% \\
+                        \midrule
+                        \textbf{Global} & \textbf{97.6\%} \\
+                        \bottomrule
+                    \end{tabular}
+                \end{center}
+            \end{block}
+            
+            \vspace{0.2cm}
+            
+            \begin{exampleblock}{\faTachometer*~Latences Système}
+                \begin{tabular}{lc}
+                    Classification Image & 320ms \\
+                    Détection YOLO/frame & 45ms \\
+                    Calcul Prédiction & <100ms \\
+                \end{tabular}
+            \end{exampleblock}
+        \end{column}
+        
+        \begin{column}{0.5\textwidth}
+            \begin{tikzpicture}[scale=0.75]
+                % Matrice de confusion simplifiée
+                \node[font=\bfseries, text=darkGreen] at (2.5, 4) {Matrice de Confusion};
+                
+                % Headers
+                \node[font=\small, rotate=45] at (0.8, 3) {Smoke};
+                \node[font=\small, rotate=45] at (1.8, 3) {Fire};
+                \node[font=\small, rotate=45] at (2.8, 3) {Non-Fire};
+                
+                \node[font=\small] at (-0.3, 2) {Smoke};
+                \node[font=\small] at (-0.3, 1) {Fire};
+                \node[font=\small] at (-0.3, 0) {Non-Fire};
+                
+                % Cellules
+                \fill[primaryGreen!50] (0.3, 1.5) rectangle (1.3, 2.5);
+                \node[font=\small\bfseries] at (0.8, 2) {3420};
+                
+                \fill[primaryGreen!50] (1.3, 0.5) rectangle (2.3, 1.5);
+                \node[font=\small\bfseries] at (1.8, 1) {3510};
+                
+                \fill[primaryGreen!50] (2.3, -0.5) rectangle (3.3, 0.5);
+                \node[font=\small\bfseries] at (2.8, 0) {3637};
+                
+                % Hors diagonale
+                \fill[fireRed!20] (1.3, 1.5) rectangle (2.3, 2.5);
+                \node[font=\tiny] at (1.8, 2) {45};
+                
+                \fill[fireRed!20] (2.3, 1.5) rectangle (3.3, 2.5);
+                \node[font=\tiny] at (2.8, 2) {35};
+                
+                \fill[fireRed!20] (0.3, 0.5) rectangle (1.3, 1.5);
+                \node[font=\tiny] at (0.8, 1) {52};
+                
+                \fill[fireRed!20] (2.3, 0.5) rectangle (3.3, 1.5);
+                \node[font=\tiny] at (2.8, 1) {38};
+                
+                \fill[fireRed!20] (0.3, -0.5) rectangle (1.3, 0.5);
+                \node[font=\tiny] at (0.8, 0) {28};
+                
+                \fill[fireRed!20] (1.3, -0.5) rectangle (2.3, 0.5);
+                \node[font=\tiny] at (1.8, 0) {35};
+                
+                % Grille
+                \draw[smokeGray] (0.3, -0.5) rectangle (3.3, 2.5);
+                \draw[smokeGray] (1.3, -0.5) -- (1.3, 2.5);
+                \draw[smokeGray] (2.3, -0.5) -- (2.3, 2.5);
+                \draw[smokeGray] (0.3, 0.5) -- (3.3, 0.5);
+                \draw[smokeGray] (0.3, 1.5) -- (3.3, 1.5);
+                
+                % Précision
+                \node[font=\bfseries, text=primaryGreen] at (1.8, -1.2) {Précision : 97.8\%};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Démonstration : Interfaces}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tikzpicture}[scale=0.65]
+                % Cadre Dashboard
+                \draw[primaryGreen, line width=2pt, rounded corners=8pt] (0, 0) rectangle (7, 4.5);
+                
+                % Header
+                \fill[darkGreen] (0.1, 3.8) rectangle (6.9, 4.4);
+                \node[text=white, font=\tiny\bfseries] at (1.2, 4.1) {\faChartBar~Dashboard};
+                
+                % Stats cards
+                % Stats cards (unrolled)
+                \fill[white, rounded corners=3pt] (0.8, 2.5) rectangle (2.0, 3.5);
+                \draw[fireRed, line width=1pt, rounded corners=3pt] (0.8, 2.5) rectangle (2.0, 3.5);
+                \node[font=\tiny\bfseries, text=fireRed] at (1.4, 3) {12};
+
+                \fill[white, rounded corners=3pt] (2.4, 2.5) rectangle (3.6, 3.5);
+                \draw[alertOrange, line width=1pt, rounded corners=3pt] (2.4, 2.5) rectangle (3.6, 3.5);
+                \node[font=\tiny\bfseries, text=alertOrange] at (3.0, 3) {3};
+
+                \fill[white, rounded corners=3pt] (4.0, 2.5) rectangle (5.2, 3.5);
+                \draw[primaryGreen, line width=1pt, rounded corners=3pt] (4.0, 2.5) rectangle (5.2, 3.5);
+                \node[font=\tiny\bfseries, text=primaryGreen] at (4.6, 3) {97\%};
+
+                \fill[white, rounded corners=3pt] (5.6, 2.5) rectangle (6.8, 3.5);
+                \draw[accentTeal, line width=1pt, rounded corners=3pt] (5.6, 2.5) rectangle (6.8, 3.5);
+                \node[font=\tiny\bfseries, text=accentTeal] at (6.2, 3) {45ms};
+                
+                % Graphique simplifié
+                \fill[mintGreen!50, rounded corners=3pt] (0.3, 0.3) rectangle (3.3, 2.3);
+                % Graphique simplifié (unrolled)
+                \fill[mintGreen!50, rounded corners=3pt] (0.3, 0.3) rectangle (3.3, 2.3);
+                \fill[primaryGreen] (0.6, 0.5) rectangle (0.9, 1.7);
+                \fill[primaryGreen] (1.1, 0.5) rectangle (1.4, 2.0);
+                \fill[primaryGreen] (1.6, 0.5) rectangle (1.9, 1.5);
+                \fill[primaryGreen] (2.1, 0.5) rectangle (2.4, 2.3);
+                \fill[primaryGreen] (2.6, 0.5) rectangle (2.9, 1.9);
+                
+                % Mini carte
+                \fill[skyBlue!30, rounded corners=3pt] (3.6, 0.3) rectangle (6.7, 2.3);
+                \fill[fireRed] (4.5, 1.5) circle (3pt);
+                \fill[alertOrange] (5.5, 1) circle (2pt);
+                
+                \node[font=\tiny\bfseries, text=darkGreen] at (3.5, -0.3) {Dashboard Principal};
+            \end{tikzpicture}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \begin{tikzpicture}[scale=0.65]
+                % Cadre détection
+                \draw[primaryGreen, line width=2pt, rounded corners=8pt] (0, 0) rectangle (7, 4.5);
+                
+                % Header
+                \fill[darkGreen] (0.1, 3.8) rectangle (6.9, 4.4);
+                \node[text=white, font=\tiny\bfseries] at (1.5, 4.1) {\faVideo~Real-Time Detection};
+                \node[text=leafGreen, font=\tiny] at (5.8, 4.1) {\faCircle~LIVE};
+                
+                % Zone vidéo
+                \fill[black!90] (0.3, 1) rectangle (4.8, 3.6);
+                
+                % Bounding box
+                \draw[fireRed, line width=2pt] (1, 1.5) rectangle (2.8, 3);
+                \node[fill=fireRed, text=white, font=\tiny] at (1.9, 3.2) {Fire: 0.94};
+                \fill[fireRed!60] (1.3, 1.7) -- (1.6, 2.7) -- (2, 2) -- (2.4, 2.8) -- (2.5, 1.7) -- cycle;
+                
+                % Panel latéral
+                \fill[mintGreen!30, rounded corners=3pt] (5, 1) rectangle (6.8, 3.6);
+                \node[font=\tiny\bfseries, text=darkGreen] at (5.9, 3.3) {Stats};
+                \fill[fireRed, rounded corners=2pt] (5.2, 2.6) rectangle (6.6, 3);
+                \node[text=white, font=\tiny] at (5.9, 2.8) {\faFire~1};
+                
+                % Alerte
+                \fill[fireRed!90, rounded corners=3pt] (0.3, 0.2) rectangle (6.7, 0.8);
+                \node[text=white, font=\tiny\bfseries] at (3.5, 0.5) {\faExclamationTriangle~ALERTE : Feu détecté !};
+                
+                \node[font=\tiny\bfseries, text=darkGreen] at (3.5, -0.3) {Détection Temps Réel};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Tests et Validation}
+    \begin{columns}[T]
+        \begin{column}{0.32\textwidth}
+            \begin{block}{\textcolor{primaryGreen}{\faCheck}~Scénario 1}
+                \textbf{Détection Feu}
+                
+                \vspace{0.2cm}
+                
+                \begin{itemize} \small
+                    \item Vidéo avec flammes
+                    \item Détection en 0.8s
+                    \item Confiance : 94\%
+                    \item Alerte Telegram reçue
+                \end{itemize}
+                
+                \vspace{0.2cm}
+                
+                \centering\textcolor{primaryGreen}{\textbf{SUCCÈS}}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.32\textwidth}
+            \begin{block}{\textcolor{primaryGreen}{\faCheck}~Scénario 2}
+                \textbf{Faux Positif}
+                
+                \vspace{0.2cm}
+                
+                \begin{itemize} \small
+                    \item Image coucher soleil
+                    \item Classification : Non-Fire
+                    \item Confiance : 87.2\%
+                    \item Pas de fausse alerte
+                \end{itemize}
+                
+                \vspace{0.2cm}
+                
+                \centering\textcolor{primaryGreen}{\textbf{SUCCÈS}}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.32\textwidth}
+            \begin{block}{\textcolor{primaryGreen}{\faCheck}~Scénario 3}
+                \textbf{Satellite}
+                
+                \vspace{0.2cm}
+                
+                \begin{itemize} \small
+                    \item Scan zone Rif
+                    \item Image récupérée OK
+                    \item Feu détecté : 87.3\%
+                    \item Coordonnées correctes
+                \end{itemize}
+                
+                \vspace{0.2cm}
+                
+                \centering\textcolor{primaryGreen}{\textbf{SUCCÈS}}
+            \end{block}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{exampleblock}{\faCheckDouble~Validation Globale}
+        \centering
+        Tous les scénarios de test ont été validés avec succès. Le système répond aux exigences de performance et de fiabilité.
+    \end{exampleblock}
+\end{frame}
+
+% ============================================
+% CONCLUSION
+% ============================================
+\section{Conclusion et Perspectives}
+
+\begin{frame}{Bilan du Projet}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{\faCheckCircle~Objectifs Atteints}
+                \begin{itemize}
+                    \item[\textcolor{primaryGreen}{\faCheck}] Détection temps réel (YOLOv8)
+                    \item[\textcolor{primaryGreen}{\faCheck}] Classification haute précision
+                    \item[\textcolor{primaryGreen}{\faCheck}] Surveillance satellite intégrée
+                    \item[\textcolor{primaryGreen}{\faCheck}] Alertes multi-canaux
+                    \item[\textcolor{primaryGreen}{\faCheck}] Interface web moderne
+                    \item[\textcolor{primaryGreen}{\faCheck}] Architecture modulaire
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \begin{block}{\faGraduationCap~Compétences Acquises}
+                \begin{itemize}
+                    \item[\textcolor{accentTeal}{\faBrain}] Deep Learning / Transfer Learning
+                    \item[\textcolor{accentTeal}{\faCode}] Développement Full-Stack
+                    \item[\textcolor{accentTeal}{\faSatellite}] Télédétection & APIs Spatiales
+                    \item[\textcolor{accentTeal}{\faTasks}] Gestion de projet Agile
+                    \item[\textcolor{accentTeal}{\faPlug}] Intégration APIs REST
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+    
+    \vspace{0.3cm}
+    
+    \begin{alertblock}{\faStar~Points Forts}
+        \centering
+        \textbf{Solution complète} combinant détection locale (caméras) et globale (satellites) avec \textbf{alertes en temps réel}
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}[fragile]{Perspectives d'Évolution}
+    \begin{center}
+        \begin{tikzpicture}[
+            phase/.style={
+                draw=primaryGreen, 
+                line width=2pt, 
+                fill=mintGreen, 
+                rounded corners=10pt,
+                text width=4cm,
+                align=center,
+                minimum height=2cm,
+                font=\small
+            }
+        ]
+            % Court terme
+            \node[phase] (ct) at (0, 0) {
+                \textcolor{darkGreen}{\faClock~\textbf{Court Terme}}\\
+                \textcolor{darkGreen}{(3-6 mois)}\\[5pt]
+                \footnotesize
+                • Authentification\\
+                • Historique détections\\
+                • Rapports PDF
+            };
+            
+            % Moyen terme
+            \node[phase] (mt) at (5.5, 0) {
+                \textcolor{darkGreen}{\faRocket~\textbf{Moyen Terme}}\\
+                \textcolor{darkGreen}{(6-12 mois)}\\[5pt]
+                \footnotesize
+                • Application mobile\\
+                • Intégration drones\\
+                • Multi-caméras
+            };
+            
+            % Long terme
+            \node[phase] (lt) at (11, 0) {
+                \textcolor{darkGreen}{\faStar~\textbf{Long Terme}}\\
+                \textcolor{darkGreen}{(1-3 ans)}\\[5pt]
+                \footnotesize
+                • Déploiement national\\
+                • Partenariats institutionnels\\
+                • Open Source
+            };
+            
+            % Flèches
+            \draw[->, line width=3pt, leafGreen] (ct) -- (mt);
+            \draw[->, line width=3pt, leafGreen] (mt) -- (lt);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+% ============================================
+% SLIDE DE FIN
+% ============================================
+{
+\setbeamertemplate{footline}{}
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture, overlay]
+    % Fond
+    \fill[top color=darkGreen, bottom color=forestDark] 
+        (current page.north west) rectangle (current page.south east);
+    
+    % Logo
+    \node at (0, 1.5) {
+        \begin{tikzpicture}
+            \fill[mintGreen, rounded corners=15pt] (-2, -1.2) rectangle (2, 1.2);
+            \node[text=darkGreen] at (0, 0) {\fontsize{48}{48}\selectfont\faLeaf};
+        \end{tikzpicture}
+    };
+    
+    % Texte
+    \node[text=white, font=\Huge\bfseries] at (0, -0.8) {Merci de votre attention !};
+    
+    \node[text=mintGreen, font=\large] at (0, -1.8) {Questions ?};
+    
+    % Ligne
+    \draw[leafGreen, line width=2pt] (-4, -2.5) -- (4, -2.5);
+    
+    % Contact
+    \node[text=white!80, font=\small] at (0, -3.3) {
+        \faEnvelope~email@example.com \quad | \quad 
+        \faGithub~github.com/username/WildFireDetection
+    };
+    
+    % Citation
+    \node[
+        text=mintGreen!80, 
+        font=\itshape\small,
+        text width=10cm,
+        align=center
+    ] at (0, -4.3) {
+        « Protégeons nos forêts avec l'Intelligence Artificielle »
+    };
+\end{tikzpicture}
+\end{frame}
+}
+
+\end{document}

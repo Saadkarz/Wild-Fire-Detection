@@ -1,5 +1,10 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import { motion, useInView, useMotionValue, useTransform, animate } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
@@ -110,6 +115,35 @@ const FadeIn = ({
         >
             {children}
         </motion.div>
+    );
+};
+
+
+
+// Fix for default marker icon
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+const LocationMarker = () => {
+    const map = useMap();
+    const [position, setPosition] = useState<[number, number] | null>(null);
+
+    useEffect(() => {
+        map.locate().on("locationfound", function (e) {
+            setPosition([e.latlng.lat, e.latlng.lng]);
+            map.flyTo(e.latlng, map.getZoom());
+        });
+    }, [map]);
+
+    return position === null ? null : (
+        <Marker position={position}>
+            <Popup>You are here</Popup>
+        </Marker>
     );
 };
 
@@ -366,49 +400,52 @@ function LandingPage() {
                     </FadeIn>
                     <FadeIn delay={0.4} fullWidth>
                         <div className="relative mx-auto max-w-5xl rounded-xl border border-[#e7edf3]/20 bg-[#101922] shadow-2xl overflow-hidden aspect-video group">
-                            <div
-                                className="absolute inset-0 bg-cover bg-center grayscale opacity-60 group-hover:scale-105 transition-transform duration-700"
-                                data-alt="Dark mode topographic map interface showing terrain contour lines"
-                                data-location="Topographic Map of California"
-                                style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBbXufs-DIdXO3B6S5jURziPkrK1Z3xvc9hrYkiwBNMDLKgHYmzMRqksGwveb-x1OlpBQ68Q5BX3alplvXaQ5YTkV1oULedNRWnlh-NrjwFwcS5vvArv2mFi0SMpQi-ZWwaurIfkt64MqHsWdXdAaF9x5j7Tv6143V4JGm2g2B38U9W_hd0FTL6KukAltW-HCpUHtwo2GtuySQ_GqfYgyZu6GW_EgiIvwURrjgmckil6lk-rFxG9G2_XHl4UfGxT7rcLimTGv6ZSYU")' }}
-                            >
-                            </div>
-                            <div className="absolute inset-0 pointer-events-none">
-                                <div className="absolute top-4 left-4 bottom-4 w-64 bg-black/80 backdrop-blur-md rounded-lg border border-white/10 p-4 hidden sm:flex flex-col gap-4">
-                                    <div className="flex items-center gap-2 text-white border-b border-white/10 pb-4">
-                                        <span className="material-symbols-outlined text-primary">dashboard</span>
-                                        <span className="font-bold text-sm font-display uppercase">Main Dashboard</span>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between p-2 rounded bg-white/5 text-xs text-gray-300">
-                                            <span>Active Sensors</span>
-                                            <span className="text-primary font-bold">428</span>
+                            <div className="relative w-full h-full">
+                                <MapContainer center={[36.7783, -119.4179]} zoom={6} style={{ height: '100%', width: '100%' }} zoomControl={false} scrollWheelZoom={false}>
+                                    <TileLayer
+                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                                        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                                    />
+                                    <LocationMarker />
+                                </MapContainer>
+                                <div className="absolute inset-0 pointer-events-none z-[1000]">
+                                    <div className="absolute top-4 left-4 bottom-4 w-64 bg-black/80 backdrop-blur-md rounded-lg border border-white/10 p-4 hidden sm:flex flex-col gap-4 pointer-events-auto">
+                                        <div className="flex items-center gap-2 text-white border-b border-white/10 pb-4">
+                                            <span className="material-symbols-outlined text-primary">dashboard</span>
+                                            <span className="font-bold text-sm font-display uppercase">Main Dashboard</span>
                                         </div>
-                                        <div className="flex items-center justify-between p-2 rounded bg-white/5 text-xs text-gray-300">
-                                            <span>Drones Airborne</span>
-                                            <span className="text-primary font-bold">12</span>
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between p-2 rounded bg-white/5 text-xs text-gray-300">
+                                                <span>Active Sensors</span>
+                                                <span className="text-primary font-bold">428</span>
+                                            </div>
+                                            <div className="flex items-center justify-between p-2 rounded bg-white/5 text-xs text-gray-300">
+                                                <span>Drones Airborne</span>
+                                                <span className="text-primary font-bold">12</span>
+                                            </div>
+                                            <div className="flex items-center justify-between p-2 rounded bg-red-500/10 border border-red-500/20 text-xs text-red-400">
+                                                <span>Active Alerts</span>
+                                                <span className="font-bold">1</span>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center justify-between p-2 rounded bg-red-500/10 border border-red-500/20 text-xs text-red-400">
-                                            <span>Active Alerts</span>
-                                            <span className="font-bold">1</span>
+                                    </div>
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                                        {/* Simulated alert overlay still useful for demo purposes */}
+                                        <div className="relative">
+                                            <div className="absolute -inset-4 rounded-full bg-red-500/20 animate-ping"></div>
+                                            <div className="relative h-4 w-4 rounded-full bg-red-500 border-2 border-white shadow-[0_0_20px_rgba(239,68,68,0.8)]"></div>
+                                        </div>
+                                        <div className="mt-2 bg-black/90 text-white text-[10px] px-2 py-1 rounded border border-red-500/50 whitespace-nowrap font-mono">
+                                            Possible Ignition: Sector 7G
                                         </div>
                                     </div>
-                                </div>
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                                    <div className="relative">
-                                        <div className="absolute -inset-4 rounded-full bg-red-500/20 animate-ping"></div>
-                                        <div className="relative h-4 w-4 rounded-full bg-red-500 border-2 border-white shadow-[0_0_20px_rgba(239,68,68,0.8)]"></div>
-                                    </div>
-                                    <div className="mt-2 bg-black/90 text-white text-[10px] px-2 py-1 rounded border border-red-500/50 whitespace-nowrap font-mono">
-                                        Possible Ignition: Sector 7G
-                                    </div>
-                                </div>
-                                <div className="absolute top-4 right-4 flex gap-2">
-                                    <div className="h-8 w-8 rounded bg-black/80 border border-white/10 flex items-center justify-center text-white">
-                                        <span className="material-symbols-outlined text-[16px]">add</span>
-                                    </div>
-                                    <div className="h-8 w-8 rounded bg-black/80 border border-white/10 flex items-center justify-center text-white">
-                                        <span className="material-symbols-outlined text-[16px]">remove</span>
+                                    <div className="absolute top-4 right-4 flex gap-2 pointer-events-auto">
+                                        <div className="h-8 w-8 rounded bg-black/80 border border-white/10 flex items-center justify-center text-white cursor-pointer hover:bg-black/90">
+                                            <span className="material-symbols-outlined text-[16px]">add</span>
+                                        </div>
+                                        <div className="h-8 w-8 rounded bg-black/80 border border-white/10 flex items-center justify-center text-white cursor-pointer hover:bg-black/90">
+                                            <span className="material-symbols-outlined text-[16px]">remove</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
