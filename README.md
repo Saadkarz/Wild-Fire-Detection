@@ -448,39 +448,162 @@ Wild-Fire-Detection/
 
 ## 🤖 Modèles d'IA
 
+### 📊 Vue d'ensemble des Modèles
+
+L'application utilise **3 modèles de Deep Learning** basés sur des réseaux de neurones convolutifs (CNN) :
+
+| Modèle | Type | Framework | Fichier | Taille |
+|--------|------|-----------|---------|--------|
+| 🧠 **MobileNetV2** | Classification | TensorFlow/Keras | `mobilenetv2_fire_detector.h5` | ~21 MB |
+| 🎯 **YOLOv8** | Détection d'objets | PyTorch/Ultralytics | `best.pt` | ~22 MB |
+| 🛰️ **CAM Model** | Satellite Analysis | TensorFlow/Keras | `cam_model.h5` | ~743 KB |
+
+---
+
 ### 1. MobileNetV2 Fire Detector
 
-| Attribut | Valeur |
-|----------|--------|
-| **Architecture** | MobileNetV2 (Transfer Learning) |
-| **Input Size** | 224x224x3 |
-| **Classes** | Smoke (0), Fire (1), Non Fire (2) |
-| **Format** | `.h5` (Keras) |
-| **Taille** | ~21 MB |
+#### 📐 Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│         Image d'entrée (224x224x3)              │
+└───────────────────────┬─────────────────────────┘
+                        │
+┌───────────────────────▼─────────────────────────┐
+│    MobileNetV2 Backbone (pré-entraîné ImageNet) │
+│    - Depthwise Separable Convolutions           │
+│    - Inverted Residuals                         │
+│    - Linear Bottlenecks                         │
+└───────────────────────┬─────────────────────────┘
+                        │
+┌───────────────────────▼─────────────────────────┐
+│         GlobalAveragePooling2D                  │
+└───────────────────────┬─────────────────────────┘
+                        │
+┌───────────────────────▼─────────────────────────┐
+│              Dropout (0.3)                      │
+└───────────────────────┬─────────────────────────┘
+                        │
+┌───────────────────────▼─────────────────────────┐
+│           Dense (128, ReLU)                     │
+└───────────────────────┬─────────────────────────┘
+                        │
+┌───────────────────────▼─────────────────────────┐
+│          Dense (3, Softmax)                     │
+│     Sortie: [Smoke, Fire, Non Fire]             │
+└─────────────────────────────────────────────────┘
+```
+
+#### 📊 Dataset d'Entraînement
+
+| Caractéristique | Valeur |
+|-----------------|--------|
+| **Source** | Kaggle - [Forest Fire Smoke and Non-Fire Dataset](https://www.kaggle.com/datasets/amerzishminha/forest-fire-smoke-and-non-fire-image-dataset) |
+| **Taille totale** | 6.43 GB |
+| **Images d'entraînement** | **32,398 images** |
+| **Images de test** | **10,500 images** |
+| **Total** | **42,898 images** |
+| **Classes** | 3 (Smoke, Fire, Non Fire) |
+| **Résolution** | 224 × 224 pixels |
+
+#### 🏋️ Processus d'Entraînement
+
+Le modèle utilise le **Transfer Learning** avec fine-tuning en 2 phases :
+
+| Phase | Description | Époques | Accuracy Validation |
+|-------|-------------|---------|---------------------|
+| **Phase 1** | Backbone gelé, entraînement de la tête | 2 | 96.40% → 97.12% |
+| **Phase 2** | Fine-tuning des 20 dernières couches | 2 | 98.12% → **98.72%** |
+
+#### 📈 Performances Finales
+
+| Classe | Precision | Recall | F1-Score | Support |
+|--------|-----------|--------|----------|---------|
+| **Smoke** 💨 | 0.9880 | 0.9854 | 0.9867 | 3,500 |
+| **Fire** 🔥 | 0.9797 | 0.9911 | 0.9854 | 3,500 |
+| **Non Fire** ✅ | 0.9942 | 0.9851 | 0.9897 | 3,500 |
+| **Accuracy** | | | **0.9872** | 10,500 |
 
 ```python
 # Utilisation
+from tensorflow.keras.models import load_model
 model = load_model("mobilenetv2_fire_detector.h5")
 prediction = model.predict(preprocessed_image)
 class_names = {0: 'Smoke', 1: 'Fire', 2: 'Non Fire'}
 ```
 
+---
+
 ### 2. YOLOv8 Custom Model
+
+#### 📐 Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│              Image/Frame vidéo                  │
+└───────────────────────┬─────────────────────────┘
+                        │
+┌───────────────────────▼─────────────────────────┐
+│            YOLOv8 Backbone                      │
+│     - CSP-Darknet53 modified                    │
+│     - Feature Pyramid Network (FPN)             │
+└───────────────────────┬─────────────────────────┘
+                        │
+┌───────────────────────▼─────────────────────────┐
+│      Detection Head (multi-scale)               │
+│     - Bounding Box Regression                   │
+│     - Class Prediction                          │
+│     - Objectness Score                          │
+└───────────────────────┬─────────────────────────┘
+                        │
+┌───────────────────────▼─────────────────────────┐
+│  Sortie : [x, y, w, h, confidence, class]       │
+└─────────────────────────────────────────────────┘
+```
 
 | Attribut | Valeur |
 |----------|--------|
 | **Architecture** | YOLOv8 (Ultralytics) |
-| **Type** | Object Detection |
+| **Type** | One-Shot Object Detection |
 | **Classes** | Smoke (0), Fire (1) |
 | **Format** | `.pt` (PyTorch) |
 | **Taille** | ~22 MB |
+| **Vitesse** | ~30-60ms par frame |
 
 ```python
 # Utilisation
 from ultralytics import YOLO
 model = YOLO("best.pt")
-results = model(image)
+results = model(image, conf=0.25, iou=0.45)
 ```
+
+---
+
+### 3. CAM Model (Satellite Analysis)
+
+| Attribut | Valeur |
+|----------|--------|
+| **Architecture** | CNN avec Class Activation Maps |
+| **Utilisation** | Analyse d'imagerie satellite Sentinel-2 |
+| **Classes** | Fire (1), No Fire (0) |
+| **Entrée** | Images 224 × 224 pixels |
+| **Format** | `.h5` (Keras) |
+
+---
+
+### 🔬 Deep Learning vs Machine Learning
+
+Cette application utilise principalement du **Deep Learning** :
+
+| Caractéristique | Machine Learning Classique | Deep Learning (utilisé ici) |
+|-----------------|---------------------------|----------------------------|
+| Extraction de features | Manuelle | Automatique |
+| Données requises | Moins | Beaucoup plus |
+| Architecture | Simple (SVM, RF) | Réseaux profonds (CNN) |
+| Vision par ordinateur | Limitée | Excellente |
+| Exemples | Random Forest | MobileNetV2, YOLO |
+
+---
 
 ### Pipeline de Détection
 

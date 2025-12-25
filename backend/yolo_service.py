@@ -15,6 +15,14 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
 class YoloService:
+    # Detection parameters - optimized for fire/smoke detection
+    CONF_THRESHOLD = 0.25      # Minimum confidence threshold (25%)
+    IOU_THRESHOLD = 0.45       # IoU threshold for NMS
+    IMG_SIZE = 640             # Standard YOLO input size
+    MIN_BOX_AREA = 1000        # Minimum detection box area (pixels²)
+    WEBCAM_WIDTH = 1280        # Webcam resolution width
+    WEBCAM_HEIGHT = 720        # Webcam resolution height
+    
     def __init__(self):
         self.model = None
         self.last_alert_time = 0
@@ -22,8 +30,17 @@ class YoloService:
         try:
             self.model = YOLO(MODEL_PATH)
             print(f"✅ YOLOv8 Model loaded from {MODEL_PATH}")
+            print(f"   📊 Detection settings: conf={self.CONF_THRESHOLD}, iou={self.IOU_THRESHOLD}, imgsz={self.IMG_SIZE}")
         except Exception as e:
             print(f"⚠️ Error loading YOLO model: {e}")
+
+    def enhance_frame(self, frame):
+        """Enhance frame quality for better detection."""
+        # Adjust contrast and brightness
+        alpha = 1.2  # Contrast (1.0 = no change)
+        beta = 10    # Brightness (0 = no change)
+        enhanced = cv2.convertScaleAbs(frame, alpha=alpha, beta=beta)
+        return enhanced
 
     def send_telegram_alert(self, message):
         if not BOT_TOKEN or not CHAT_ID:
@@ -50,11 +67,19 @@ class YoloService:
         Thread(target=_send).start()
 
     def generate_frames(self):
-        # Open webcam
+        # Open webcam with HD resolution
         cap = cv2.VideoCapture(0)
         if not cap.isOpened():
             print("❌ Could not open webcam")
             return
+        
+        # Set webcam resolution for better detection
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.WEBCAM_WIDTH)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.WEBCAM_HEIGHT)
+        print(f"📷 Webcam opened at {self.WEBCAM_WIDTH}x{self.WEBCAM_HEIGHT}")
+
+        # Override class names for consistency
+        CUSTOM_NAMES = {0: 'Smoke', 1: 'Fire'}
 
         while True:
             success, frame = cap.read()
@@ -62,29 +87,61 @@ class YoloService:
                 break
 
             if self.model:
-                results = self.model(frame, verbose=False)
+                # Enhance frame for better detection
+                enhanced_frame = self.enhance_frame(frame)
+                
+                # Run inference with optimized parameters
+                results = self.model(
+                    enhanced_frame, 
+                    conf=self.CONF_THRESHOLD,
+                    iou=self.IOU_THRESHOLD,
+                    imgsz=self.IMG_SIZE,
+                    verbose=False
+                )
                 
                 fire_detected = False
+                smoke_detected = False
+                detection_count = 0
+                
                 for result in results:
                     boxes = result.boxes
                     for box in boxes:
                         cls = int(box.cls[0])
-                        # Assuming 0: Smoke, 1: Fire based on previous app.py
-                        # But YOLO typically uses COCO classes unless trained.
-                        # The user provided a custom model 'best.pt' which is likely trained on Fire/Smoke.
-                        # Let's trust the model's classes.
-                        class_name = self.model.names[cls]
                         x1, y1, x2, y2 = map(int, box.xyxy[0])
                         conf = float(box.conf[0])
+                        
+                        # Filter small detections (likely false positives)
+                        box_area = (x2 - x1) * (y2 - y1)
+                        if box_area < self.MIN_BOX_AREA:
+                            continue
+                        
+                        # Use custom names for consistency
+                        class_name = CUSTOM_NAMES.get(cls, self.model.names[cls])
+                        detection_count += 1
 
-                        # Draw box
-                        color = (0, 0, 255) if 'Fire' in class_name or 'fire' in class_name else (255, 165, 0)
-                        cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
-                        cv2.putText(frame, f"{class_name} {conf:.2f}", (x1, y1 - 10),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-
+                        # Color based on detection type
                         if 'Fire' in class_name or 'fire' in class_name:
+                            color = (0, 0, 255)  # Red for fire
                             fire_detected = True
+                        else:
+                            color = (0, 165, 255)  # Orange for smoke
+                            smoke_detected = True
+                        
+                        # Draw enhanced bounding box
+                        cv2.rectangle(frame, (x1, y1), (x2, y2), color, 3)
+                        
+                        # Draw label with background
+                        label = f"{class_name} {conf:.0%}"
+                        (label_w, label_h), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
+                        cv2.rectangle(frame, (x1, y1 - label_h - 10), (x1 + label_w + 10, y1), color, -1)
+                        cv2.putText(frame, label, (x1 + 5, y1 - 5),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+
+                # Add status overlay
+                status_color = (0, 0, 255) if fire_detected else (0, 165, 255) if smoke_detected else (0, 255, 0)
+                status_text = f"🔥 FIRE!" if fire_detected else f"💨 SMOKE" if smoke_detected else "✓ Clear"
+                cv2.putText(frame, status_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, status_color, 2)
+                cv2.putText(frame, f"Detections: {detection_count}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
                 if fire_detected:
                     self.send_telegram_alert("🔥 FIRE DETECTED! Immediate action required.")
@@ -107,8 +164,14 @@ class YoloService:
         if frame is None:
             return None, {"error": "Could not decode image"}
 
-        # Run inference
-        results = self.model(frame)
+        # Enhance frame and run inference with optimized parameters
+        enhanced_frame = self.enhance_frame(frame)
+        results = self.model(
+            enhanced_frame,
+            conf=self.CONF_THRESHOLD,
+            iou=self.IOU_THRESHOLD,
+            imgsz=self.IMG_SIZE
+        )
         
         detections = []
         fire_detected = False
@@ -179,7 +242,15 @@ class YoloService:
                 break
                 
             frame_count += 1
-            results = self.model(frame, verbose=False)
+            # Enhance and run inference with optimized parameters
+            enhanced_frame = self.enhance_frame(frame)
+            results = self.model(
+                enhanced_frame,
+                conf=self.CONF_THRESHOLD,
+                iou=self.IOU_THRESHOLD,
+                imgsz=self.IMG_SIZE,
+                verbose=False
+            )
             
             frame_fire_detected = False
             for result in results:
