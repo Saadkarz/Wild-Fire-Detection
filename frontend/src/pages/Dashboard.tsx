@@ -85,6 +85,7 @@ const Dashboard = () => {
                 <div className="hidden md:flex flex-1 justify-center gap-8">
                     <nav className="flex items-center gap-1 rounded-full bg-surface-darker p-1 border border-white/5">
                         <Link className="px-5 py-2 rounded-full bg-primary/20 text-primary text-sm font-bold shadow-[0_0_10px_rgba(19,236,91,0.2)] transition-all" to="/dashboard">Dashboard</Link>
+                        <Link className="px-5 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 text-sm font-medium transition-all" to="/detection">AI Console</Link>
                         <Link className="px-5 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 text-sm font-medium transition-all" to="/fwi">Fire Weather</Link>
                         <Link className="px-5 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 text-sm font-medium transition-all" to="/realtime">Live Monitoring</Link>
                         <Link className="px-5 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 text-sm font-medium transition-all" to="/upload">Upload Analyze</Link>
