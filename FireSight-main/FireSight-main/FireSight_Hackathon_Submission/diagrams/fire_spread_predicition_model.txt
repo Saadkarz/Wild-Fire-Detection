@@ -1,0 +1,22 @@
+🔥 FireSight Fire Spread Prediction Model Evolution
+
+📊 CURRENT MODEL (v1.0) - Simple Empirical Approach:
+🔥 Base: 3.0km (6h) + 🌡️ Temp Factor + 📊 Confidence + 🌪️ Simple Wind
+├─ >350K: +3.0km | >320K: +1.5km (brightness temperature)
+├─ High confidence: +1.0km | Low: -1.0km  
+├─ Wind: Random ±2.0km variation (simplified)
+└─ Final: max(1.0, min(15.0, sum)) = Circular prediction
+
+🎯 OUTPUT: Yellow circle radius on map (1-15km range)
+⚠️ LIMITATIONS: Circular only, simple wind, no terrain/fuel factors
+
+🚀 FUTURE MODEL (v2.0+) - AI-Enhanced Physics:
+🔬 Rothermel equations + 💧 Fuel moisture + 🌪️ CFD wind + ⛰️ Topography
+├─ Neural networks for pattern recognition
+├─ Multi-source data fusion (satellite + IoT + drones)  
+├─ Elliptical spread shapes with wind direction
+└─ 95%+ accuracy with 3h/6h/12h/24h/48h predictions
+
+🎨 ENHANCED OUTPUT: Probability heat maps, evacuation routes, impact analysis
+
+SEE DETAILED SVGS: current_fire_prediction_model.svg, future_advanced_fire_model.svg

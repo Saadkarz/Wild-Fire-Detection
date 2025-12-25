@@ -21,7 +21,9 @@ const Dashboard = () => {
                         <Link className="px-5 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 text-sm font-medium transition-all" to="/fwi">Fire Weather</Link>
                         <Link className="px-5 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 text-sm font-medium transition-all" to="/realtime">Live Monitoring</Link>
                         <Link className="px-5 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 text-sm font-medium transition-all" to="/upload">Upload Analyze</Link>
-                        <a className="px-5 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 text-sm font-medium transition-all" href="#">Logs</a>
+                        <Link className="px-5 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 text-sm font-medium transition-all" to="/prediction">Predict Spread</Link>
+                        <Link className="px-5 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 text-sm font-medium transition-all" to="/prevention">Prevention</Link>
+                        <Link className="px-5 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 text-sm font-medium transition-all" to="/satellite">Satellite</Link>
                     </nav>
                 </div>
                 <div className="flex items-center gap-3">
@@ -59,7 +61,7 @@ const Dashboard = () => {
                         </div>
                     </div>
                     {/* KPI Cards */}
-                    <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-4 gap-4">
                         {/* Stat 1 */}
                         <div className="group relative overflow-hidden rounded-xl bg-surface-dark border border-primary/20 p-5 flex flex-col justify-between hover:border-primary/50 transition-colors">
                             <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -117,6 +119,25 @@ const Dashboard = () => {
                                 <div className="bg-blue-400 h-full w-[65%] shadow-[0_0_10px_rgba(96,165,250,0.5)]"></div>
                             </div>
                         </div>
+                        {/* Stat 4: Prevention */}
+                        <Link to="/prevention" className="group relative overflow-hidden rounded-xl bg-surface-dark border border-white/10 p-5 flex flex-col justify-between hover:border-primary/50 transition-colors">
+                            <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <span className="material-symbols-outlined text-6xl text-primary">security</span>
+                            </div>
+                            <div className="flex justify-between items-start">
+                                <p className="text-white/70 text-sm font-medium uppercase tracking-wider">Prevention</p>
+                                <span className="flex items-center text-primary text-xs bg-primary/10 px-2 py-0.5 rounded border border-primary/20 font-mono">
+                                    <span className="material-symbols-outlined text-sm mr-1">shield</span> ACTIVE
+                                </span>
+                            </div>
+                            <div className="flex items-end gap-3 mt-2">
+                                <p className="text-white text-4xl font-bold leading-none">GRID</p>
+                                <span className="text-primary text-sm font-medium tracking-tighter">NASA LIVE</span>
+                            </div>
+                            <div className="w-full bg-white/10 h-1 mt-4 rounded-full overflow-hidden">
+                                <div className="bg-primary h-full w-[100%] shadow-[0_0_10px_rgba(19,236,91,0.5)] animate-pulse"></div>
+                            </div>
+                        </Link>
                     </div>
                 </div>
 

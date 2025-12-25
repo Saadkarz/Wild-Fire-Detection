@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FireSight Data Fetch Test</title>
+</head>
+<body>
+    <h1>FireSight Data Fetch Test</h1>
+    <div id="status">Testing...</div>
+    <div id="results"></div>
+    
+    <script>
+        const NASA_FIRMS_ENDPOINTS = {
+            modis: 'https://firms.modaps.eosdis.nasa.gov/data/active_fire/modis-c6.1/csv/MODIS_C6_1_Global_24h.csv',
+            viirs: 'https://firms.modaps.eosdis.nasa.gov/data/active_fire/viirs-i/csv/VNP14IMGTDL_NRT_Global_24h.csv'
+        };
+
+        const CORS_PROXIES = [
+            'https://corsproxy.io/?',
+            'https://api.allorigins.win/raw?url=',
+            'https://cors-anywhere.herokuapp.com/'
+        ];
+
+        async function testFetch() {
+            const status = document.getElementById('status');
+            const results = document.getElementById('results');
+            
+            status.innerHTML = 'Testing CORS proxies...';
+            
+            for (let i = 0; i < CORS_PROXIES.length; i++) {
+                const proxy = CORS_PROXIES[i];
+                const endpoint = NASA_FIRMS_ENDPOINTS.modis;
+                
+                try {
+                    status.innerHTML = `Testing proxy ${i + 1}: ${proxy}`;
+                    console.log(`Testing: ${proxy}${encodeURIComponent(endpoint)}`);
+                    
+                    const response = await fetch(proxy + encodeURIComponent(endpoint), {
+                        headers: {
+                            'Accept': 'text/csv,text/plain,*/*'
+                        }
+                    });
+                    
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const text = await response.text();
+                    console.log('Response length:', text.length);
+                    console.log('First 200 chars:', text.substring(0, 200));
+                    
+                    if (text.length > 100 && text.includes('latitude')) {
+                        const lines = text.split('\n');
+                        results.innerHTML = `
+                            <h3>✅ Success with proxy ${i + 1}: ${proxy}</h3>
+                            <p>Data length: ${text.length} characters</p>
+                            <p>Number of lines: ${lines.length}</p>
+                            <p>First few lines:</p>
+                            <pre>${lines.slice(0, 5).join('\n')}</pre>
+                        `;
+                        status.innerHTML = 'Test completed successfully!';
+                        return;
+                    } else {
+                        throw new Error('Invalid CSV data received');
+                    }
+                    
+                } catch (error) {
+                    console.error(`Proxy ${i + 1} failed:`, error);
+                    results.innerHTML += `<p>❌ Proxy ${i + 1} failed: ${error.message}</p>`;
+                }
+            }
+            
+            status.innerHTML = '❌ All proxies failed!';
+        }
+        
+        // Start test
+        testFetch();
+    </script>
+</body>
+</html> 

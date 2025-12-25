@@ -56,6 +56,7 @@ const RealTimeDetection = () => {
                         <Link className="text-gray-300 hover:text-primary transition-colors text-sm font-medium leading-normal" to="/dashboard">Dashboard</Link>
                         <Link className="text-gray-300 hover:text-primary transition-colors text-sm font-medium leading-normal" to="/detection">Console</Link>
                         <Link className="text-gray-300 hover:text-primary transition-colors text-sm font-medium leading-normal" to="/fwi">Fire Weather</Link>
+                        <Link className="text-gray-300 hover:text-primary transition-colors text-sm font-medium leading-normal" to="/prevention">Prevention</Link>
                     </div>
                 </div>
             </header>

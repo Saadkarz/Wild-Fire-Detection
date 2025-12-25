@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireSight - Simple Test</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { height: 100vh; }
+        .header {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>FireSight - Simple Test</h1>
+        <div id="status">Loading...</div>
+    </div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize map
+        const map = L.map('map').setView([37, -95.5], 4);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Load and display data
+        fetch('data/wildfires.geojson')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Data loaded:', data);
+                document.getElementById('status').textContent = `Loaded ${data.features.length} hotspots`;
+                
+                // Add markers
+                data.features.forEach(feature => {
+                    const coords = feature.geometry.coordinates;
+                    const props = feature.properties;
+                    
+                    // Add hotspot
+                    L.circleMarker([coords[1], coords[0]], {
+                        radius: 6,
+                        fillColor: '#ff0000',
+                        color: '#ffffff',
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).addTo(map)
+                    .bindPopup(`
+                        <b>Hotspot Details</b><br>
+                        Location: ${props.lat.toFixed(3)}°, ${props.lon.toFixed(3)}°<br>
+                        Brightness: ${props.brightness.toFixed(1)} K<br>
+                        Confidence: ${props.confidence}<br>
+                        Spread: ${props.spread_radius_km.toFixed(1)} km
+                    `);
+                    
+                    // Add spread ring
+                    L.circle([coords[1], coords[0]], {
+                        radius: props.spread_radius_km * 1000,
+                        fillColor: '#ffff00',
+                        fillOpacity: 0.3,
+                        color: '#ff0000',
+                        weight: 1
+                    }).addTo(map);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('status').textContent = 'Error loading data: ' + error.message;
+            });
+    </script>
+</body>
+</html> 

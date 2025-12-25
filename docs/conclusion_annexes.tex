@@ -1,0 +1,404 @@
+% ============================================
+% CONCLUSION GÉNÉRALE ET PERSPECTIVES
+% ============================================
+\chapter*{Conclusion Générale et Perspectives}
+\addcontentsline{toc}{chapter}{Conclusion Générale et Perspectives}
+\thispagestyle{fancy}
+
+\section*{Synthèse des Travaux Réalisés}
+
+\lettrine[lines=3, lhang=0.15, loversize=0.1, findent=3pt]{\textcolor{primaryGreen}{A}}{u terme} de ce projet de fin d'études, nous pouvons dresser un bilan positif des travaux réalisés. Le système \textbf{AI Sentinel} répond aux objectifs initialement fixés : développer une plateforme complète de détection et de prévention des incendies de forêt exploitant les technologies d'intelligence artificielle les plus avancées.
+
+\begin{greenbox}[\faBullseye\ Rappel des Objectifs]
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] Développer un système de détection en temps réel via analyse vidéo
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] Intégrer des données satellites pour une surveillance à grande échelle
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] Implémenter un algorithme de prédiction de propagation
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] Créer un système d'alertes multi-canaux réactif
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] Concevoir une interface utilisateur moderne et intuitive
+\end{itemize}
+\end{greenbox}
+
+\subsection*{Récapitulatif des Fonctionnalités Développées}
+
+Le système AI Sentinel offre aujourd'hui un ensemble complet de fonctionnalités opérationnelles :
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{l p{8cm} c}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Module}} & \textcolor{white}{\textbf{Fonctionnalité}} & \textcolor{white}{\textbf{Statut}} \\
+\midrule
+Détection Temps Réel & Analyse vidéo YOLOv8 avec bounding boxes & \textcolor{primaryGreen}{\faCheckCircle} \\
+Classification Image & Upload et analyse MobileNetV2 (3 classes) & \textcolor{primaryGreen}{\faCheckCircle} \\
+Analyse Vidéo & Traitement de fichiers vidéo avec export annoté & \textcolor{primaryGreen}{\faCheckCircle} \\
+Surveillance Satellite & Intégration Sentinel Hub avec modèle CAM & \textcolor{primaryGreen}{\faCheckCircle} \\
+Prévention Hotspots & Carte interactive NASA FIRMS & \textcolor{primaryGreen}{\faCheckCircle} \\
+Prédiction Propagation & Algorithme empirique avec visualisation & \textcolor{primaryGreen}{\faCheckCircle} \\
+Notifications & Alertes Email et Telegram automatiques & \textcolor{primaryGreen}{\faCheckCircle} \\
+Interface Web & Application React moderne et responsive & \textcolor{primaryGreen}{\faCheckCircle} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{Technologies Maîtrisées}
+
+Ce projet nous a permis d'acquérir une expertise pratique sur un large spectre technologique :
+
+\begin{center}
+\begin{tikzpicture}[
+    tech/.style={rectangle, rounded corners=5pt, draw=primaryGreen, line width=1pt, fill=mintGreen!50, minimum width=2.5cm, minimum height=0.8cm, align=center, font=\small}
+]
+    % Backend
+    \node[font=\bfseries, text=darkGreen] at (0, 3) {Backend};
+    \node[tech] at (0, 2.2) {Python};
+    \node[tech] at (0, 1.3) {FastAPI};
+    \node[tech] at (0, 0.4) {TensorFlow};
+    
+    % IA/ML
+    \node[font=\bfseries, text=darkGreen] at (3.5, 3) {IA/ML};
+    \node[tech] at (3.5, 2.2) {YOLOv8};
+    \node[tech] at (3.5, 1.3) {MobileNetV2};
+    \node[tech] at (3.5, 0.4) {OpenCV};
+    
+    % Frontend
+    \node[font=\bfseries, text=darkGreen] at (7, 3) {Frontend};
+    \node[tech] at (7, 2.2) {React/TS};
+    \node[tech] at (7, 1.3) {TailwindCSS};
+    \node[tech] at (7, 0.4) {Leaflet};
+    
+    % APIs
+    \node[font=\bfseries, text=darkGreen] at (10.5, 3) {APIs};
+    \node[tech] at (10.5, 2.2) {NASA FIRMS};
+    \node[tech] at (10.5, 1.3) {Sentinel Hub};
+    \node[tech] at (10.5, 0.4) {Telegram};
+\end{tikzpicture}
+\end{center}
+
+% ============================================
+\section*{Contributions et Points Forts}
+% ============================================
+
+Le projet AI Sentinel se distingue par plusieurs contributions significatives dans le domaine de la détection d'incendies :
+
+\begin{objectifbox}{Points Forts du Projet}
+
+\textbf{\faLayerGroup\ Solution Complète de Bout en Bout}
+
+Contrairement aux solutions partielles existantes, AI Sentinel offre une plateforme intégrée couvrant l'ensemble du cycle de détection : surveillance préventive, détection en temps réel, prédiction de propagation, et alertes automatisées.
+
+\vspace{0.3cm}
+
+\textbf{\faSatelliteDish\ Approche Multi-Modale}
+
+La combinaison de sources de données complémentaires (caméras au sol + satellites) permet une couverture optimale. Les caméras offrent la réactivité tandis que les satellites assurent la couverture géographique.
+
+\vspace{0.3cm}
+
+\textbf{\faBolt\ Alertes Temps Réel}
+
+Le système de notifications multi-canaux (Email + Telegram) garantit que les alertes atteignent les opérateurs rapidement, où qu'ils se trouvent.
+
+\vspace{0.3cm}
+
+\textbf{\faDesktop\ Interface Moderne et Intuitive}
+
+L'interface utilisateur, développée avec React et TailwindCSS, offre une expérience utilisateur fluide avec un design thématique cohérent (thème vert nature).
+
+\vspace{0.3cm}
+
+\textbf{\faCode\ Architecture Modulaire et Extensible}
+
+La conception en services indépendants permet une maintenance aisée et l'ajout futur de nouvelles fonctionnalités sans refonte majeure.
+\end{objectifbox}
+
+% ============================================
+\section*{Difficultés Rencontrées}
+% ============================================
+
+Le développement d'AI Sentinel n'a pas été sans défis. Cette section présente les principales difficultés rencontrées et les solutions apportées.
+
+\begin{alertbox}{Défis Techniques Surmontés}
+
+\textbf{\faDatabase\ Collecte et Annotation de Données}
+
+La constitution d'un dataset de qualité pour l'entraînement des modèles a nécessité la combinaison de plusieurs sources publiques et un travail de curation pour éliminer les images de mauvaise qualité.
+
+\textbf{Solution :} Utilisation de datasets préexistants (Kaggle) combinés avec des techniques d'augmentation de données.
+
+\vspace{0.3cm}
+
+\textbf{\faTachometerAlt\ Optimisation des Performances Temps Réel}
+
+Atteindre 30 FPS pour la détection vidéo tout en maintenant une précision acceptable a requis un travail d'optimisation considérable.
+
+\textbf{Solution :} Utilisation de YOLOv8n (nano), optimisation du pipeline de traitement, exploitation du GPU lorsque disponible.
+
+\vspace{0.3cm}
+
+\textbf{\faPlug\ Intégration des APIs Externes}
+
+Les APIs NASA FIRMS et Sentinel Hub présentent des particularités (authentification OAuth2, quotas, formats de données) qui ont nécessité une attention particulière.
+
+\textbf{Solution :} Création de services dédiés avec gestion robuste des erreurs, retry automatique et cache.
+
+\vspace{0.3cm}
+
+\textbf{\faExclamationTriangle\ Gestion des Faux Positifs}
+
+La distinction entre un véritable incendie et des phénomènes visuellement similaires (coucher de soleil, reflets) a représenté un défi pour les modèles.
+
+\textbf{Solution :} Enrichissement du dataset avec des contre-exemples, ajustement des seuils de confiance, validation manuelle optionnelle.
+\end{alertbox}
+
+% ============================================
+\newpage
+\section*{Perspectives d'Amélioration}
+% ============================================
+
+Le système AI Sentinel, bien que fonctionnel, offre de nombreuses possibilités d'évolution. Nous proposons une feuille de route en trois horizons temporels.
+
+\subsection*{Court Terme (3-6 mois)}
+
+\begin{infobox}{Améliorations Immédiates}
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item \textbf{Enrichissement du Dataset :} Collecte de données supplémentaires spécifiques au contexte marocain pour améliorer la précision des modèles
+    \item \textbf{Authentification Utilisateur :} Ajout d'un système de login pour sécuriser l'accès et personnaliser l'expérience
+    \item \textbf{Historique des Détections :} Base de données pour conserver et consulter les détections passées
+    \item \textbf{Rapports Automatisés :} Génération de rapports PDF quotidiens/hebdomadaires
+    \item \textbf{Configuration des Seuils :} Interface permettant aux utilisateurs d'ajuster les seuils d'alerte
+\end{itemize}
+\end{infobox}
+
+\subsection*{Moyen Terme (6-12 mois)}
+
+\begin{infobox}{Évolutions Structurantes}
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item \textbf{Intégration de Drones :} Support de flux vidéo provenant de drones pour surveillance active des zones difficiles d'accès
+    \item \textbf{Modèle de Prédiction ML :} Remplacement de l'algorithme heuristique par un modèle de machine learning entraîné sur des données historiques de propagation
+    \item \textbf{Application Mobile Native :} Développement d'applications iOS et Android pour les équipes terrain
+    \item \textbf{Multi-Caméras :} Support de plusieurs flux vidéo simultanés avec gestion centralisée
+    \item \textbf{Intégration Météo Avancée :} Incorporation des prévisions météo pour l'anticipation des risques
+\end{itemize}
+\end{infobox}
+
+\subsection*{Long Terme (1-3 ans)}
+
+\begin{greenbox}[\faRocket\ Vision à Long Terme]
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item \textbf{Déploiement à l'Échelle Nationale :} Couverture complète des zones forestières marocaines avec infrastructure cloud
+    \item \textbf{Partenariat Institutionnel :} Collaboration avec l'ANEF, la Protection Civile et les autorités régionales
+    \item \textbf{Système d'Aide à la Décision :} Outil complet pour les pompiers intégrant optimisation des ressources et routage
+    \item \textbf{Edge Computing :} Déploiement de modèles légers sur dispositifs embarqués pour détection locale sans latence réseau
+    \item \textbf{Contribution Open Source :} Publication du code et des modèles pour favoriser l'adoption et les contributions communautaires
+\end{itemize}
+\end{greenbox}
+
+% ============================================
+\section*{Compétences Acquises}
+% ============================================
+
+Ce projet de fin d'études a été l'occasion d'acquérir et de consolider un ensemble de compétences transversales :
+
+\begin{center}
+\begin{tikzpicture}[
+    skill/.style={rectangle, rounded corners=8pt, draw=primaryGreen, line width=2pt, fill=mintGreen!30, text width=5.5cm, minimum height=2cm, align=center}
+]
+    \node[skill] (s1) at (0, 2) {
+        \textcolor{darkGreen}{\faCode\ \textbf{Développement Full-Stack}}\\[5pt]
+        \footnotesize Backend Python/FastAPI\\
+        Frontend React/TypeScript
+    };
+    
+    \node[skill] (s2) at (7, 2) {
+        \textcolor{darkGreen}{\faBrain\ \textbf{Deep Learning}}\\[5pt]
+        \footnotesize Transfer Learning, CNN\\
+        YOLO, Classification
+    };
+    
+    \node[skill] (s3) at (0, -0.5) {
+        \textcolor{darkGreen}{\faSatellite\ \textbf{Télédétection}}\\[5pt]
+        \footnotesize Imagerie satellite\\
+        APIs spatiales (Sentinel, FIRMS)
+    };
+    
+    \node[skill] (s4) at (7, -0.5) {
+        \textcolor{darkGreen}{\faTasks\ \textbf{Gestion de Projet}}\\[5pt]
+        \footnotesize Méthodologie Agile\\
+        Git, Documentation
+    };
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5cm}
+
+\begin{quotebox}
+\textit{``Ce projet représente une contribution modeste mais concrète à la protection de notre patrimoine forestier. Face à l'urgence climatique et à l'augmentation des risques d'incendies, chaque initiative technologique compte. AI Sentinel démontre que l'intelligence artificielle peut être mise au service de causes environnementales vitales.''}
+
+\hfill --- \textbf{L'équipe du projet}
+\end{quotebox}
+
+% ============================================
+% ANNEXES
+% ============================================
+\appendix
+\chapter*{Annexes}
+\addcontentsline{toc}{chapter}{Annexes}
+
+\section*{Annexe A : Guide d'Installation}
+\addcontentsline{toc}{section}{Annexe A : Guide d'Installation}
+
+\begin{techbox}{Installation du Projet}
+\begin{verbatim}
+# Cloner le repository
+git clone https://github.com/username/WildFireDetection.git
+cd WildFireDetection
+
+# ========== BACKEND ==========
+cd backend
+
+# Créer un environnement virtuel
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+.\venv\Scripts\activate   # Windows
+
+# Installer les dépendances
+pip install -r requirements.txt
+
+# Configurer les variables d'environnement
+cp .env.example .env
+# Éditer .env avec vos clés API
+
+# Lancer le serveur
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+# ========== FRONTEND ==========
+cd ../frontend
+
+# Installer les dépendances
+npm install
+
+# Lancer le serveur de développement
+npm run dev
+
+# L'application est accessible sur http://localhost:5173
+\end{verbatim}
+\end{techbox}
+
+\section*{Annexe B : Variables d'Environnement}
+\addcontentsline{toc}{section}{Annexe B : Variables d'Environnement}
+
+\begin{techbox}{Fichier .env}
+\begin{verbatim}
+# ========== SENTINEL HUB ==========
+SENTINEL_CLIENT_ID=your_sentinel_client_id
+SENTINEL_CLIENT_SECRET=your_sentinel_client_secret
+
+# ========== NASA FIRMS ==========
+NASA_FIRMS_MAP_KEY=your_firms_map_key
+
+# ========== EMAIL NOTIFICATIONS ==========
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_EMAIL=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+ALERT_RECIPIENT=recipient@example.com
+
+# ========== TELEGRAM BOT ==========
+TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+TELEGRAM_CHAT_ID=-1001234567890
+
+# ========== APPLICATION ==========
+ENVIRONMENT=development
+DEBUG=true
+\end{verbatim}
+\end{techbox}
+
+\section*{Annexe C : Endpoints API}
+\addcontentsline{toc}{section}{Annexe C : Endpoints API}
+
+\begin{table}[H]
+\centering
+\caption{Liste complète des endpoints API}
+\rowcolors{2}{mintGreen!20}{white}
+\begin{tabular}{l l p{6cm}}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Méthode}} & \textcolor{white}{\textbf{Endpoint}} & \textcolor{white}{\textbf{Description}} \\
+\midrule
+GET & /video\_feed & Flux vidéo MJPEG temps réel \\
+POST & /predict & Classification d'image (MobileNetV2) \\
+POST & /detect/image & Détection sur image (YOLOv8) \\
+POST & /detect/video & Détection sur vidéo \\
+GET & /api/wildfire/realtime & Hotspots NASA FIRMS \\
+POST & /api/satellite/scan & Scan zone satellite \\
+POST & /api/prediction & Calcul propagation \\
+POST & /start\_monitoring & Démarrer scheduler \\
+POST & /stop\_monitoring & Arrêter scheduler \\
+GET & /api/fwi/\{region\} & Indice FWI météo \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section*{Annexe D : Bibliographie}
+\addcontentsline{toc}{section}{Annexe D : Bibliographie}
+
+\subsection*{Articles Scientifiques}
+
+\begin{enumerate}
+    \item Howard, A. G., et al. (2017). \textit{``MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications''}. arXiv:1704.04861.
+    
+    \item Redmon, J., \& Farhadi, A. (2018). \textit{``YOLOv3: An Incremental Improvement''}. arXiv:1804.02767.
+    
+    \item Zhou, B., et al. (2016). \textit{``Learning Deep Features for Discriminative Localization''}. CVPR 2016.
+    
+    \item Jocher, G., et al. (2023). \textit{``Ultralytics YOLOv8''}. GitHub repository.
+    
+    \item Van Wagner, C. E. (1987). \textit{``Development and structure of the Canadian Forest Fire Weather Index System''}. Canadian Forestry Service.
+\end{enumerate}
+
+\subsection*{Documentation Technique}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item FastAPI Documentation --- \url{https://fastapi.tiangolo.com/}
+    \item TensorFlow Documentation --- \url{https://www.tensorflow.org/}
+    \item Ultralytics YOLOv8 --- \url{https://docs.ultralytics.com/}
+    \item Sentinel Hub Documentation --- \url{https://docs.sentinel-hub.com/}
+    \item NASA FIRMS --- \url{https://firms.modaps.eosdis.nasa.gov/}
+    \item React Documentation --- \url{https://react.dev/}
+    \item Leaflet Documentation --- \url{https://leafletjs.com/}
+    \item TailwindCSS --- \url{https://tailwindcss.com/}
+\end{itemize}
+
+\subsection*{Ressources et Datasets}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item Copernicus Open Access Hub --- \url{https://scihub.copernicus.eu/}
+    \item Kaggle Fire/Smoke Dataset --- \url{https://www.kaggle.com/datasets/}
+    \item Open-Meteo API --- \url{https://open-meteo.com/}
+\end{itemize}
+
+\vspace{2cm}
+
+% Fin du document
+\begin{center}
+\begin{tikzpicture}
+    \node[
+        fill=mintGreen,
+        draw=primaryGreen,
+        line width=2pt,
+        rounded corners=15pt,
+        inner sep=25pt,
+        text width=10cm,
+        align=center
+    ] {
+        \textcolor{darkGreen}{\fontsize{40}{48}\selectfont\faLeaf}\\[20pt]
+        \Large\textbf{\textcolor{darkGreen}{AI Sentinel}}\\[10pt]
+        \normalsize\textcolor{textGray}{Système de Détection des Incendies de Forêt}\\[5pt]
+        \small\textcolor{textGray}{Projet de Fin d'Études --- 2024-2025}\\[15pt]
+        \textcolor{primaryGreen}{\faHeart\ Protégeons nos forêts}
+    };
+\end{tikzpicture}
+\end{center}

@@ -9,3 +9,6 @@ pillow
 ultralytics
 opencv-python
 python-dotenv
+requests
+sentinelhub
+apscheduler

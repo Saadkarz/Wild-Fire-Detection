@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FireSight Debug</title>
+</head>
+<body>
+    <h1>FireSight Debug</h1>
+    <p>Open Developer Console (F12) to see debug info</p>
+    <div id="status"></div>
+    
+    <script>
+        console.log('Debug page loaded');
+        const status = document.getElementById('status');
+        
+        // Test data loading
+        fetch('data/wildfires.geojson')
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data loaded successfully:', data);
+                status.innerHTML = `
+                    <h2>✅ Data loaded successfully!</h2>
+                    <p>Features found: ${data.features.length}</p>
+                    <pre>${JSON.stringify(data.features[0], null, 2)}</pre>
+                `;
+            })
+            .catch(error => {
+                console.error('Error loading data:', error);
+                status.innerHTML = `<h2>❌ Error: ${error.message}</h2>`;
+            });
+    </script>
+</body>
+</html> 

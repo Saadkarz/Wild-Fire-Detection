@@ -1,0 +1,486 @@
+% ============================================
+% CHAPITRE III - PARTIE 3 : BESOINS NON FONCTIONNELS ET MÉTHODOLOGIE
+% ============================================
+
+\newpage
+\section{Analyse des Besoins Non Fonctionnels}
+
+Les besoins non fonctionnels définissent \textbf{comment} le système doit fonctionner, en termes de qualité, de performance et de contraintes techniques. Ces exigences sont tout aussi importantes que les besoins fonctionnels car elles déterminent l'acceptabilité du système par les utilisateurs et sa viabilité à long terme.
+
+Dans le contexte critique de la détection d'incendies, où chaque seconde compte, les exigences de performance, de fiabilité et de disponibilité revêtent une importance capitale.
+
+\subsection{Performance}
+
+La performance du système AI Sentinel est un facteur clé de succès. Un système de détection d'incendies doit être capable de traiter les données rapidement pour permettre une intervention précoce.
+
+\begin{techbox}{Exigences de Performance}
+
+\textbf{NF01 : Temps de Réponse API}
+
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Temps de réponse moyen : < \textbf{2 secondes}
+    \item Temps de réponse au 95ème percentile : < \textbf{5 secondes}
+    \item Endpoints critiques (détection) : < \textbf{500 ms}
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{NF02 : Traitement Vidéo en Temps Réel}
+
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Fréquence de traitement : $\geq$ \textbf{25 FPS} sur GPU
+    \item Fréquence minimale acceptable : $\geq$ \textbf{15 FPS} sur CPU
+    \item Latence bout en bout : < \textbf{500 ms}
+    \item Résolution supportée : jusqu'à \textbf{1080p}
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{NF03 : Capacité de Traitement}
+
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Support de \textbf{10 utilisateurs} simultanés minimum
+    \item Traitement de \textbf{100 images/heure} pour classification
+    \item Scan satellite de \textbf{8 zones} en moins de 10 minutes
+\end{itemize}
+\end{techbox}
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tikzpicture}
+    % Graphique de performance
+    \begin{axis}[
+        width=12cm,
+        height=6cm,
+        xlabel={Composant},
+        ylabel={Temps de réponse (ms)},
+        ymin=0, ymax=3000,
+        symbolic x coords={YOLOv8, MobileNet, CAM, API REST, Satellite, Notification},
+        xtick=data,
+        xticklabel style={rotate=45, anchor=east, font=\footnotesize},
+        ylabel style={font=\small},
+        xlabel style={font=\small},
+        bar width=15pt,
+        nodes near coords,
+        nodes near coords style={font=\tiny},
+        ybar,
+        enlarge x limits=0.15,
+    ]
+    \addplot[fill=primaryGreen!70, draw=primaryGreen] coordinates {
+        (YOLOv8, 33)
+        (MobileNet, 150)
+        (CAM, 200)
+        (API REST, 100)
+        (Satellite, 2000)
+        (Notification, 500)
+    };
+    \end{axis}
+    \node[font=\bfseries\small, text=darkGreen] at (6, -1) {Temps de Réponse Cibles par Composant};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Fiabilité}
+
+La fiabilité du système est essentielle dans un contexte où des vies et des biens sont en jeu. Le système doit fonctionner de manière continue et prévisible.
+
+\begin{greenbox}[\faShieldAlt\ Exigences de Fiabilité]
+
+\textbf{NF04 : Disponibilité}
+
+Le système doit garantir une disponibilité de \textbf{99\%} minimum, soit moins de \textbf{87.6 heures} d'indisponibilité par an. Cette disponibilité couvre :
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item Le backend API (FastAPI)
+    \item Le frontend web (React)
+    \item Les services de notification (Telegram, Email)
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{NF05 : Tolérance aux Pannes}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item \textbf{Dégradation gracieuse :} En cas d'indisponibilité d'un service externe (NASA, Sentinel), le reste du système continue de fonctionner
+    \item \textbf{Retry automatique :} Les appels échoués sont automatiquement relancés (3 tentatives avec backoff exponentiel)
+    \item \textbf{Circuit breaker :} Protection contre les cascades de pannes
+    \item \textbf{Logs complets :} Enregistrement de toutes les erreurs pour diagnostic
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{NF06 : Précision des Modèles IA}
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{l c c}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Modèle}} & \textcolor{white}{\textbf{Précision Cible}} & \textcolor{white}{\textbf{Faux Positifs}} \\
+\midrule
+YOLOv8 (Détection) & $\geq$ 85\% & < 5\% \\
+MobileNetV2 (Classification) & $\geq$ 97\% & < 3\% \\
+CAM (Satellite) & $\geq$ 90\% & < 10\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{greenbox}
+
+\subsection{Sécurité}
+
+Bien que le système AI Sentinel soit principalement orienté vers la surveillance environnementale, les aspects de sécurité informatique restent importants pour protéger les données et garantir l'intégrité du système.
+
+\begin{alertbox}{Exigences de Sécurité}
+
+\textbf{NF07 : Authentification API}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item Protection des endpoints API par clés d'authentification
+    \item Rotation régulière des clés API externes (NASA, Sentinel Hub)
+    \item Stockage sécurisé des credentials dans des variables d'environnement
+    \item Rate limiting pour prévenir les abus
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{NF08 : Protection des Données}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item Chiffrement HTTPS pour toutes les communications
+    \item Pas de stockage de données personnelles sensibles
+    \item Anonymisation des logs si nécessaire
+    \item Conformité RGPD pour les données utilisateur
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{NF09 : Intégrité du Système}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item Validation de toutes les entrées utilisateur (images, paramètres)
+    \item Protection contre les injections (SQL, command injection)
+    \item Limitation de la taille des fichiers uploadés
+    \item Sandboxing du traitement des fichiers
+\end{itemize}
+\end{alertbox}
+
+\subsection{Maintenabilité}
+
+La maintenabilité garantit que le système peut évoluer et être corrigé efficacement au fil du temps.
+
+\begin{infobox}{Exigences de Maintenabilité}
+
+\textbf{NF10 : Code Modulaire}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item Architecture en microservices logiques (YoloService, FirmsService, PredictionService, etc.)
+    \item Séparation claire des responsabilités (Single Responsibility Principle)
+    \item Injection de dépendances pour faciliter les tests
+    \item Interfaces bien définies entre les modules
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{NF11 : Documentation}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item Documentation API Swagger/OpenAPI automatique
+    \item Commentaires de code pour les sections complexes
+    \item README avec instructions d'installation et d'utilisation
+    \item Documentation technique d'architecture
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{NF12 : Testabilité}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item Tests unitaires pour les fonctions critiques
+    \item Tests d'intégration pour les flux principaux
+    \item Couverture de code cible : > 70\%
+    \item Environnement de test isolé
+\end{itemize}
+\end{infobox}
+
+\subsection{Ergonomie}
+
+L'ergonomie et l'expérience utilisateur sont essentielles pour garantir l'adoption du système par les opérateurs terrain qui doivent pouvoir réagir rapidement.
+
+\begin{greenbox}[\faDesktop\ Exigences d'Ergonomie]
+
+\textbf{NF13 : Interface Intuitive}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item Navigation claire avec menu principal accessible
+    \item Actions principales accessibles en \textbf{moins de 3 clics}
+    \item Feedback visuel immédiat pour toutes les actions
+    \item Messages d'erreur explicites et actionables
+    \item Thème visuel cohérent (palette verte nature)
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{NF14 : Design Responsive}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item Compatibilité : Desktop (1920×1080), Tablette (768px), Mobile (375px)
+    \item Adaptation automatique de la mise en page
+    \item Carte interactive utilisable sur écran tactile
+    \item Performances optimisées pour les appareils mobiles
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{NF15 : Accessibilité}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item Contraste suffisant pour lisibilité
+    \item Labels pour tous les éléments de formulaire
+    \item Navigation au clavier possible
+    \item Compatibilité avec les lecteurs d'écran (ARIA)
+\end{itemize}
+\end{greenbox}
+
+\vspace{0.5cm}
+
+% Tableau récapitulatif des besoins non fonctionnels
+\begin{table}[H]
+\centering
+\caption{Récapitulatif des Besoins Non Fonctionnels}
+\label{tab:bnf}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{l l p{6cm} l}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{ID}} & \textcolor{white}{\textbf{Catégorie}} & \textcolor{white}{\textbf{Description}} & \textcolor{white}{\textbf{Priorité}} \\
+\midrule
+NF01 & Performance & Temps de réponse API < 2s & Critique \\
+NF02 & Performance & Traitement vidéo $\geq$ 25 FPS & Critique \\
+NF03 & Performance & 10 utilisateurs simultanés & Haute \\
+NF04 & Fiabilité & Disponibilité 99\% & Critique \\
+NF05 & Fiabilité & Tolérance aux pannes & Haute \\
+NF06 & Fiabilité & Précision modèles $\geq$ 85\% & Critique \\
+NF07 & Sécurité & Authentification API & Haute \\
+NF08 & Sécurité & Protection des données & Haute \\
+NF09 & Sécurité & Validation des entrées & Haute \\
+NF10 & Maintenabilité & Code modulaire & Moyenne \\
+NF11 & Maintenabilité & Documentation complète & Moyenne \\
+NF12 & Maintenabilité & Couverture tests > 70\% & Moyenne \\
+NF13 & Ergonomie & Interface intuitive & Haute \\
+NF14 & Ergonomie & Design responsive & Haute \\
+NF15 & Ergonomie & Accessibilité & Moyenne \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================
+\newpage
+\section{Méthodologie de Développement}
+% ============================================
+
+Le choix d'une méthodologie de développement adaptée est crucial pour la réussite d'un projet logiciel. Dans le cadre d'AI Sentinel, nous avons opté pour une approche \textbf{Agile} avec le framework \textbf{Scrum}, particulièrement adapté aux projets innovants nécessitant flexibilité et itérations rapides.
+
+\subsection{Choix de la Méthodologie : Agile/Scrum}
+
+\subsubsection{Justification du Choix}
+
+Le développement d'un système de détection d'incendies par IA présente plusieurs caractéristiques qui oriententnaturellement vers une méthodologie agile :
+
+\begin{greenbox}[\faList\ Pourquoi Agile/Scrum ?]
+
+\textbf{Complexité Technique}
+
+Le projet intègre des technologies diverses (IA, satellite, temps réel) dont l'intégration peut révéler des défis imprévus. Scrum permet d'adapter le plan au fil des découvertes.
+
+\vspace{0.3cm}
+
+\textbf{Besoins Évolutifs}
+
+Les exigences des utilisateurs (autorités, gestionnaires forestiers) peuvent évoluer à mesure qu'ils découvrent les possibilités du système. Les sprints courts permettent d'intégrer leurs retours.
+
+\vspace{0.3cm}
+
+\textbf{Livraisons Incrémentales}
+
+Chaque module (détection temps réel, satellite, prédiction) peut être développé et livré indépendamment, permettant des tests terrain précoces.
+
+\vspace{0.3cm}
+
+\textbf{Gestion des Risques}
+
+Les revues de sprint régulières permettent d'identifier et de traiter rapidement les problèmes techniques ou fonctionnels.
+\end{greenbox}
+
+\subsubsection{Principes Scrum Appliqués}
+
+\begin{center}
+\begin{tikzpicture}[
+    role/.style={ellipse, draw=primaryGreen, line width=2pt, fill=mintGreen, text width=2cm, align=center, font=\small, minimum height=1.5cm},
+    artifact/.style={rectangle, rounded corners=8pt, draw=accentTeal, line width=1.5pt, fill=skyBlue!20, text width=2.5cm, align=center, font=\small, minimum height=1.5cm},
+    event/.style={rectangle, rounded corners=8pt, draw=leafGreen, line width=1.5pt, fill=leafGreen!20, text width=2cm, align=center, font=\small, minimum height=1.2cm}
+]
+    % Titre
+    \node[font=\Large\bfseries, text=darkGreen] at (6, 4) {Framework Scrum appliqué à AI Sentinel};
+    
+    % Rôles
+    \node[role] (po) at (0, 2) {Product\\Owner};
+    \node[role] (sm) at (0, 0) {Scrum\\Master};
+    \node[role] (team) at (0, -2) {Dev\\Team};
+    
+    % Artefacts
+    \node[artifact] (pb) at (4, 2) {Product\\Backlog};
+    \node[artifact] (sb) at (4, 0) {Sprint\\Backlog};
+    \node[artifact] (inc) at (4, -2) {Incrément\\Produit};
+    
+    % Événements
+    \node[event] (sprint) at (8, 2) {Sprint\\(2 sem.)};
+    \node[event] (plan) at (8, 0.5) {Sprint\\Planning};
+    \node[event] (daily) at (8, -0.8) {Daily\\Standup};
+    \node[event] (review) at (8, -2) {Sprint\\Review};
+    
+    % Connexions
+    \draw[->, >=stealth, primaryGreen, line width=1pt] (po) -- (pb);
+    \draw[->, >=stealth, primaryGreen, line width=1pt] (pb) -- (sb);
+    \draw[->, >=stealth, primaryGreen, line width=1pt] (sb) -- (inc);
+    \draw[->, >=stealth, leafGreen, line width=1pt] (sb) -- (sprint);
+    
+\end{tikzpicture}
+\end{center}
+
+\subsection{Planning des Sprints}
+
+Le projet AI Sentinel a été planifié sur \textbf{6 sprints} de 2 semaines chacun, soit une durée totale de 12 semaines.
+
+\begin{table}[H]
+\centering
+\caption{Planning des Sprints AI Sentinel}
+\label{tab:sprints}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{c p{4cm} p{5cm} c}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Sprint}} & \textcolor{white}{\textbf{Objectif}} & \textcolor{white}{\textbf{Livrables}} & \textcolor{white}{\textbf{Durée}} \\
+\midrule
+1 & Setup \& Architecture & Environnement dev, structure projet, API base & 2 sem. \\
+2 & Module Détection & YOLOv8 intégré, détection temps réel & 2 sem. \\
+3 & Module Classification & MobileNetV2, upload images & 2 sem. \\
+4 & Module Satellite & Sentinel Hub, NASA FIRMS & 2 sem. \\
+5 & Module Prédiction & Algorithme propagation, carte & 2 sem. \\
+6 & Notifications \& Polish & Email, Telegram, UI final & 2 sem. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+
+\begin{center}
+\begin{tikzpicture}
+    % Timeline
+    \draw[line width=3pt, primaryGreen] (0,0) -- (14,0);
+    
+    % Sprints
+    \foreach \x/\s/\label in {0/1/Setup, 2.33/2/Détection, 4.66/3/Classification, 7/4/Satellite, 9.33/5/Prédiction, 11.66/6/Notif.} {
+        \fill[primaryGreen] (\x, 0) circle (6pt);
+        \node[above, font=\footnotesize\bfseries] at (\x, 0.3) {S\s};
+        \node[below, font=\tiny, text width=1.5cm, align=center] at (\x, -0.3) {\label};
+    }
+    \fill[leafGreen] (14, 0) circle (8pt);
+    \node[above, font=\footnotesize\bfseries] at (14, 0.3) {Release};
+    
+    % Durées
+    \node[font=\tiny] at (1.16, -1) {2 sem.};
+    \node[font=\tiny] at (3.5, -1) {2 sem.};
+    \node[font=\tiny] at (5.83, -1) {2 sem.};
+    \node[font=\tiny] at (8.16, -1) {2 sem.};
+    \node[font=\tiny] at (10.5, -1) {2 sem.};
+    \node[font=\tiny] at (12.83, -1) {2 sem.};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Outils de Gestion}
+
+La gestion efficace du projet repose sur un ensemble d'outils complémentaires permettant le suivi des tâches, la gestion du code source et la collaboration d'équipe.
+
+\begin{techbox}{Stack d'Outils de Gestion de Projet}
+
+\textbf{\faTrello\ Trello --- Gestion des Tâches}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item Tableau Kanban avec colonnes : Backlog, To Do, In Progress, Review, Done
+    \item Cartes pour chaque User Story avec checklist de sous-tâches
+    \item Labels par module (Détection, Satellite, UI, etc.)
+    \item Power-ups pour estimation en points et burndown
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{\faGitAlt\ Git/GitHub --- Gestion du Code}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item Repository centralisé avec branches par feature
+    \item Convention de nommage : \texttt{feature/module-description}
+    \item Pull Requests obligatoires pour merge sur \texttt{main}
+    \item Code review par au moins 1 développeur
+    \item GitHub Actions pour CI/CD automatisé
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{\faSlack\ Communication}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item Channels dédiés par sujet (dev, bugs, releases)
+    \item Intégrations avec GitHub et Trello
+    \item Daily standups asynchrones
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{\faFileAlt\ Documentation}
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item Confluence/Notion pour documentation technique
+    \item Swagger pour documentation API
+    \item README.md dans chaque module
+\end{itemize}
+\end{techbox}
+
+\vspace{0.5cm}
+
+% Workflow Git
+\begin{center}
+\begin{tikzpicture}[
+    branch/.style={rectangle, rounded corners=5pt, draw=accentTeal, line width=1.5pt, fill=skyBlue!20, text width=2cm, minimum height=1cm, align=center, font=\small},
+    commit/.style={circle, draw=primaryGreen, line width=1.5pt, fill=mintGreen, minimum size=0.6cm},
+    arrow/.style={->, >=stealth, line width=1.5pt}
+]
+    % Branches
+    \node[font=\bfseries, text=darkGreen] at (0, 2) {main};
+    \node[font=\bfseries, text=accentTeal] at (0, 0.5) {develop};
+    \node[font=\bfseries, text=leafGreen] at (0, -1) {feature/x};
+    
+    % Commits main
+    \foreach \x in {2, 6, 10, 14} {
+        \node[commit] at (\x, 2) {};
+    }
+    \draw[darkGreen, line width=2pt] (1, 2) -- (15, 2);
+    
+    % Commits develop
+    \foreach \x in {2, 4, 6, 8, 10, 12, 14} {
+        \node[commit, fill=skyBlue!50] at (\x, 0.5) {};
+    }
+    \draw[accentTeal, line width=2pt] (1, 0.5) -- (15, 0.5);
+    
+    % Feature branch
+    \foreach \x in {4, 5, 6} {
+        \node[commit, fill=leafGreen!50] at (\x, -1) {};
+    }
+    \draw[leafGreen, line width=1.5pt] (3, 0.5) -- (4, -1) -- (6, -1) -- (7, 0.5);
+    
+    % Merge arrows
+    \draw[arrow, accentTeal] (6, 0.5) -- (6, 1.8);
+    \draw[arrow, accentTeal] (14, 0.5) -- (14, 1.8);
+    
+    \node[font=\bfseries\small, text=darkGreen] at (8, -2.5) {Workflow Git Flow};
+\end{tikzpicture}
+\end{center}

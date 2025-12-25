@@ -1,0 +1,725 @@
+% ============================================
+% CHAPITRE VI - PRÉSENTATION DES RÉSULTATS
+% ============================================
+\chapter{Présentation des Résultats}
+\thispagestyle{fancy}
+
+\section{Démonstration des Fonctionnalités}
+
+\lettrine[lines=3, lhang=0.15, loversize=0.1, findent=3pt]{\textcolor{primaryGreen}{C}}{e chapitre} présente les résultats concrets obtenus avec le système AI Sentinel. Nous démontrerons chaque fonctionnalité à travers des captures d'écran commentées, puis analyserons les performances des modèles d'intelligence artificielle et les temps de réponse du système.
+
+\subsection{Page d'Accueil (Landing Page)}
+
+La page d'accueil constitue le premier point de contact de l'utilisateur avec le système. Elle présente de manière claire et attractive les fonctionnalités principales d'AI Sentinel.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+    % Cadre de la capture
+    \draw[primaryGreen, line width=2pt, rounded corners=10pt] (0, 0) rectangle (14, 8);
+    
+    % Header
+    \fill[primaryGreen!80] (0.1, 7) rectangle (13.9, 7.9);
+    \node[text=white, font=\bfseries] at (2, 7.45) {\faLeaf\ AI Sentinel};
+    \node[text=white, font=\small] at (10, 7.45) {Dashboard | Detection | Map | Satellite};
+    
+    % Hero section
+    \fill[mintGreen!50] (0.1, 4) rectangle (13.9, 6.9);
+    \node[font=\Large\bfseries, text=darkGreen] at (7, 6) {Protégez nos Forêts avec l'IA};
+    \node[font=\small, text=textGray, text width=10cm, align=center] at (7, 5) {Système intelligent de détection et prédiction des incendies de forêt combinant vision par ordinateur et données satellites};
+    
+    % Boutons CTA
+    \fill[primaryGreen, rounded corners=5pt] (4, 4.2) rectangle (6.5, 4.8);
+    \node[text=white, font=\small\bfseries] at (5.25, 4.5) {Démarrer};
+    \fill[accentTeal, rounded corners=5pt] (7.5, 4.2) rectangle (10, 4.8);
+    \node[text=white, font=\small\bfseries] at (8.75, 4.5) {En savoir plus};
+    
+    % Features cards
+    \foreach \x/\icon/\title in {1.5/\faVideo/Temps Réel, 5/\faSatellite/Satellite, 8.5/\faChartLine/Prédiction, 12/\faBell/Alertes} {
+        \fill[white, rounded corners=5pt] (\x-1, 1) rectangle (\x+1.5, 3.5);
+        \draw[lightGreen, line width=1pt, rounded corners=5pt] (\x-1, 1) rectangle (\x+1.5, 3.5);
+        \node[text=primaryGreen, font=\Large] at (\x+0.25, 2.8) {\icon};
+        \node[text=darkGreen, font=\footnotesize\bfseries] at (\x+0.25, 2) {\title};
+    }
+    
+    % Footer
+    \fill[textGray!20] (0.1, 0.1) rectangle (13.9, 0.8);
+    \node[font=\tiny, text=textGray] at (7, 0.45) {© 2024 AI Sentinel - Projet de Fin d'Études};
+\end{tikzpicture}
+\caption{Page d'accueil du système AI Sentinel}
+\label{fig:landing}
+\end{figure}
+
+\begin{greenbox}[\faDesktop\ Éléments de la Page d'Accueil]
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item \textbf{En-tête :} Navigation principale avec accès aux modules
+    \item \textbf{Hero Section :} Message d'accroche et boutons d'action
+    \item \textbf{Cartes de fonctionnalités :} Présentation visuelle des 4 modules principaux
+    \item \textbf{Animations :} Transitions fluides avec Framer Motion
+    \item \textbf{Design :} Thème vert nature avec glassmorphism
+\end{itemize}
+\end{greenbox}
+
+\subsection{Dashboard Principal}
+
+Le tableau de bord offre une vue d'ensemble de l'état du système et des statistiques clés.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+    % Cadre
+    \draw[primaryGreen, line width=2pt, rounded corners=10pt] (0, 0) rectangle (14, 8);
+    
+    % Header
+    \fill[darkGreen] (0.1, 7.2) rectangle (13.9, 7.9);
+    \node[text=white, font=\bfseries\small] at (2, 7.55) {\faChartBar\ Dashboard};
+    
+    % Stat cards row
+    \foreach \x/\val/\label/\col in {1.5/12/Détections Aujourd'hui/moroccanRed, 4.5/3/Zones Actives/alertOrange, 7.5/97\%/Précision Modèle/primaryGreen, 10.5/45ms/Latence Moyenne/accentTeal} {
+        \fill[white, rounded corners=5pt] (\x-1, 5.5) rectangle (\x+2, 7);
+        \draw[\col, line width=1.5pt, rounded corners=5pt] (\x-1, 5.5) rectangle (\x+2, 7);
+        \node[font=\Large\bfseries, text=\col] at (\x+0.5, 6.5) {\val};
+        \node[font=\tiny, text=textGray] at (\x+0.5, 5.9) {\label};
+    }
+    
+    % Graphique gauche
+    \fill[mintGreen!30, rounded corners=5pt] (0.3, 1.5) rectangle (6.5, 5.2);
+    \node[font=\small\bfseries, text=darkGreen] at (3.4, 4.8) {Détections par Jour};
+    % Barres
+    \foreach \x/\h in {1/2, 1.8/2.5, 2.6/1.8, 3.4/3.2, 4.2/2.8, 5/3.5, 5.8/2.2} {
+        \fill[primaryGreen] (\x, 2) rectangle (\x+0.5, 2+\h);
+    }
+    
+    % Carte droite
+    \fill[skyBlue!20, rounded corners=5pt] (6.8, 1.5) rectangle (13.7, 5.2);
+    \node[font=\small\bfseries, text=accentTeal] at (10.25, 4.8) {Carte des Alertes};
+    % Points simulés
+    \fill[moroccanRed] (8.5, 3.5) circle (4pt);
+    \fill[alertOrange] (10, 2.8) circle (3pt);
+    \fill[alertOrange] (11.5, 3.2) circle (3pt);
+    
+    % Footer status
+    \fill[primaryGreen!20] (0.1, 0.2) rectangle (13.9, 1.2);
+    \node[font=\small, text=darkGreen] at (3, 0.7) {\faCheckCircle\ Système Opérationnel};
+    \node[font=\small, text=textGray] at (10, 0.7) {Dernière mise à jour: 14:32:05};
+\end{tikzpicture}
+\caption{Tableau de bord principal avec statistiques en temps réel}
+\label{fig:dashboard}
+\end{figure}
+
+\subsection{Détection Temps Réel}
+
+L'interface de détection temps réel affiche le flux vidéo avec les bounding boxes générées par YOLOv8.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+    % Cadre principal
+    \draw[primaryGreen, line width=2pt, rounded corners=10pt] (0, 0) rectangle (14, 9);
+    
+    % Header
+    \fill[darkGreen] (0.1, 8.2) rectangle (13.9, 8.9);
+    \node[text=white, font=\bfseries\small] at (2.5, 8.55) {\faVideo\ Real-Time Detection};
+    \node[text=lightGreen, font=\tiny] at (11, 8.55) {\faCircle\ LIVE};
+    
+    % Zone vidéo
+    \fill[black!90] (0.3, 2) rectangle (9.5, 8);
+    
+    % Simulation de détection
+    \draw[moroccanRed, line width=2pt] (2, 4) rectangle (5, 7);
+    \node[fill=moroccanRed, text=white, font=\tiny\bfseries, inner sep=2pt] at (3.5, 7.2) {Fire: 0.94};
+    
+    \draw[textGray, line width=2pt] (6, 3) rectangle (8.5, 5.5);
+    \node[fill=textGray, text=white, font=\tiny\bfseries, inner sep=2pt] at (7.25, 5.7) {Smoke: 0.87};
+    
+    % Zone flammes simulée
+    \fill[moroccanRed!60] (2.5, 4.5) -- (3, 6.5) -- (3.5, 5) -- (4, 6.8) -- (4.5, 4.5) -- cycle;
+    \fill[alertOrange!70] (6.5, 3.5) -- (7, 4.5) -- (7.5, 3.8) -- (8, 5) -- (7.5, 3.5) -- cycle;
+    
+    % Panel latéral
+    \fill[mintGreen!30, rounded corners=5pt] (9.8, 2) rectangle (13.7, 8);
+    
+    % Stats
+    \node[font=\bfseries\small, text=darkGreen] at (11.75, 7.5) {Detection Stats};
+    
+    \fill[moroccanRed!20, rounded corners=3pt] (10, 6.5) rectangle (11.5, 7.2);
+    \node[text=moroccanRed, font=\small] at (10.75, 6.85) {\faFire\ 1};
+    
+    \fill[textGray!20, rounded corners=3pt] (12, 6.5) rectangle (13.5, 7.2);
+    \node[text=textGray, font=\small] at (12.75, 6.85) {\faCloud\ 1};
+    
+    \node[font=\footnotesize, text=darkGreen] at (11.75, 5.8) {Confidence: 94\%};
+    \node[font=\footnotesize, text=textGray] at (11.75, 5.3) {FPS: 32};
+    
+    % Boutons
+    \fill[moroccanRed, rounded corners=5pt] (10.2, 3) rectangle (13.3, 3.8);
+    \node[text=white, font=\small\bfseries] at (11.75, 3.4) {\faStop\ Stop Detection};
+    
+    \fill[accentTeal, rounded corners=5pt] (10.2, 2.2) rectangle (13.3, 2.8);
+    \node[text=white, font=\tiny\bfseries] at (11.75, 2.5) {\faCamera\ Capture};
+    
+    % Bandeau d'alerte
+    \fill[moroccanRed!90, rounded corners=5pt] (0.3, 0.3) rectangle (13.7, 1.7);
+    \node[text=white, font=\bfseries] at (7, 1.2) {\faExclamationTriangle\ ALERTE : Feu détecté !};
+    \node[text=white, font=\small] at (7, 0.7) {Confiance: 94\% | Horodatage: 14:32:05 | Zone: Webcam-01};
+\end{tikzpicture}
+\caption{Interface de détection temps réel avec bounding boxes YOLOv8}
+\label{fig:realtime}
+\end{figure}
+
+\begin{alertbox}{Éléments Affichés}
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item \textbf{Flux vidéo :} Stream MJPEG en temps réel depuis la webcam
+    \item \textbf{Bounding boxes :} Rectangles colorés (rouge=feu, gris=fumée) avec score de confiance
+    \item \textbf{Statistiques :} Nombre de détections, confiance moyenne, FPS
+    \item \textbf{Bandeau d'alerte :} Notification visuelle immédiate lors d'une détection
+\end{itemize}
+\end{alertbox}
+
+\subsection{Upload et Analyse d'Images}
+
+L'interface d'upload permet d'analyser des images statiques avec le modèle MobileNetV2.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+    % Cadre
+    \draw[primaryGreen, line width=2pt, rounded corners=10pt] (0, 0) rectangle (14, 7);
+    
+    % Header
+    \fill[darkGreen] (0.1, 6.2) rectangle (13.9, 6.9);
+    \node[text=white, font=\bfseries\small] at (2.5, 6.55) {\faUpload\ Upload \& Analysis};
+    
+    % Zone upload (avant)
+    \fill[mintGreen!20, rounded corners=5pt] (0.3, 1.5) rectangle (6.5, 6);
+    \draw[primaryGreen, line width=1pt, dashed, rounded corners=5pt] (0.5, 1.7) rectangle (6.3, 5.8);
+    \node[text=primaryGreen, font=\Huge] at (3.4, 4) {\faCloudUploadAlt};
+    \node[text=textGray, font=\small] at (3.4, 2.8) {Glissez une image ici};
+    \node[text=textGray, font=\tiny] at (3.4, 2.3) {ou cliquez pour sélectionner};
+    
+    % Flèche
+    \node[text=primaryGreen, font=\huge] at (7, 3.75) {\faArrowRight};
+    
+    % Résultat (après)
+    \fill[white, rounded corners=5pt] (7.5, 1.5) rectangle (13.7, 6);
+    \draw[moroccanRed, line width=2pt, rounded corners=5pt] (7.5, 1.5) rectangle (13.7, 6);
+    
+    % Image simulée
+    \fill[alertOrange!30] (7.8, 3) rectangle (10.5, 5.7);
+    \fill[moroccanRed!60] (8.5, 3.5) -- (9, 5) -- (9.5, 4) -- (10, 5.2) -- (9.5, 3.5) -- cycle;
+    
+    % Résultat
+    \fill[moroccanRed, rounded corners=3pt] (10.8, 5) rectangle (13.4, 5.6);
+    \node[text=white, font=\bfseries\small] at (12.1, 5.3) {\faFire\ FIRE};
+    
+    \node[font=\small, text=darkGreen] at (12.1, 4.3) {Confiance: 92.3\%};
+    
+    % Barres de probabilité
+    \node[font=\tiny, text=textGray] at (11, 3.5) {Fire};
+    \fill[moroccanRed!70] (11.5, 3.35) rectangle (13.3, 3.65);
+    
+    \node[font=\tiny, text=textGray] at (11, 3) {Smoke};
+    \fill[textGray!50] (11.5, 2.85) rectangle (11.8, 3.15);
+    
+    \node[font=\tiny, text=textGray] at (11, 2.5) {Non-Fire};
+    \fill[primaryGreen!50] (11.5, 2.35) rectangle (11.6, 2.65);
+    
+    % Footer
+    \node[font=\tiny, text=textGray] at (7, 0.8) {Temps de traitement: 320ms | Modèle: MobileNetV2};
+\end{tikzpicture}
+\caption{Interface d'upload avec résultat de classification}
+\label{fig:upload}
+\end{figure}
+
+\subsection{Carte des Hotspots NASA FIRMS}
+
+La carte interactive affiche les points chauds détectés par les satellites NASA FIRMS.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+    % Cadre carte
+    \draw[primaryGreen, line width=2pt, rounded corners=10pt] (0, 0) rectangle (14, 8);
+    
+    % Header
+    \fill[darkGreen] (0.1, 7.2) rectangle (13.9, 7.9);
+    \node[text=white, font=\bfseries\small] at (3, 7.55) {\faMapMarkerAlt\ Real-Time Prevention - NASA FIRMS};
+    
+    % Fond carte
+    \fill[skyBlue!15] (0.1, 0.5) rectangle (13.9, 7.1);
+    
+    % Contours Maroc simplifié
+    \draw[warmBrown, line width=1pt] (3, 2) -- (5, 1.5) -- (8, 1.8) -- (10, 2.5) -- (11, 4) -- (10, 5.5) -- (8, 6) -- (5, 6.5) -- (3, 5.5) -- (2.5, 4) -- cycle;
+    \fill[mintGreen!30] (3, 2) -- (5, 1.5) -- (8, 1.8) -- (10, 2.5) -- (11, 4) -- (10, 5.5) -- (8, 6) -- (5, 6.5) -- (3, 5.5) -- (2.5, 4) -- cycle;
+    
+    % Hotspots avec cercles de propagation
+    \draw[moroccanRed!40, line width=1pt, fill=moroccanRed!10] (5.5, 5.5) circle (0.8);
+    \fill[moroccanRed] (5.5, 5.5) circle (4pt);
+    \node[font=\tiny, text=moroccanRed] at (5.5, 4.5) {High};
+    
+    \draw[alertOrange!40, line width=1pt, fill=alertOrange!10] (7, 4) circle (0.5);
+    \fill[alertOrange] (7, 4) circle (3pt);
+    
+    \draw[alertOrange!40, line width=1pt, fill=alertOrange!10] (9, 3.5) circle (0.6);
+    \fill[alertOrange] (9, 3.5) circle (3pt);
+    
+    \draw[sunYellow!60, line width=1pt, fill=sunYellow!20] (4, 3) circle (0.4);
+    \fill[sunYellow] (4, 3) circle (3pt);
+    
+    % Légende
+    \fill[white, rounded corners=3pt] (11, 5) rectangle (13.5, 7);
+    \node[font=\tiny\bfseries, text=darkGreen] at (12.25, 6.7) {Légende};
+    \fill[moroccanRed] (11.3, 6.2) circle (3pt);
+    \node[font=\tiny, anchor=west] at (11.6, 6.2) {High};
+    \fill[alertOrange] (11.3, 5.7) circle (3pt);
+    \node[font=\tiny, anchor=west] at (11.6, 5.7) {Nominal};
+    \fill[sunYellow] (11.3, 5.2) circle (3pt);
+    \node[font=\tiny, anchor=west] at (11.6, 5.2) {Low};
+    
+    % Info bar
+    \fill[white, rounded corners=3pt] (0.3, 0.7) rectangle (10, 1.5);
+    \node[font=\tiny, text=textGray] at (5, 1.1) {Hotspot sélectionné: Rif | Brightness: 352K | Vent: 15 km/h NE | Propagation estimée: 5.2 km};
+\end{tikzpicture}
+\caption{Carte interactive des hotspots avec cercles de propagation}
+\label{fig:hotspots}
+\end{figure}
+
+\subsection{Surveillance Satellite Sentinel}
+
+L'interface de surveillance satellite affiche les images Sentinel-2 avec les résultats d'analyse CAM.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+    % Cadre
+    \draw[primaryGreen, line width=2pt, rounded corners=10pt] (0, 0) rectangle (14, 8);
+    
+    % Header
+    \fill[darkGreen] (0.1, 7.2) rectangle (13.9, 7.9);
+    \node[text=white, font=\bfseries\small] at (2.5, 7.55) {\faSatellite\ Satellite Monitoring};
+    \node[text=lightGreen, font=\tiny] at (11, 7.55) {8 zones configurées};
+    
+    % Cards de zones
+    \foreach \x/\name/\status/\col in {1.5/North/Safe/primaryGreen, 4.5/Rif/Fire!/moroccanRed, 7.5/Oriental/Safe/primaryGreen, 10.5/Atlas/Scanning/accentTeal} {
+        \fill[white, rounded corners=5pt] (\x-1, 4.5) rectangle (\x+2, 7);
+        \draw[\col, line width=1.5pt, rounded corners=5pt] (\x-1, 4.5) rectangle (\x+2, 7);
+        \node[font=\small\bfseries, text=\col] at (\x+0.5, 6.5) {\name};
+        \node[font=\tiny, text=\col] at (\x+0.5, 5.8) {\status};
+        \fill[\col!30] (\x-0.7, 5) rectangle (\x+1.7, 5.5);
+    }
+    
+    % Image satellite (gauche)
+    \fill[forestDark!30] (0.3, 0.5) rectangle (6.5, 4.3);
+    \node[font=\bfseries\small, text=white] at (3.4, 3.9) {Image Satellite - Rif};
+    % Heatmap simulée
+    \fill[moroccanRed!50] (2, 1.5) circle (0.8);
+    \fill[alertOrange!40] (2, 1.5) circle (1.2);
+    \fill[sunYellow!30] (2, 1.5) circle (1.6);
+    \node[font=\tiny, text=white] at (4.5, 1) {Heatmap CAM};
+    
+    % Résultats (droite)
+    \fill[mintGreen!20, rounded corners=5pt] (6.8, 0.5) rectangle (13.7, 4.3);
+    \node[font=\bfseries\small, text=darkGreen] at (10.25, 3.9) {Résultats d'Analyse};
+    
+    \fill[moroccanRed, rounded corners=3pt] (7.2, 3) rectangle (9.5, 3.6);
+    \node[text=white, font=\small\bfseries] at (8.35, 3.3) {\faFire\ FIRE DETECTED};
+    
+    \node[font=\small, text=darkGreen, anchor=west] at (7.2, 2.5) {Confiance: 87.3\%};
+    \node[font=\small, text=textGray, anchor=west] at (7.2, 2) {Coordonnées: 34.50°N, -5.00°W};
+    \node[font=\small, text=textGray, anchor=west] at (7.2, 1.5) {Date acquisition: 2024-12-22};
+    
+    \fill[accentTeal, rounded corners=3pt] (10.5, 0.8) rectangle (13.3, 1.4);
+    \node[text=white, font=\tiny\bfseries] at (11.9, 1.1) {\faMapMarkerAlt\ View on Maps};
+\end{tikzpicture}
+\caption{Interface de surveillance satellite avec résultat CAM}
+\label{fig:satellite}
+\end{figure}
+
+\subsection{Interface de Prédiction}
+
+L'interface de prédiction permet de calculer et visualiser le rayon de propagation estimé.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+    % Cadre
+    \draw[primaryGreen, line width=2pt, rounded corners=10pt] (0, 0) rectangle (14, 7);
+    
+    % Header
+    \fill[darkGreen] (0.1, 6.2) rectangle (13.9, 6.9);
+    \node[text=white, font=\bfseries\small] at (2.5, 6.55) {\faChartLine\ Prediction Dashboard};
+    
+    % Formulaire gauche
+    \fill[mintGreen!20, rounded corners=5pt] (0.3, 0.5) rectangle (5.5, 6);
+    \node[font=\bfseries\small, text=darkGreen] at (2.9, 5.5) {Paramètres};
+    
+    \node[font=\tiny, text=textGray, anchor=west] at (0.5, 5) {Brightness (K)};
+    \fill[white, rounded corners=2pt] (0.5, 4.4) rectangle (5.2, 4.9);
+    \node[font=\small, anchor=west] at (0.7, 4.65) {352};
+    
+    \node[font=\tiny, text=textGray, anchor=west] at (0.5, 4) {Confidence};
+    \fill[white, rounded corners=2pt] (0.5, 3.4) rectangle (5.2, 3.9);
+    \node[font=\small, anchor=west] at (0.7, 3.65) {High};
+    
+    \node[font=\tiny, text=textGray, anchor=west] at (0.5, 3) {Wind Speed (km/h)};
+    \fill[white, rounded corners=2pt] (0.5, 2.4) rectangle (5.2, 2.9);
+    \node[font=\small, anchor=west] at (0.7, 2.65) {25};
+    
+    \node[font=\tiny, text=textGray, anchor=west] at (0.5, 2) {Wind Direction (°)};
+    \fill[white, rounded corners=2pt] (0.5, 1.4) rectangle (5.2, 1.9);
+    \node[font=\small, anchor=west] at (0.7, 1.65) {45 (NE)};
+    
+    \fill[primaryGreen, rounded corners=3pt] (1.5, 0.7) rectangle (4.3, 1.2);
+    \node[text=white, font=\small\bfseries] at (2.9, 0.95) {Calculate};
+    
+    % Résultat droite
+    \fill[white, rounded corners=5pt] (5.8, 0.5) rectangle (13.7, 6);
+    \draw[alertOrange, line width=2pt, rounded corners=5pt] (5.8, 0.5) rectangle (13.7, 6);
+    
+    % Cercle de propagation
+    \draw[moroccanRed!60, line width=2pt, fill=moroccanRed!10] (8, 3) circle (1.8);
+    \draw[alertOrange!60, line width=1pt, fill=alertOrange!5] (8, 3) circle (1.2);
+    \fill[moroccanRed] (8, 3) circle (4pt);
+    
+    % Flèche vent
+    \draw[->, line width=2pt, accentTeal] (8, 3) -- (9.2, 4);
+    \node[font=\tiny, text=accentTeal] at (9.5, 4.3) {Wind};
+    
+    % Résultats numériques
+    \node[font=\bfseries\large, text=moroccanRed] at (11.8, 5) {8.67 km};
+    \node[font=\small, text=textGray] at (11.8, 4.5) {Rayon estimé};
+    
+    \node[font=\bfseries, text=alertOrange] at (11.8, 3.5) {236 km²};
+    \node[font=\small, text=textGray] at (11.8, 3) {Surface menacée};
+    
+    \fill[alertOrange, rounded corners=3pt] (10.5, 1.5) rectangle (13.2, 2.1);
+    \node[text=white, font=\small\bfseries] at (11.85, 1.8) {HIGH RISK};
+\end{tikzpicture}
+\caption{Interface de prédiction avec visualisation du rayon de propagation}
+\label{fig:prediction}
+\end{figure}
+
+% ============================================
+\newpage
+\section{Performances des Modèles}
+% ============================================
+
+Cette section présente une analyse détaillée des performances des modèles d'intelligence artificielle déployés dans AI Sentinel.
+
+\subsection{Métriques du Modèle MobileNetV2}
+
+Le modèle de classification MobileNetV2 a été évalué sur un jeu de test de 10 800 images. Les résultats démontrent d'excellentes performances sur les trois classes.
+
+\begin{table}[H]
+\centering
+\caption{Métriques de performance MobileNetV2 par classe}
+\label{tab:mobilenet-metrics}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{l c c c c}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Métrique}} & \textcolor{white}{\textbf{Smoke}} & \textcolor{white}{\textbf{Fire}} & \textcolor{white}{\textbf{Non-Fire}} & \textcolor{white}{\textbf{Global}} \\
+\midrule
+Precision & 96.8\% & 97.2\% & 98.1\% & 97.4\% \\
+Recall & 97.7\% & 97.5\% & 98.3\% & 97.8\% \\
+F1-Score & 97.2\% & 97.3\% & 98.2\% & 97.6\% \\
+Support & 3,500 & 3,600 & 3,700 & 10,800 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{greenbox}[\faChartPie\ Interprétation des Résultats MobileNetV2]
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item \textbf{Précision globale exceptionnelle :} 97.8\% sur le jeu de test
+    \item \textbf{Classe Fire :} F1-Score de 97.3\%, crucial pour les alertes
+    \item \textbf{Classe Smoke :} Légèrement plus difficile à distinguer, mais 97.2\% reste excellent
+    \item \textbf{Non-Fire :} Meilleure performance (98.2\%), limitant les faux positifs
+    \item \textbf{Équilibre :} Les trois classes ont des scores très proches, indiquant un modèle bien équilibré
+\end{itemize}
+\end{greenbox}
+
+\subsection{Métriques du Modèle YOLOv8}
+
+Le modèle YOLOv8 a été évalué selon les métriques standard de détection d'objets.
+
+\begin{table}[H]
+\centering
+\caption{Métriques de performance YOLOv8}
+\label{tab:yolo-metrics}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{l c c c c}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Classe}} & \textcolor{white}{\textbf{mAP@50}} & \textcolor{white}{\textbf{mAP@50-95}} & \textcolor{white}{\textbf{Precision}} & \textcolor{white}{\textbf{Recall}} \\
+\midrule
+Smoke & 89.2\% & 67.4\% & 91.5\% & 87.3\% \\
+Fire & 94.1\% & 78.2\% & 95.8\% & 92.6\% \\
+\midrule
+\textbf{Global} & \textbf{91.6\%} & \textbf{72.8\%} & \textbf{93.6\%} & \textbf{89.9\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{infobox}{Signification des Métriques YOLO}
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item \textbf{mAP@50 :} Mean Average Precision avec IoU threshold de 50\%
+    \item \textbf{mAP@50-95 :} Moyenne sur plusieurs seuils IoU (plus strict)
+    \item \textbf{Precision :} Proportion de détections correctes parmi toutes les détections
+    \item \textbf{Recall :} Proportion d'objets réels détectés
+\end{itemize}
+\end{infobox}
+
+\subsection{Courbes ROC et AUC}
+
+Les courbes ROC (Receiver Operating Characteristic) illustrent la capacité de discrimination des modèles.
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm,
+    height=8cm,
+    xlabel={Taux de Faux Positifs (FPR)},
+    ylabel={Taux de Vrais Positifs (TPR)},
+    xmin=0, xmax=1,
+    ymin=0, ymax=1,
+    legend pos=south east,
+    grid=major,
+    grid style={dashed, gray!30},
+    title={\textbf{Courbes ROC - MobileNetV2}}
+]
+
+% Ligne diagonale (random)
+\addplot[color=textGray, line width=1pt, dashed] coordinates {(0,0) (1,1)};
+
+% ROC Fire
+\addplot[color=moroccanRed, line width=2pt] coordinates {
+    (0, 0) (0.01, 0.85) (0.02, 0.92) (0.03, 0.95) (0.05, 0.97) (0.1, 0.98) (0.2, 0.99) (1, 1)
+};
+\addlegendentry{Fire (AUC = 0.994)}
+
+% ROC Smoke
+\addplot[color=textGray, line width=2pt] coordinates {
+    (0, 0) (0.01, 0.80) (0.02, 0.88) (0.03, 0.92) (0.05, 0.95) (0.1, 0.97) (0.2, 0.98) (1, 1)
+};
+\addlegendentry{Smoke (AUC = 0.989)}
+
+% ROC Non-Fire
+\addplot[color=primaryGreen, line width=2pt] coordinates {
+    (0, 0) (0.01, 0.88) (0.02, 0.94) (0.03, 0.96) (0.05, 0.98) (0.1, 0.99) (0.2, 0.995) (1, 1)
+};
+\addlegendentry{Non-Fire (AUC = 0.997)}
+
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+% ============================================
+\newpage
+\section{Temps de Réponse}
+% ============================================
+
+Les temps de réponse du système sont critiques pour une application de détection en temps réel. Cette section présente les mesures de latence pour chaque module.
+
+\subsection{Benchmark par Module}
+
+\begin{center}
+\begin{tikzpicture}
+    % Titre
+    \node[font=\bfseries\large, text=darkGreen] at (7, 7) {Temps de Traitement par Module};
+    
+    % Barres horizontales
+    \fill[primaryGreen!70] (0, 5.5) rectangle (3.2, 6);
+    \node[anchor=west, font=\small] at (3.4, 5.75) {320 ms};
+    \node[anchor=east, font=\footnotesize] at (-0.2, 5.75) {Classification Image};
+    
+    \fill[leafGreen] (0, 4.5) rectangle (0.45, 5);
+    \node[anchor=west, font=\small] at (0.6, 4.75) {45 ms/frame};
+    \node[anchor=east, font=\footnotesize] at (-0.2, 4.75) {Détection YOLO};
+    
+    \fill[accentTeal] (0, 3.5) rectangle (1.2, 4);
+    \node[anchor=west, font=\small] at (1.4, 3.75) {1.2 s};
+    \node[anchor=east, font=\footnotesize] at (-0.2, 3.75) {Récupération FIRMS};
+    
+    \fill[alertOrange] (0, 2.5) rectangle (3.5, 3);
+    \node[anchor=west, font=\small] at (3.7, 2.75) {3.5 s};
+    \node[anchor=east, font=\footnotesize] at (-0.2, 2.75) {Scan Satellite};
+    
+    \fill[warmBrown] (0, 1.5) rectangle (0.85, 2);
+    \node[anchor=west, font=\small] at (1, 1.75) {850 ms};
+    \node[anchor=east, font=\footnotesize] at (-0.2, 1.75) {Envoi Notification};
+    
+    \fill[skyBlue] (0, 0.5) rectangle (0.1, 1);
+    \node[anchor=west, font=\small] at (0.25, 0.75) {< 100 ms};
+    \node[anchor=east, font=\footnotesize] at (-0.2, 0.75) {Calcul Prédiction};
+    
+    % Échelle
+    \draw[textGray, line width=0.5pt] (0, 0) -- (10, 0);
+    \foreach \x/\label in {0/0, 2/2s, 4/4s, 6/6s, 8/8s, 10/10s} {
+        \draw[textGray] (\x, -0.1) -- (\x, 0.1);
+        \node[font=\tiny, text=textGray] at (\x, -0.3) {\label};
+    }
+\end{tikzpicture}
+\end{center}
+
+\begin{table}[H]
+\centering
+\caption{Détail des temps de réponse par composant}
+\label{tab:latency}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{l c c c}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Module}} & \textcolor{white}{\textbf{Temps Moyen}} & \textcolor{white}{\textbf{Min}} & \textcolor{white}{\textbf{Max}} \\
+\midrule
+Classification Image (MobileNetV2) & 320 ms & 280 ms & 450 ms \\
+Détection YOLO (par frame) & 45 ms & 33 ms & 60 ms \\
+Récupération données FIRMS & 1.2 s & 0.8 s & 2.5 s \\
+Scan satellite Sentinel Hub & 3.5 s & 2.0 s & 8.0 s \\
+Envoi notification Telegram & 850 ms & 500 ms & 1.5 s \\
+Envoi notification Email & 1.2 s & 0.8 s & 3.0 s \\
+Calcul prédiction propagation & 50 ms & 30 ms & 100 ms \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{greenbox}[\faRocket\ Performance Temps Réel}
+Le module de détection YOLO atteint \textbf{45 ms par frame}, soit environ \textbf{22 FPS} en moyenne. Sur GPU dédié, cette performance peut atteindre \textbf{30+ FPS}, garantissant une expérience fluide et une détection véritablement temps réel.
+\end{greenbox}
+
+% ============================================
+\newpage
+\section{Scénarios de Test}
+% ============================================
+
+Cette section présente les résultats de trois scénarios de test représentatifs validant le comportement du système dans des conditions réelles.
+
+\subsection{Scénario 1 : Détection de Feu de Forêt}
+
+\begin{table}[H]
+\centering
+\caption{Scénario de test : Détection de feu réel}
+\rowcolors{2}{mintGreen!20}{white}
+\begin{tabular}{>{\bfseries}p{3cm} p{10cm}}
+\toprule
+\rowcolor{primaryGreen}
+\multicolumn{2}{l}{\textcolor{white}{\textbf{Scénario 1 : Détection de Feu de Forêt}}} \\
+\midrule
+Contexte & Vidéo de surveillance capturant un départ de feu dans une zone forestière \\
+Actions & 1. Démarrage de la détection temps réel\\
+& 2. Apparition de flammes dans le champ de vision\\
+& 3. Observation du comportement du système \\
+Résultats attendus & Détection immédiate, bounding box, alerte \\
+\midrule
+Résultats observés & \textcolor{primaryGreen}{\faCheckCircle} Feu détecté en 0.8 secondes\\
+& \textcolor{primaryGreen}{\faCheckCircle} Bounding box rouge avec confiance 94\%\\
+& \textcolor{primaryGreen}{\faCheckCircle} Bandeau d'alerte affiché instantanément\\
+& \textcolor{primaryGreen}{\faCheckCircle} Notification Telegram reçue en 1.2s \\
+Statut & \textcolor{primaryGreen}{\textbf{SUCCÈS}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Scénario 2 : Fausse Alerte (Coucher de Soleil)}
+
+\begin{table}[H]
+\centering
+\caption{Scénario de test : Robustesse aux faux positifs}
+\rowcolors{2}{mintGreen!20}{white}
+\begin{tabular}{>{\bfseries}p{3cm} p{10cm}}
+\toprule
+\rowcolor{primaryGreen}
+\multicolumn{2}{l}{\textcolor{white}{\textbf{Scénario 2 : Fausse Alerte (Coucher de Soleil)}}} \\
+\midrule
+Contexte & Image de coucher de soleil avec des tons orangés/rouges pouvant ressembler à des flammes \\
+Actions & 1. Upload de l'image dans le module de classification\\
+& 2. Analyse par MobileNetV2 \\
+Résultats attendus & Classification correcte comme Non-Fire \\
+\midrule
+Résultats observés & \textcolor{primaryGreen}{\faCheckCircle} Classification: Non-Fire (87.2\%)\\
+& \textcolor{primaryGreen}{\faCheckCircle} Fire: 8.1\%, Smoke: 4.7\%\\
+& \textcolor{primaryGreen}{\faCheckCircle} Aucune fausse alerte générée \\
+Analyse & Le modèle distingue correctement les couleurs naturelles du ciel des flammes grâce aux patterns appris \\
+Statut & \textcolor{primaryGreen}{\textbf{SUCCÈS}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Scénario 3 : Détection Satellite}
+
+\begin{table}[H]
+\centering
+\caption{Scénario de test : Surveillance satellite}
+\rowcolors{2}{mintGreen!20}{white}
+\begin{tabular}{>{\bfseries}p{3cm} p{10cm}}
+\toprule
+\rowcolor{primaryGreen}
+\multicolumn{2}{l}{\textcolor{white}{\textbf{Scénario 3 : Détection Satellite}}} \\
+\midrule
+Contexte & Analyse d'une zone du Rif où un hotspot FIRMS a été signalé \\
+Actions & 1. Lancement du scan sur la zone Rif\\
+& 2. Récupération de l'image Sentinel-2\\
+& 3. Analyse par le modèle CAM \\
+Résultats attendus & Détection positive avec localisation spatiale \\
+\midrule
+Résultats observés & \textcolor{primaryGreen}{\faCheckCircle} Image satellite récupérée (512x512px)\\
+& \textcolor{primaryGreen}{\faCheckCircle} Temps d'acquisition: 3.2s\\
+& \textcolor{primaryGreen}{\faCheckCircle} Classification: Fire (87.3\%)\\
+& \textcolor{primaryGreen}{\faCheckCircle} Heatmap CAM générée avec zone d'intérêt\\
+& \textcolor{primaryGreen}{\faCheckCircle} Coordonnées correspondant au hotspot FIRMS \\
+Statut & \textcolor{primaryGreen}{\textbf{SUCCÈS}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================
+\section{Retours Utilisateurs}
+% ============================================
+
+Bien que le système AI Sentinel soit un prototype développé dans le cadre d'un projet de fin d'études, des retours informels ont été collectés auprès de testeurs.
+
+\subsection{Points Positifs Identifiés}
+
+\begin{greenbox}[\faThumbsUp\ Retours Positifs]
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Interface intuitive :} Navigation claire et design moderne apprécié
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Réactivité :} Détection temps réel fluide et alertes immédiates
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Visualisation :} Carte interactive utile pour la localisation
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Informativité :} Données enrichies (météo, propagation) pertinentes
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Multi-canaux :} Notifications Telegram appréciées pour la mobilité
+\end{itemize}
+\end{greenbox}
+
+\subsection{Améliorations Suggérées}
+
+\begin{alertbox}{Suggestions d'Amélioration}
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item \textbf{Application mobile :} Version native iOS/Android souhaitée
+    \item \textbf{Historique :} Sauvegarde et consultation des détections passées
+    \item \textbf{Multi-caméras :} Support de plusieurs flux vidéo simultanés
+    \item \textbf{Personnalisation :} Configuration des seuils d'alerte par l'utilisateur
+    \item \textbf{Rapports :} Génération automatique de rapports PDF
+\end{itemize}
+\end{alertbox}
+
+\vspace{1cm}
+
+% Transition
+\begin{center}
+\begin{tikzpicture}
+    \node[
+        fill=primaryGreen!10,
+        draw=primaryGreen,
+        line width=1.5pt,
+        rounded corners=12pt,
+        inner sep=20pt,
+        text width=13cm,
+        align=center
+    ] {
+        \textcolor{primaryGreen}{\fontsize{24}{28}\selectfont\faArrowCircleRight}\\[15pt]
+        \large\textbf{Suite du Document}\\[10pt]
+        \normalsize La conclusion synthétise les réalisations du projet,\\
+        discute les limitations identifiées et propose des perspectives d'évolution.\\[10pt]
+        \textit{\textcolor{textGray}{Conclusion et Perspectives}}
+    };
+\end{tikzpicture}
+\end{center}

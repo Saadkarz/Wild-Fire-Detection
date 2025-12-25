@@ -1,0 +1,476 @@
+% ============================================
+% CHAPITRE III - PARTIE 2 : MODULES SATELLITE, PRÉVENTION, PRÉDICTION
+% ============================================
+
+\subsection{Module de Surveillance Satellite}
+
+Le module de surveillance satellite représente une composante stratégique du système AI Sentinel. Il permet d'étendre la couverture de détection au-delà des zones équipées de caméras en exploitant les images satellites du programme européen \textbf{Copernicus} via l'API \textbf{Sentinel Hub}, ainsi que les données de hotspots thermiques de \textbf{NASA FIRMS}.
+
+\subsubsection{Contexte et Justification}
+
+Les forêts marocaines s'étendent sur près de \textbf{9 millions d'hectares}, une superficie impossible à couvrir intégralement par des caméras de surveillance. L'imagerie satellite offre une solution complémentaire permettant une surveillance à grande échelle. Les satellites Sentinel-2 fournissent des images multi-spectrales avec une résolution spatiale de 10 à 60 mètres et une revisite de 5 jours, tandis que les satellites MODIS et VIIRS de NASA FIRMS détectent les anomalies thermiques en quasi temps réel.
+
+\begin{moroccobox}{Couverture Géographique du Maroc}
+Le système AI Sentinel surveille \textbf{8 zones géographiques} couvrant l'ensemble du territoire marocain à risque d'incendie :
+
+\vspace{0.3cm}
+\begin{center}
+\begin{tabular}{l l l}
+\textbf{Zone} & \textbf{Coordonnées} & \textbf{Caractéristiques} \\
+\hline
+North (Tanger-Tétouan) & -6.00, 34.00 & Forêts méditerranéennes \\
+Rif & -5.00, 34.50 & Montagnes boisées \\
+Oriental & -3.00, 33.50 & Steppe et maquis \\
+Casablanca & -8.00, 33.00 & Zone périurbaine \\
+Middle Atlas & -6.00, 32.50 & Cèdres et chênes verts \\
+Marrakech & -8.50, 31.00 & Arganeraie \\
+High Atlas & -8.00, 30.50 & Forêts d'altitude \\
+Souss & -10.00, 29.50 & Formations semi-arides \\
+\end{tabular}
+\end{center}
+\end{moroccobox}
+
+\subsubsection{Besoins Fonctionnels Détaillés}
+
+\begin{objectifbox}{RF11 : Acquisition d'Images Sentinel-2}
+\textbf{Description :} Le système doit pouvoir récupérer automatiquement les images satellites Sentinel-2 pour les zones définies.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Authentification OAuth2 avec l'API Sentinel Hub
+    \item Récupération d'images Sentinel-2 L2A (atmosphériquement corrigées)
+    \item Deux types de scripts d'évaluation (evalscripts) :
+    \begin{itemize}
+        \item \textbf{True Color :} RGB standard pour visualisation
+        \item \textbf{Fire Detection :} SWIR enhanced pour détection thermique
+    \end{itemize}
+    \item Résolution de 10m/pixel pour les bandes visibles
+    \item Gestion intelligente de la couverture nuageuse (seuil < 30\%)
+    \item Stockage local des images pour analyse ultérieure
+\end{itemize}
+
+\textbf{Critère d'acceptation :} Le système doit récupérer une image satellite en moins de 10 secondes (hors temps de traitement Sentinel Hub).
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF12 : Analyse IA des Images Satellites}
+\textbf{Description :} Les images satellites doivent être analysées par un modèle IA spécialisé (CAM - Class Activation Map) pour détecter les zones de feu potentiel.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Modèle CAM personnalisé avec sortie duale :
+    \begin{itemize}
+        \item Carte d'activation (10×10×64) pour visualisation des zones critiques
+        \item Classification binaire (Fire / No Fire)
+    \end{itemize}
+    \item Prétraitement : redimensionnement 224×224, normalisation 0-1
+    \item Génération de heatmaps colorées superposées à l'image originale
+    \item Score de confiance pour chaque analyse
+    \item Détection des anomalies thermiques via les bandes SWIR
+\end{itemize}
+
+\textbf{Critère d'acceptation :} L'analyse d'une image satellite doit se compléter en moins de 5 secondes avec un taux de détection > 90\%.
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF13 : Scan Automatique Programmé}
+\textbf{Description :} Le système doit pouvoir effectuer des scans automatiques périodiques de toutes les zones surveillées.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Scheduler configurable (intervalle par défaut : 30 minutes)
+    \item Scan séquentiel de toutes les zones pour éviter la surcharge API
+    \item Détection des changements par comparaison avec le scan précédent
+    \item Génération automatique d'alertes en cas de détection positive
+    \item Interface de contrôle : démarrer/arrêter le monitoring
+    \item Logs détaillés de chaque cycle de scan
+    \item Résilience aux erreurs (retry automatique)
+\end{itemize}
+
+\textbf{Critère d'acceptation :} Le scan de toutes les zones doit se terminer en moins de 10 minutes avec génération d'un rapport de synthèse.
+\end{objectifbox}
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=1.5cm,
+    block/.style={rectangle, rounded corners=8pt, draw=accentTeal, line width=1.5pt, fill=skyBlue!15, text width=2.8cm, minimum height=1.8cm, align=center, font=\footnotesize},
+    decision/.style={diamond, draw=alertOrange, line width=1.5pt, fill=sunYellow!30, text width=1.5cm, align=center, font=\footnotesize, aspect=2},
+    arrow/.style={->, >=stealth, line width=1pt, color=primaryGreen}
+]
+    \node[block] (start) {\faClock\\Déclenchement\\Scheduler};
+    \node[block, right=of start] (fetch) {\faSatellite\\Récupération\\Image Sentinel};
+    \node[block, right=of fetch] (analyze) {\faBrain\\Analyse\\CAM Model};
+    \node[decision, right=of analyze] (detect) {Feu\\?};
+    \node[block, above right=1cm and 1.5cm of detect] (alert) {\faBell\\Envoi\\Alerte};
+    \node[block, below right=1cm and 1.5cm of detect] (log) {\faDatabase\\Log\\Résultat};
+    \node[block, right=3.5cm of detect] (next) {\faRedo\\Zone\\Suivante};
+    
+    \draw[arrow] (start) -- (fetch);
+    \draw[arrow] (fetch) -- (analyze);
+    \draw[arrow] (analyze) -- (detect);
+    \draw[arrow] (detect) -- node[above, font=\tiny, text=moroccanRed] {Oui} (alert);
+    \draw[arrow] (detect) -- node[below, font=\tiny, text=primaryGreen] {Non} (log);
+    \draw[arrow] (alert) -| (next);
+    \draw[arrow] (log) -| (next);
+    
+    \node[font=\bfseries\small, text=darkGreen] at (5, -2.5) {Workflow de Surveillance Satellite Automatisée};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Module de Prévention (Hotspots NASA FIRMS)}
+
+Le module de prévention exploite les données de \textbf{NASA FIRMS} (Fire Information for Resource Management System) pour afficher en temps quasi réel les hotspots thermiques détectés par les satellites MODIS et VIIRS. Ces données permettent une vision globale des zones à risque et des feux actifs.
+
+\subsubsection{Contexte et Justification}
+
+NASA FIRMS fournit gratuitement des données de détection thermique avec une latence de seulement \textbf{3 heures}, permettant une surveillance quasi temps réel à l'échelle globale. Ces données sont essentielles pour :
+\begin{itemize}[leftmargin=1cm, itemsep=3pt]
+    \item Identifier les feux actifs dans des zones non couvertes par les caméras
+    \item Cartographier les tendances et patterns d'incendies
+    \item Anticiper les risques de propagation vers les zones habitées
+    \item Compléter les données de terrain avec une vue satellite
+\end{itemize}
+
+\begin{infobox}{Données NASA FIRMS}
+Les satellites MODIS (Moderate Resolution Imaging Spectroradiometer) et VIIRS (Visible Infrared Imaging Radiometer Suite) détectent les anomalies thermiques en mesurant la luminosité dans les bandes infrarouges thermiques. Un pixel est marqué comme hotspot lorsque sa température dépasse significativement celle des pixels environnants.
+
+\textbf{Caractéristiques des données :}
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item \textbf{Résolution MODIS :} 1 km
+    \item \textbf{Résolution VIIRS :} 375 m
+    \item \textbf{Latence :} 3 heures après passage satellite
+    \item \textbf{Couverture :} Globale, plusieurs passages par jour
+\end{itemize}
+\end{infobox}
+
+\subsubsection{Besoins Fonctionnels Détaillés}
+
+\begin{objectifbox}{RF14 : Récupération des Données NASA FIRMS}
+\textbf{Description :} Le système doit récupérer automatiquement les données de hotspots depuis l'API NASA FIRMS pour les régions surveillées.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Authentification via MAP\_KEY NASA FIRMS
+    \item Récupération des données VIIRS\_SNPP pour les dernières 24 heures
+    \item Filtrage par zone géographique (bounding box)
+    \item Parsing des attributs : latitude, longitude, brightness, confidence, frp, daynight
+    \item Mise en cache pour optimiser les requêtes répétées
+    \item Gestion des erreurs et retry automatique
+\end{itemize}
+
+\textbf{Critère d'acceptation :} Les données doivent être récupérées et parsées en moins de 5 secondes par zone.
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF15 : Affichage sur Carte Interactive}
+\textbf{Description :} Les hotspots doivent être affichés sur une carte interactive permettant la navigation et l'exploration des données.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Carte interactive basée sur Leaflet/React-Leaflet
+    \item Marqueurs colorés selon le niveau de confiance :
+    \begin{itemize}
+        \item \textcolor{moroccanRed}{\textbf{Rouge}} : High confidence
+        \item \textcolor{alertOrange}{\textbf{Orange}} : Nominal confidence
+        \item \textcolor{sunYellow}{\textbf{Jaune}} : Low confidence
+    \end{itemize}
+    \item Popup d'information au clic sur un marqueur
+    \item Zoom et pan fluides
+    \item Clustering automatique des marqueurs à faible zoom
+    \item Filtres par région, date, niveau de confiance
+    \item Lien vers Google Maps pour navigation
+\end{itemize}
+
+\textbf{Critère d'acceptation :} La carte doit afficher jusqu'à 500 marqueurs sans dégradation notable des performances.
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF16 : Calcul du Rayon de Propagation}
+\textbf{Description :} Pour chaque hotspot, le système doit calculer une estimation du rayon de propagation probable basée sur les données disponibles.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Algorithme de calcul intégrant plusieurs facteurs :
+    \begin{itemize}
+        \item \textbf{Luminosité (brightness\_ti4/ti5)} : indicateur d'intensité
+        \item \textbf{Confiance NASA} : fiabilité de la détection
+        \item \textbf{FRP (Fire Radiative Power)} : puissance du feu en MW
+    \end{itemize}
+    \item Affichage d'un cercle de propagation sur la carte
+    \item Rayon borné entre 1 km et 15 km
+    \item Code couleur du cercle selon le niveau de risque
+    \item Tooltip avec estimation de la surface menacée
+\end{itemize}
+
+\textbf{Critère d'acceptation :} Le rayon de propagation doit être calculé et affiché en moins de 100ms par hotspot.
+\end{objectifbox}
+
+\subsection{Module de Prédiction de Propagation}
+
+Le module de prédiction de propagation constitue l'élément d'anticipation du système AI Sentinel. Il permet d'estimer, à horizon de 6 heures, la zone potentiellement affectée par la propagation d'un incendie en tenant compte de multiples facteurs environnementaux.
+
+\subsubsection{Contexte et Justification}
+
+La prédiction de la propagation des feux de forêt est un problème complexe qui dépend de nombreuses variables : topographie, type de végétation, conditions météorologiques, humidité du sol, etc. Notre approche empirique, basée sur les données réelles de NASA FIRMS et les données météorologiques, offre une estimation utilisable opérationnellement tout en restant computationnellement légère.
+
+\begin{alertbox}{Importance de la Prédiction}
+Une prédiction, même approximative, de la propagation d'un feu permet aux services d'intervention de :
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item \textbf{Anticiper} les zones à évacuer
+    \item \textbf{Positionner} les moyens de lutte de manière optimale
+    \item \textbf{Protéger} les infrastructures critiques en priorité
+    \item \textbf{Informer} les populations à risque
+\end{itemize}
+\end{alertbox}
+
+\subsubsection{Besoins Fonctionnels Détaillés}
+
+\begin{objectifbox}{RF17 : Saisie des Paramètres de Simulation}
+\textbf{Description :} L'utilisateur doit pouvoir saisir ou modifier les paramètres de simulation de propagation.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Interface de saisie intuitive avec valeurs par défaut
+    \item Paramètres configurables :
+    \begin{itemize}
+        \item \textbf{Luminosité (Kelvin)} : 300K - 500K (défaut : 350K)
+        \item \textbf{Confiance NASA} : high, nominal, low
+        \item \textbf{Vitesse du vent} : 0 - 100 km/h
+        \item \textbf{Direction du vent} : 0° - 360°
+    \end{itemize}
+    \item Sliders et sélecteurs pour faciliter la saisie
+    \item Validation des valeurs en temps réel
+    \item Pré-remplissage automatique depuis les données réelles
+\end{itemize}
+
+\textbf{Critère d'acceptation :} Tous les paramètres doivent être modifiables avec feedback visuel immédiat.
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF18 : Calcul Prédictif de Propagation}
+\textbf{Description :} Le système doit calculer le rayon de propagation estimé à 6 heures basé sur l'algorithme empirique.
+
+\textbf{Algorithme de calcul :}
+
+\begin{center}
+\begin{tcolorbox}[
+    enhanced,
+    colback=white,
+    colframe=accentTeal,
+    boxrule=2pt,
+    rounded corners,
+    width=12cm
+]
+\begin{align*}
+\text{Rayon} &= \text{Base} + f(\text{Brightness}) + f(\text{Confidence}) + f(\text{Wind})
+\end{align*}
+
+Où :
+\begin{itemize}[leftmargin=0.5cm]
+    \item $\text{Base} = 3.0$ km (rayon de base)
+    \item $f(\text{Brightness})$ :
+    \begin{itemize}
+        \item $> 350K \rightarrow +3.0$ km
+        \item $> 320K \rightarrow +1.5$ km
+        \item sinon $\rightarrow +0.0$ km
+    \end{itemize}
+    \item $f(\text{Confidence})$ :
+    \begin{itemize}
+        \item high $\rightarrow +1.0$ km
+        \item low $\rightarrow -1.0$ km
+    \end{itemize}
+    \item $f(\text{Wind}) = (\text{vitesse} / 30) \times 2.0$ km
+\end{itemize}
+
+Résultat final : $\max(1.0, \min(15.0, \text{Rayon}))$ km
+\end{tcolorbox}
+\end{center}
+
+\textbf{Critère d'acceptation :} Le calcul doit s'exécuter en moins de 50ms avec une précision de 2 décimales.
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF19 : Visualisation de la Zone de Danger}
+\textbf{Description :} La zone de danger prédite doit être visualisée sur une carte interactive avec des indicateurs clairs.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Cercle de propagation centré sur le hotspot
+    \item Dégradé de couleur du centre (rouge intense) vers l'extérieur (jaune)
+    \item Flèche indiquant la direction du vent
+    \item Affichage des coordonnées du centre
+    \item Estimation de la surface en km²
+    \item Animation optionnelle de l'expansion
+    \item Légende explicative des zones de risque
+\end{itemize}
+
+\textbf{Critère d'acceptation :} La visualisation doit se mettre à jour en temps réel lors de la modification des paramètres.
+\end{objectifbox}
+
+\vspace{0.5cm}
+
+\begin{table}[H]
+\centering
+\caption{Exemples de calcul de propagation}
+\label{tab:propagation}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{c c c c c}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Brightness}} & \textcolor{white}{\textbf{Confiance}} & \textcolor{white}{\textbf{Vent (km/h)}} & \textcolor{white}{\textbf{Rayon (km)}} & \textcolor{white}{\textbf{Surface (km²)}} \\
+\midrule
+320 K & Nominal & 20 & 5.83 & 106.9 \\
+355 K & High & 40 & 9.67 & 293.6 \\
+380 K & High & 60 & 11.00 & 380.1 \\
+310 K & Low & 10 & 2.67 & 22.4 \\
+400 K & High & 80 & 12.33 & 477.7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Module de Notifications}
+
+Le module de notifications assure la diffusion rapide et fiable des alertes vers les parties prenantes via différents canaux de communication. Cette composante est critique pour garantir une réponse rapide aux détections.
+
+\subsubsection{Contexte et Justification}
+
+La détection n'a de valeur que si elle est suivie d'une action. Le module de notifications transforme une détection technique en information actionnable pour les équipes terrain. L'utilisation de canaux multiples (\textbf{Email} et \textbf{Telegram}) garantit que l'alerte atteindra ses destinataires même en cas de défaillance d'un canal.
+
+\begin{greenbox}[\faBell\ Philosophie du Système d'Alertes]
+Notre système d'alertes repose sur trois principes fondamentaux :
+
+\begin{enumerate}[leftmargin=1cm, itemsep=5pt]
+    \item \textbf{Rapidité :} L'alerte doit être envoyée dans les secondes suivant la détection
+    \item \textbf{Fiabilité :} Utilisation de canaux redondants (Email + Telegram)
+    \item \textbf{Non-intrusivité :} Mécanisme anti-spam pour éviter la fatigue d'alerte
+\end{enumerate}
+\end{greenbox}
+
+\subsubsection{Besoins Fonctionnels Détaillés}
+
+\begin{objectifbox}{RF20 : Envoi d'Email avec Détails}
+\textbf{Description :} Le système doit envoyer des alertes par email contenant toutes les informations pertinentes sur la détection.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Envoi via SMTP (Gmail ou serveur configuré)
+    \item Contenu HTML richement formaté :
+    \begin{itemize}
+        \item Titre d'alerte avec niveau de sévérité
+        \item Zone géographique concernée
+        \item Coordonnées GPS du point de détection
+        \item Image satellite ou capture d'écran intégrée
+        \item Prédiction de propagation
+        \item Lien Google Maps pour localisation rapide
+        \item Horodatage précis
+    \end{itemize}
+    \item Gestion des pièces jointes (images)
+    \item Configuration des destinataires multiples
+    \item Retry automatique en cas d'échec (3 tentatives)
+\end{itemize}
+
+\textbf{Critère d'acceptation :} L'email doit être envoyé dans les 10 secondes suivant la détection.
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF21 : Envoi de Message Telegram}
+\textbf{Description :} Le système doit envoyer des alertes instantanées via un bot Telegram.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Intégration avec l'API Telegram Bot
+    \item Message formaté avec emojis pour lisibilité rapide :
+    \begin{itemize}
+        \item 🔥 \textbf{ALERTE FEU DÉTECTÉ}
+        \item 📍 Zone : [nom de la région]
+        \item 🌡️ Confiance : [score]\%
+        \item 📐 Propagation estimée : [rayon] km
+        \item 🗺️ [Lien Google Maps]
+    \end{itemize}
+    \item Envoi d'image satellite avec le message
+    \item Boutons inline pour actions rapides
+    \item Notification push instantanée sur mobile
+    \item Support des groupes et channels
+\end{itemize}
+
+\textbf{Critère d'acceptation :} Le message Telegram doit être reçu dans les 5 secondes suivant la détection.
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF22 : Gestion du Cooldown Anti-Spam}
+\textbf{Description :} Le système doit implémenter un mécanisme de cooldown pour éviter l'envoi d'alertes répétées pour la même détection.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Cooldown par défaut : 30 secondes
+    \item Cooldown configurable par zone (5s - 300s)
+    \item Tracking par zone géographique + type de détection
+    \item Reset du cooldown lors d'un changement significatif
+    \item Logs des alertes ignorées pour audit
+    \item Interface de monitoring des cooldowns actifs
+\end{itemize}
+
+\textbf{Critère d'acceptation :} Aucune alerte dupliquée ne doit être envoyée pendant la période de cooldown.
+\end{objectifbox}
+
+\subsection{Module FWI (Fire Weather Index)}
+
+Le module FWI intègre l'indice météorologique de risque d'incendie, un standard international développé par le Service canadien des forêts. Cet indice combine plusieurs paramètres météorologiques pour évaluer le potentiel de départ et de propagation des feux.
+
+\subsubsection{Besoins Fonctionnels Détaillés}
+
+\begin{objectifbox}{RF23 : Affichage des Indices Météo}
+\textbf{Description :} Le système doit afficher les indices météorologiques pertinents pour l'évaluation du risque d'incendie.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Récupération des données via Open-Meteo API
+    \item Paramètres affichés :
+    \begin{itemize}
+        \item Température (°C)
+        \item Humidité relative (\%)
+        \item Vitesse et direction du vent
+        \item Précipitations (mm)
+        \item Indice FWI calculé
+    \end{itemize}
+    \item Mise à jour automatique toutes les heures
+    \item Historique sur 24h avec graphiques
+    \item Prévisions à 48h
+\end{itemize}
+
+\textbf{Critère d'acceptation :} Les données météo doivent être affichées avec une latence maximale de 2 secondes.
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF24 : Carte de Risque}
+\textbf{Description :} Le système doit afficher une carte de risque d'incendie basée sur les indices FWI.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Carte choroplèthe avec zones colorées par niveau de risque
+    \item Échelle de risque standardisée :
+    \begin{itemize}
+        \item \textcolor{primaryGreen}{\textbf{Vert}} : Faible (FWI 0-5)
+        \item \textcolor{sunYellow}{\textbf{Jaune}} : Modéré (FWI 5-10)
+        \item \textcolor{alertOrange}{\textbf{Orange}} : Élevé (FWI 10-20)
+        \item \textcolor{moroccanRed}{\textbf{Rouge}} : Très élevé (FWI 20-30)
+        \item \textbf{Pourpre} : Extrême (FWI > 30)
+    \end{itemize}
+    \item Superposition optionnelle avec les hotspots actifs
+    \item Export de la carte en image
+    \item Légende interactive
+\end{itemize}
+
+\textbf{Critère d'acceptation :} La carte de risque doit se charger en moins de 3 secondes.
+\end{objectifbox}

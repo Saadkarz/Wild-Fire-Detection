@@ -1,0 +1,411 @@
+% ============================================
+% CHAPITRE IV - CONCEPTION ET ARCHITECTURE
+% ============================================
+\chapter{Conception et Architecture}
+\thispagestyle{fancy}
+
+\section{Architecture Globale du Système}
+
+\lettrine[lines=3, lhang=0.15, loversize=0.1, findent=3pt]{\textcolor{primaryGreen}{L}}{a conception} architecturale constitue le fondement sur lequel repose l'ensemble du système AI Sentinel. Une architecture bien pensée garantit non seulement la performance et la fiabilité du système, mais également sa capacité à évoluer et à s'adapter aux besoins futurs. Ce chapitre présente les choix architecturaux qui ont guidé le développement de notre plateforme de détection d'incendies.
+
+L'architecture d'AI Sentinel a été conçue avec plusieurs objectifs en tête : la \textbf{modularité} pour faciliter la maintenance et l'évolution, la \textbf{performance} pour garantir une détection en temps réel, et la \textbf{scalabilité} pour permettre une extension future du système.
+
+\subsection{Architecture Logicielle}
+
+\subsubsection{Pattern MVC Adapté}
+
+Le système AI Sentinel adopte une variante du pattern \textbf{MVC} (Model-View-Controller) adaptée aux architectures modernes de type \textbf{API-First}. Dans cette approche, la séparation des responsabilités est claire et permet un développement parallèle des différentes couches.
+
+\begin{greenbox}[\faLayerGroup\ Principes Architecturaux]
+
+\textbf{Séparation Frontend/Backend}
+
+La communication entre le frontend (React) et le backend (FastAPI) s'effectue exclusivement via des \textbf{API REST}, garantissant un découplage total. Cette séparation permet :
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item Le développement indépendant de chaque partie
+    \item La possibilité de remplacer l'une sans impacter l'autre
+    \item La création future d'applications mobiles natives
+    \item Une meilleure testabilité de chaque composant
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Services Métier Isolés}
+
+Chaque fonctionnalité métier (détection YOLO, classification MobileNet, surveillance satellite, etc.) est encapsulée dans un \textbf{service dédié}. Ces services sont indépendants et peuvent être testés, déployés ou mis à jour individuellement.
+
+\vspace{0.3cm}
+
+\textbf{Injection de Dépendances}
+
+Les dépendances entre services sont gérées de manière explicite, facilitant les tests unitaires avec des mocks et permettant une configuration flexible selon l'environnement (dev, test, prod).
+\end{greenbox}
+
+\subsubsection{Architecture en Couches}
+
+L'architecture d'AI Sentinel est organisée en \textbf{quatre couches principales}, chacune ayant une responsabilité bien définie et communiquant uniquement avec les couches adjacentes.
+
+\begin{center}
+\begin{tikzpicture}[
+    layer/.style={rectangle, rounded corners=10pt, draw=#1, line width=2pt, fill=#1!20, minimum width=14cm, minimum height=2cm, align=center},
+    sublayer/.style={rectangle, rounded corners=5pt, draw=#1, line width=1pt, fill=white, minimum width=2.2cm, minimum height=1cm, align=center, font=\footnotesize},
+    arrow/.style={->, >=stealth, line width=2pt, color=textGray}
+]
+    % Couche Présentation
+    \node[layer=primaryGreen] (pres) at (0, 6) {};
+    \node[font=\bfseries\large, text=darkGreen] at (-5, 6.6) {COUCHE PRÉSENTATION};
+    \node[sublayer=primaryGreen] at (-4.5, 5.7) {Components};
+    \node[sublayer=primaryGreen] at (-2, 5.7) {Pages};
+    \node[sublayer=primaryGreen] at (0.5, 5.7) {Services};
+    \node[sublayer=primaryGreen] at (3, 5.7) {Hooks};
+    \node[sublayer=primaryGreen] at (5.5, 5.7) {Context};
+    \node[font=\small, text=textGray] at (0, 6.5) {React + TypeScript + TailwindCSS};
+    
+    % Flèche
+    \draw[arrow] (0, 4.8) -- node[right, font=\small] {HTTP/REST} (0, 4.2);
+    
+    % Couche Métier
+    \node[layer=accentTeal] (metier) at (0, 3) {};
+    \node[font=\bfseries\large, text=accentTeal] at (-5, 3.6) {COUCHE MÉTIER (API)};
+    \node[sublayer=accentTeal] at (-4.5, 2.7) {Routes};
+    \node[sublayer=accentTeal] at (-2, 2.7) {Services};
+    \node[sublayer=accentTeal] at (0.5, 2.7) {Models};
+    \node[sublayer=accentTeal] at (3, 2.7) {Schemas};
+    \node[sublayer=accentTeal] at (5.5, 2.7) {Utils};
+    \node[font=\small, text=textGray] at (0, 3.5) {FastAPI + Python};
+    
+    % Flèche
+    \draw[arrow] (0, 1.8) -- (0, 1.2);
+    
+    % Couche IA/ML
+    \node[layer=leafGreen] (ia) at (0, 0) {};
+    \node[font=\bfseries\large, text=darkGreen] at (-5, 0.6) {COUCHE IA/ML};
+    \node[sublayer=leafGreen] at (-3.5, -0.3) {MobileNetV2\\(Keras .h5)};
+    \node[sublayer=leafGreen] at (0, -0.3) {YOLOv8\\(best.pt)};
+    \node[sublayer=leafGreen] at (3.5, -0.3) {CAM Model\\(cam\_model.h5)};
+    \node[font=\small, text=textGray] at (0, 0.5) {TensorFlow + Ultralytics};
+    
+    % Flèche
+    \draw[arrow] (0, -1.2) -- (0, -1.8);
+    
+    % Couche Services Externes
+    \node[layer=warmBrown] (ext) at (0, -3) {};
+    \node[font=\bfseries\large, text=warmBrown] at (-5, -2.4) {SERVICES EXTERNES};
+    \node[sublayer=warmBrown] at (-4, -3.3) {NASA\\FIRMS};
+    \node[sublayer=warmBrown] at (-1.3, -3.3) {Sentinel\\Hub};
+    \node[sublayer=warmBrown] at (1.4, -3.3) {Open\\Meteo};
+    \node[sublayer=warmBrown] at (4.1, -3.3) {SMTP/\\Telegram};
+    
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5cm}
+
+\begin{table}[H]
+\centering
+\caption{Description des couches architecturales}
+\label{tab:couches}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{>{\bfseries}p{3.5cm} p{5cm} p{5cm}}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Couche}} & \textcolor{white}{\textbf{Responsabilité}} & \textcolor{white}{\textbf{Technologies}} \\
+\midrule
+Présentation & Interface utilisateur, interactions, visualisations & React 18, TypeScript, TailwindCSS, Leaflet, Framer Motion \\
+Métier (API) & Logique applicative, orchestration, validation & FastAPI, Pydantic, APScheduler \\
+IA/ML & Inférence des modèles, traitement d'images & TensorFlow 2.x, Keras, Ultralytics YOLOv8 \\
+Services Externes & Intégration APIs tierces, notifications & REST APIs, SMTP, Telegram Bot API \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Microservices vs Monolithique}
+
+Pour le projet AI Sentinel, nous avons opté pour une architecture \textbf{monolithique modulaire} plutôt qu'une architecture microservices pure. Ce choix est justifié par plusieurs facteurs :
+
+\begin{infobox}{Justification du Choix Architectural}
+
+\textbf{Avantages du Monolithique Modulaire pour AI Sentinel :}
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Simplicité de déploiement :} Un seul backend à déployer et maintenir
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Latence réduite :} Pas de communication réseau entre services
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Partage des modèles IA :} Les modèles lourds sont chargés une seule fois
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Développement accéléré :} Moins de complexité infrastructurelle
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Adapté à l'équipe :} Taille de projet et d'équipe limitée
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Modularité Préservée :}
+
+Malgré l'architecture monolithique, le code est organisé en \textbf{modules indépendants} (services) qui pourraient être extraits en microservices si le besoin se présentait à l'avenir. Cette approche offre le meilleur des deux mondes : simplicité actuelle et évolutivité future.
+\end{infobox}
+
+\subsection{Schéma d'Architecture Détaillé}
+
+Le schéma suivant présente une vue complète de l'architecture technique du système AI Sentinel, incluant les flux de données et les interactions entre composants.
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={rectangle, rounded corners=8pt, draw=#1, line width=1.5pt, fill=#1!15, text width=2.5cm, minimum height=1.2cm, align=center, font=\small},
+    service/.style={rectangle, rounded corners=5pt, draw=accentTeal, line width=1pt, fill=skyBlue!20, text width=2cm, minimum height=0.8cm, align=center, font=\footnotesize},
+    external/.style={rectangle, rounded corners=5pt, draw=warmBrown, line width=1pt, fill=warmBrown!15, text width=1.8cm, minimum height=0.8cm, align=center, font=\footnotesize},
+    arrow/.style={->, >=stealth, line width=1pt, color=primaryGreen},
+    darrow/.style={<->, >=stealth, line width=1pt, color=accentTeal}
+]
+    % Client
+    \node[box=primaryGreen] (client) at (0, 5) {\faDesktop\\Client\\(Browser)};
+    
+    % Frontend
+    \node[box=primaryGreen, text width=8cm] (frontend) at (5, 5) {
+        \textbf{Frontend React}\\
+        \footnotesize Pages | Components | Services | Hooks
+    };
+    
+    % Backend
+    \node[box=accentTeal, text width=10cm, minimum height=3cm] (backend) at (4, 1.5) {};
+    \node[font=\bfseries, text=accentTeal] at (4, 2.8) {Backend FastAPI};
+    
+    % Services internes
+    \node[service] (yolo) at (0, 1.5) {YoloService};
+    \node[service] (class) at (2.5, 1.5) {ClassificationService};
+    \node[service] (firms) at (5, 1.5) {FirmsService};
+    \node[service] (sentinel) at (7.5, 1.5) {SentinelService};
+    
+    \node[service] (pred) at (1.25, 0.3) {PredictionService};
+    \node[service] (monitor) at (4, 0.3) {MonitoringService};
+    \node[service] (notif) at (6.75, 0.3) {NotificationService};
+    
+    % Modèles IA
+    \node[box=leafGreen, minimum height=2cm, text width=9cm] (models) at (4, -1.5) {};
+    \node[font=\bfseries, text=darkGreen] at (4, -0.9) {Modèles IA};
+    \node[font=\footnotesize] at (1, -1.8) {MobileNetV2\\(.h5)};
+    \node[font=\footnotesize] at (4, -1.8) {YOLOv8\\(.pt)};
+    \node[font=\footnotesize] at (7, -1.8) {CAM Model\\(.h5)};
+    
+    % Services Externes
+    \node[external] (nasa) at (-2, -1) {NASA\\FIRMS};
+    \node[external] (senti) at (-2, -2.5) {Sentinel\\Hub};
+    \node[external] (smtp) at (10, -1) {SMTP\\Server};
+    \node[external] (tg) at (10, -2.5) {Telegram\\Bot};
+    
+    % Connexions
+    \draw[arrow] (client) -- (frontend);
+    \draw[darrow] (frontend) -- node[right, font=\footnotesize] {REST API} (4, 3.5);
+    
+    \draw[arrow, dashed] (firms) -- (nasa);
+    \draw[arrow, dashed] (sentinel) -- (senti);
+    \draw[arrow, dashed] (notif) -- (smtp);
+    \draw[arrow, dashed] (notif) -- (tg);
+    
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Flux de Données Principaux}
+
+Le système gère plusieurs flux de données distincts, chacun correspondant à un cas d'utilisation principal :
+
+\begin{alertbox}{Flux 1 : Détection Temps Réel}
+\begin{enumerate}[leftmargin=0.5cm, itemsep=3pt]
+    \item Le client demande le flux vidéo via \texttt{GET /video\_feed}
+    \item Le backend capture les frames de la webcam (OpenCV)
+    \item Chaque frame est analysée par YOLOv8
+    \item Les bounding boxes sont superposées
+    \item Le flux MJPEG est streamé vers le client
+    \item En cas de détection, une alerte est déclenchée
+\end{enumerate}
+\textbf{Latence cible :} < 500ms bout en bout
+\end{alertbox}
+
+\begin{alertbox}{Flux 2 : Surveillance Satellite}
+\begin{enumerate}[leftmargin=0.5cm, itemsep=3pt]
+    \item Le scheduler déclenche un scan (ou demande manuelle)
+    \item SentinelService s'authentifie et récupère l'image
+    \item L'image est analysée par le modèle CAM
+    \item Si feu détecté : NotificationService envoie les alertes
+    \item Les résultats sont retournés au frontend
+\end{enumerate}
+\textbf{Intervalle :} Configurable (défaut 30 min)
+\end{alertbox}
+
+\begin{alertbox}{Flux 3 : Prédiction de Propagation}
+\begin{enumerate}[leftmargin=0.5cm, itemsep=3pt]
+    \item L'utilisateur sélectionne un hotspot sur la carte
+    \item Le frontend envoie les paramètres à \texttt{POST /api/prediction}
+    \item PredictionService calcule le rayon avec l'algorithme empirique
+    \item Le rayon et la zone sont retournés
+    \item Le frontend affiche le cercle de propagation
+\end{enumerate}
+\textbf{Temps de calcul :} < 100ms
+\end{alertbox}
+
+% ============================================
+\newpage
+\section{Conception du Backend}
+% ============================================
+
+Le backend d'AI Sentinel est construit avec \textbf{FastAPI}, un framework Python moderne reconnu pour ses performances exceptionnelles et son support natif de la documentation OpenAPI. Cette section détaille la structure et l'organisation du code backend.
+
+\subsection{Structure des Modules}
+
+L'organisation du code backend suit une structure claire et modulaire, facilitant la navigation et la maintenance.
+
+\begin{techbox}{Arborescence du Backend}
+\begin{verbatim}
+backend/
+├── main.py                     # Point d'entrée FastAPI
+├── services/
+│   ├── yolo_service.py         # Service détection YOLO
+│   ├── classification_service.py # Classification MobileNet
+│   ├── firms_service.py        # Intégration NASA FIRMS
+│   ├── prediction_service.py   # Calcul propagation
+│   ├── sentinel_service.py     # API Sentinel Hub
+│   ├── monitoring_service.py   # Scheduler surveillance
+│   ├── email_service.py        # Envoi emails SMTP
+│   └── telegram_service.py     # Bot Telegram
+├── models/
+│   ├── mobilenetv2_fire_detector.h5  # Modèle classification
+│   ├── best.pt                       # Modèle YOLO
+│   └── cam_model.h5                  # Modèle CAM satellite
+├── schemas/
+│   └── prediction_schemas.py   # Schémas Pydantic
+├── utils/
+│   └── image_processing.py     # Utilitaires images
+├── config.py                   # Configuration
+└── requirements.txt            # Dépendances Python
+\end{verbatim}
+\end{techbox}
+
+\subsubsection{Description des Services}
+
+Chaque service encapsule une fonctionnalité métier spécifique :
+
+\begin{table}[H]
+\centering
+\caption{Services Backend et leurs responsabilités}
+\label{tab:services}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{>{\bfseries}p{3.5cm} p{6cm} p{3.5cm}}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Service}} & \textcolor{white}{\textbf{Responsabilité}} & \textcolor{white}{\textbf{Dépendances}} \\
+\midrule
+yolo\_service & Chargement modèle YOLO, détection objets, dessin bounding boxes & Ultralytics, OpenCV \\
+classification\_service & Chargement MobileNetV2, prétraitement, classification 3 classes & TensorFlow, Keras \\
+firms\_service & Appels API NASA FIRMS, parsing données, récupération météo & Requests, Open-Meteo \\
+prediction\_service & Algorithme de propagation, calcul rayon, facteurs environnementaux & NumPy \\
+sentinel\_service & OAuth2 Sentinel Hub, récupération images, evalscripts & Requests, OAuth2 \\
+monitoring\_service & Scheduler APScheduler, orchestration scans, gestion état & APScheduler \\
+email\_service & Configuration SMTP, templates HTML, envoi emails & smtplib, email.mime \\
+telegram\_service & API Telegram Bot, envoi messages et images & Requests \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Conception des APIs REST}
+
+L'API REST d'AI Sentinel suit les principes RESTful et fournit des endpoints clairement définis pour chaque fonctionnalité.
+
+\subsubsection{Endpoints Principaux}
+
+\begin{table}[H]
+\centering
+\caption{Spécification des Endpoints API}
+\label{tab:endpoints}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{l l p{4cm} p{3cm} p{3cm}}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Endpoint}} & \textcolor{white}{\textbf{Méthode}} & \textcolor{white}{\textbf{Description}} & \textcolor{white}{\textbf{Request}} & \textcolor{white}{\textbf{Response}} \\
+\midrule
+\texttt{/predict} & POST & Classification image & multipart/form-data & \{class, confidence\} \\
+\texttt{/video\_feed} & GET & Flux vidéo MJPEG & - & multipart/x-mixed-replace \\
+\texttt{/detect/image} & POST & Détection sur image & file: image & Image annotée \\
+\texttt{/detect/video} & POST & Détection sur vidéo & file: video & Vidéo annotée \\
+\texttt{/api/wildfire/realtime} & GET & Hotspots FIRMS & ?region=xxx & [\{lat, lng, ...\}] \\
+\texttt{/api/satellite/scan} & POST & Scan satellite zone & \{zone\_id\} & \{results, image\} \\
+\texttt{/api/prediction} & POST & Calcul propagation & \{params\} & \{radius, area\} \\
+\texttt{/start\_monitoring} & POST & Démarrer scheduler & \{interval\} & \{status\} \\
+\texttt{/stop\_monitoring} & POST & Arrêter scheduler & - & \{status\} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Exemple de Schéma Pydantic}
+
+Les schémas Pydantic assurent la validation et la documentation automatique des données échangées :
+
+\begin{techbox}{Schéma de Prédiction (prediction\_schemas.py)}
+\begin{verbatim}
+from pydantic import BaseModel, Field
+from typing import Optional
+from enum import Enum
+
+class ConfidenceLevel(str, Enum):
+    HIGH = "high"
+    NOMINAL = "nominal"
+    LOW = "low"
+
+class PredictionRequest(BaseModel):
+    brightness: float = Field(..., ge=250, le=500, 
+                              description="Brightness in Kelvin")
+    confidence: ConfidenceLevel = Field(default=ConfidenceLevel.NOMINAL)
+    wind_speed: float = Field(default=0, ge=0, le=150)
+    wind_direction: float = Field(default=0, ge=0, le=360)
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+
+class PredictionResponse(BaseModel):
+    predicted_radius_km: float
+    predicted_area_km2: float
+    risk_level: str
+    factors: dict
+\end{verbatim}
+\end{techbox}
+
+\subsection{Flux de Données Backend}
+
+Le diagramme suivant illustre le flux de traitement d'une requête de détection temps réel :
+
+\begin{center}
+\begin{tikzpicture}[
+    step/.style={rectangle, rounded corners=5pt, draw=accentTeal, line width=1.5pt, fill=skyBlue!20, text width=2cm, minimum height=1.2cm, align=center, font=\footnotesize},
+    data/.style={rectangle, draw=leafGreen, line width=1pt, fill=leafGreen!20, text width=1.5cm, minimum height=0.8cm, align=center, font=\tiny},
+    arrow/.style={->, >=stealth, line width=1.5pt, color=primaryGreen}
+]
+    % Étapes
+    \node[step] (s1) at (0, 0) {Requête\\HTTP};
+    \node[step] (s2) at (3, 0) {Route\\FastAPI};
+    \node[step] (s3) at (6, 0) {YOLO\\Service};
+    \node[step] (s4) at (9, 0) {Capture\\Frame};
+    \node[step] (s5) at (12, 0) {Inférence\\Model};
+    
+    \node[step] (s6) at (12, -2.5) {Post-\\Processing};
+    \node[step] (s7) at (9, -2.5) {Draw\\Boxes};
+    \node[step] (s8) at (6, -2.5) {Encode\\JPEG};
+    \node[step] (s9) at (3, -2.5) {Stream\\Response};
+    \node[step] (s10) at (0, -2.5) {Client\\Display};
+    
+    % Flèches
+    \draw[arrow] (s1) -- (s2);
+    \draw[arrow] (s2) -- (s3);
+    \draw[arrow] (s3) -- (s4);
+    \draw[arrow] (s4) -- (s5);
+    \draw[arrow] (s5) -- (s6);
+    \draw[arrow] (s6) -- (s7);
+    \draw[arrow] (s7) -- (s8);
+    \draw[arrow] (s8) -- (s9);
+    \draw[arrow] (s9) -- (s10);
+    
+    % Données
+    \node[data] at (1.5, 0.8) {GET};
+    \node[data] at (4.5, 0.8) {call};
+    \node[data] at (7.5, 0.8) {frame};
+    \node[data] at (10.5, 0.8) {tensor};
+    \node[data] at (10.5, -1.7) {boxes};
+    \node[data] at (7.5, -1.7) {img};
+    \node[data] at (4.5, -1.7) {bytes};
+    \node[data] at (1.5, -1.7) {MJPEG};
+    
+\end{tikzpicture}
+\end{center}

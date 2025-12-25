@@ -1,0 +1,587 @@
+% ============================================
+% CHAPITRE III - PARTIE 4 : MODÉLISATION UML
+% ============================================
+
+\newpage
+\section{Modélisation UML}
+
+La modélisation UML (Unified Modeling Language) permet de visualiser l'architecture et le comportement du système de manière standardisée. Cette section présente les différents diagrammes qui décrivent AI Sentinel sous ses multiples facettes : fonctionnelle, structurelle et comportementale.
+
+\subsection{Diagramme de Cas d'Utilisation Global}
+
+Le diagramme de cas d'utilisation global offre une vue d'ensemble des fonctionnalités du système et des interactions entre les acteurs et le système.
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tikzpicture}[
+    actor/.style={font=\small},
+    usecase/.style={ellipse, draw=primaryGreen, line width=1.5pt, fill=mintGreen!50, text width=2.5cm, align=center, font=\footnotesize, minimum height=1cm},
+    system/.style={rectangle, draw=darkGreen, line width=2pt, rounded corners=10pt, minimum width=11cm, minimum height=10cm}
+]
+    % Système
+    \node[system, label={[font=\Large\bfseries, text=darkGreen]above:Système AI Sentinel}] (sys) at (5, 0) {};
+    
+    % Acteurs
+    \node[actor] (user) at (-2, 1) {\includegraphics[width=1cm]{example-image}};
+    \node[font=\small\bfseries, below] at (-2, 0.3) {Utilisateur};
+    
+    \node[actor] (admin) at (12, 1) {\includegraphics[width=1cm]{example-image}};
+    \node[font=\small\bfseries, below] at (12, 0.3) {Admin};
+    
+    \node[actor] (ext) at (5, -6.5) {};
+    \node[font=\small\bfseries, text=accentTeal] at (5, -6.5) {\faCloud\ Services Externes};
+    
+    % Cas d'utilisation - Colonne gauche
+    \node[usecase] (uc1) at (2, 3) {Détection\\temps réel};
+    \node[usecase] (uc2) at (2, 1.5) {Upload\\média};
+    \node[usecase] (uc3) at (2, 0) {Surveillance\\satellite};
+    \node[usecase] (uc4) at (2, -1.5) {Visualiser\\carte};
+    
+    % Cas d'utilisation - Colonne droite
+    \node[usecase] (uc5) at (8, 3) {Prédiction\\propagation};
+    \node[usecase] (uc6) at (8, 1.5) {Configurer\\alertes};
+    \node[usecase] (uc7) at (8, 0) {Consulter\\historique};
+    \node[usecase] (uc8) at (8, -1.5) {Exporter\\rapports};
+    
+    % Cas Admin
+    \node[usecase, fill=skyBlue!30] (uca1) at (5, -3) {Gérer\\monitoring};
+    \node[usecase, fill=skyBlue!30] (uca2) at (5, -4.5) {Configurer\\système};
+    
+    % Connexions Utilisateur
+    \draw[primaryGreen, line width=1pt] (user) -- (uc1);
+    \draw[primaryGreen, line width=1pt] (user) -- (uc2);
+    \draw[primaryGreen, line width=1pt] (user) -- (uc3);
+    \draw[primaryGreen, line width=1pt] (user) -- (uc4);
+    \draw[primaryGreen, line width=1pt] (-0.5, 1) -- (uc5);
+    \draw[primaryGreen, line width=1pt] (-0.5, 1) -- (uc7);
+    
+    % Connexions Admin
+    \draw[accentTeal, line width=1pt] (admin) -- (uc6);
+    \draw[accentTeal, line width=1pt] (admin) -- (uc8);
+    \draw[accentTeal, line width=1pt] (admin) -- (uca1);
+    \draw[accentTeal, line width=1pt] (admin) -- (uca2);
+    
+    % Connexions Services Externes
+    \draw[textGray, line width=1pt, dashed] (uc3) -- (ext);
+    \draw[textGray, line width=1pt, dashed] (uc5) -- (ext);
+    \draw[textGray, line width=1pt, dashed] (uca1) -- (ext);
+    
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5cm}
+
+\begin{greenbox}[\faListOl\ Légende des Cas d'Utilisation]
+\begin{minipage}[t]{0.48\textwidth}
+\textbf{Cas Utilisateur :}
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item Détection temps réel (vidéo/webcam)
+    \item Upload média (images/vidéos)
+    \item Surveillance satellite
+    \item Visualiser carte interactive
+    \item Prédiction de propagation
+    \item Consulter historique
+\end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\textbf{Cas Administrateur :}
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item Configurer alertes
+    \item Exporter rapports
+    \item Gérer monitoring satellite
+    \item Configurer système
+\end{itemize}
+\end{minipage}
+\end{greenbox}
+
+\subsection{Diagrammes de Cas d'Utilisation Détaillés}
+
+\subsubsection{UC01 : Détection en Temps Réel}
+
+\begin{center}
+\begin{tikzpicture}[
+    usecase/.style={ellipse, draw=primaryGreen, line width=1.5pt, fill=mintGreen!50, text width=2.2cm, align=center, font=\footnotesize, minimum height=0.9cm},
+    extends/.style={->, >=stealth, dashed, line width=1pt, textGray},
+    includes/.style={->, >=stealth, dashed, line width=1pt, accentTeal}
+]
+    % Acteur
+    \node (user) at (-3, 0) {\faUser};
+    \node[font=\small\bfseries, below] at (-3, -0.5) {Utilisateur};
+    
+    % Cas principal
+    \node[usecase, fill=leafGreen!30, text width=3cm] (main) at (3, 0) {Détection\\Temps Réel};
+    
+    % Sous-cas
+    \node[usecase] (uc1) at (7, 2) {Activer\\webcam};
+    \node[usecase] (uc2) at (7, 0) {Visualiser\\flux};
+    \node[usecase] (uc3) at (7, -2) {Afficher\\détections};
+    \node[usecase] (uc4) at (11, 1) {Envoyer\\alerte};
+    \node[usecase] (uc5) at (11, -1) {Sauvegarder\\capture};
+    
+    % Connexions
+    \draw[primaryGreen, line width=1.5pt] (user) -- (main);
+    \draw[includes] (main) -- node[above, font=\tiny] {<<include>>} (uc1);
+    \draw[includes] (main) -- node[above, font=\tiny] {<<include>>} (uc2);
+    \draw[includes] (main) -- node[below, font=\tiny] {<<include>>} (uc3);
+    \draw[extends] (uc4) -- node[above, font=\tiny] {<<extends>>} (uc3);
+    \draw[extends] (uc5) -- node[below, font=\tiny] {<<extends>>} (uc3);
+    
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{UC02 : Surveillance Satellite}
+
+\begin{center}
+\begin{tikzpicture}[
+    usecase/.style={ellipse, draw=accentTeal, line width=1.5pt, fill=skyBlue!30, text width=2.2cm, align=center, font=\footnotesize, minimum height=0.9cm},
+    extends/.style={->, >=stealth, dashed, line width=1pt, textGray},
+    includes/.style={->, >=stealth, dashed, line width=1pt, primaryGreen}
+]
+    % Acteurs
+    \node (user) at (-3, 1) {\faUser};
+    \node[font=\small\bfseries, below] at (-3, 0.5) {Utilisateur};
+    
+    \node (admin) at (-3, -2) {\faUserCog};
+    \node[font=\small\bfseries, below] at (-3, -2.5) {Admin};
+    
+    % Cas principal
+    \node[usecase, fill=accentTeal!30, text width=3cm] (main) at (3, 0) {Surveillance\\Satellite};
+    
+    % Sous-cas
+    \node[usecase] (uc1) at (7, 2.5) {Sélectionner\\zone};
+    \node[usecase] (uc2) at (7, 1) {Récupérer\\image Sentinel};
+    \node[usecase] (uc3) at (7, -0.5) {Analyser\\par CAM};
+    \node[usecase] (uc4) at (7, -2) {Afficher\\résultat};
+    \node[usecase] (uc5) at (11, 0) {Démarrer\\scan auto};
+    
+    % Connexions
+    \draw[primaryGreen, line width=1.5pt] (user) -- (main);
+    \draw[primaryGreen, line width=1.5pt] (admin) -- (main);
+    \draw[includes] (main) -- node[above, font=\tiny] {<<include>>} (uc1);
+    \draw[includes] (main) -- node[above, font=\tiny] {<<include>>} (uc2);
+    \draw[includes] (main) -- node[above, font=\tiny] {<<include>>} (uc3);
+    \draw[includes] (main) -- node[below, font=\tiny] {<<include>>} (uc4);
+    \draw[extends] (uc5) -- node[above, font=\tiny] {<<extends>>} (main);
+    
+\end{tikzpicture}
+\end{center}
+
+\subsection{Description Textuelle des Cas d'Utilisation}
+
+\begin{table}[H]
+\centering
+\caption{UC01 : Détection en Temps Réel}
+\label{tab:uc01}
+\rowcolors{2}{mintGreen!20}{white}
+\begin{tabular}{>{\bfseries}p{3cm} p{10cm}}
+\toprule
+\rowcolor{primaryGreen}
+\multicolumn{2}{l}{\textcolor{white}{\textbf{UC01 : Détection en Temps Réel}}} \\
+\midrule
+Acteur principal & Utilisateur (Opérateur de surveillance) \\
+Acteurs secondaires & Système de notification, Modèle YOLOv8 \\
+Description & Permet à l'utilisateur de détecter en temps réel la présence de feu ou de fumée via une webcam ou caméra connectée \\
+Préconditions & \begin{itemize}[leftmargin=0.3cm, topsep=0pt, itemsep=0pt]
+    \item Caméra/webcam connectée et fonctionnelle
+    \item Modèle YOLOv8 chargé en mémoire
+    \item Connexion au backend établie
+\end{itemize} \\
+\midrule
+\multicolumn{2}{l}{\textbf{\textcolor{primaryGreen}{Scénario nominal :}}} \\
+\multicolumn{2}{p{13cm}}{
+\begin{enumerate}[leftmargin=0.5cm, topsep=0pt, itemsep=2pt]
+    \item L'utilisateur accède à la page /realtime
+    \item L'utilisateur clique sur "Démarrer la détection"
+    \item Le système active le flux vidéo de la webcam
+    \item Le système affiche le flux vidéo en temps réel
+    \item Le système analyse chaque frame avec YOLOv8
+    \item Si feu/fumée détecté : affichage des bounding boxes
+    \item Le système génère une alerte visuelle
+    \item [Optionnel] Le système envoie une notification
+\end{enumerate}
+} \\
+\midrule
+Postconditions & \begin{itemize}[leftmargin=0.3cm, topsep=0pt, itemsep=0pt]
+    \item Flux vidéo affiché avec annotations
+    \item Alertes générées si détection positive
+    \item Logs de détection enregistrés
+\end{itemize} \\
+Exceptions & \begin{itemize}[leftmargin=0.3cm, topsep=0pt, itemsep=0pt]
+    \item E1 : Caméra non accessible → Message d'erreur
+    \item E2 : Modèle non chargé → Tentative de rechargement
+\end{itemize} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.5cm}
+
+\begin{table}[H]
+\centering
+\caption{UC02 : Upload et Analyse d'Image}
+\label{tab:uc02}
+\rowcolors{2}{mintGreen!20}{white}
+\begin{tabular}{>{\bfseries}p{3cm} p{10cm}}
+\toprule
+\rowcolor{primaryGreen}
+\multicolumn{2}{l}{\textcolor{white}{\textbf{UC02 : Upload et Analyse d'Image}}} \\
+\midrule
+Acteur principal & Utilisateur \\
+Acteurs secondaires & Modèle MobileNetV2 \\
+Description & Permet d'uploader une image et d'obtenir sa classification (Fire/Smoke/Non-Fire) \\
+Préconditions & \begin{itemize}[leftmargin=0.3cm, topsep=0pt, itemsep=0pt]
+    \item Image au format valide (JPEG, PNG)
+    \item Taille < 10 MB
+\end{itemize} \\
+\midrule
+\multicolumn{2}{l}{\textbf{\textcolor{primaryGreen}{Scénario nominal :}}} \\
+\multicolumn{2}{p{13cm}}{
+\begin{enumerate}[leftmargin=0.5cm, topsep=0pt, itemsep=2pt]
+    \item L'utilisateur accède à la page /upload
+    \item L'utilisateur sélectionne une image (drag-and-drop ou bouton)
+    \item L'utilisateur clique sur "Analyser"
+    \item Le système uploade l'image vers le backend
+    \item Le backend prétraite l'image (224×224, normalisation)
+    \item Le modèle MobileNetV2 effectue la classification
+    \item Le système affiche le résultat : classe + score de confiance
+\end{enumerate}
+} \\
+\midrule
+Postconditions & Résultat de classification affiché avec probabilités \\
+Exceptions & \begin{itemize}[leftmargin=0.3cm, topsep=0pt, itemsep=0pt]
+    \item E1 : Format invalide → Message d'erreur avec formats acceptés
+    \item E2 : Image trop grande → Message avec taille maximale
+\end{itemize} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Diagramme de Séquence - Détection Temps Réel}
+
+Ce diagramme illustre les interactions entre les composants lors d'une session de détection en temps réel.
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tikzpicture}[
+    lifeline/.style={dashed, line width=1pt, textGray},
+    message/.style={->, >=stealth, line width=1pt, primaryGreen},
+    return/.style={->, >=stealth, dashed, line width=1pt, accentTeal},
+    actor/.style={rectangle, draw=primaryGreen, line width=1.5pt, fill=mintGreen, minimum width=1.8cm, minimum height=0.8cm, align=center, font=\footnotesize}
+]
+    % Acteurs
+    \node[actor] (user) at (0, 0) {Utilisateur};
+    \node[actor] (front) at (3.5, 0) {Frontend\\React};
+    \node[actor] (back) at (7, 0) {Backend\\FastAPI};
+    \node[actor] (yolo) at (10.5, 0) {YOLOv8\\Model};
+    \node[actor] (notif) at (14, 0) {Telegram\\Bot};
+    
+    % Lifelines
+    \draw[lifeline] (0, -0.5) -- (0, -11);
+    \draw[lifeline] (3.5, -0.5) -- (3.5, -11);
+    \draw[lifeline] (7, -0.5) -- (7, -11);
+    \draw[lifeline] (10.5, -0.5) -- (10.5, -11);
+    \draw[lifeline] (14, -0.5) -- (14, -11);
+    
+    % Messages
+    \draw[message] (0, -1.5) -- node[above, font=\tiny] {1: Accéder /realtime} (3.5, -1.5);
+    \draw[return] (3.5, -2) -- node[above, font=\tiny] {Page chargée} (0, -2);
+    
+    \draw[message] (0, -2.8) -- node[above, font=\tiny] {2: Clic "Démarrer"} (3.5, -2.8);
+    \draw[message] (3.5, -3.3) -- node[above, font=\tiny] {3: GET /video\_feed} (7, -3.3);
+    
+    % Boucle de détection
+    \draw[darkGreen, line width=1pt] (6.2, -4) rectangle (11.3, -7.5);
+    \node[font=\tiny\bfseries, text=darkGreen] at (7.5, -3.8) {loop [pour chaque frame]};
+    
+    \draw[message] (7, -4.5) -- node[above, font=\tiny] {4: capture\_frame()} (7, -4.5);
+    \draw[message] (7, -5) -- node[above, font=\tiny] {5: predict(frame)} (10.5, -5);
+    \draw[return] (10.5, -5.5) -- node[above, font=\tiny] {boxes, scores} (7, -5.5);
+    \draw[message] (7, -6) -- node[above, font=\tiny] {6: draw\_boxes()} (7, -6);
+    \draw[message] (7, -7) -- node[above, font=\tiny] {7: encode MJPEG} (7, -7);
+    
+    % Condition alerte
+    \draw[alertOrange, line width=1pt] (6.2, -8) rectangle (14.8, -9.5);
+    \node[font=\tiny\bfseries, text=alertOrange] at (8, -7.8) {alt [si Fire détecté]};
+    
+    \draw[message] (7, -8.5) -- node[above, font=\tiny] {8: send\_alert()} (14, -8.5);
+    \draw[return] (14, -9) -- node[above, font=\tiny] {OK} (7, -9);
+    
+    % Retour stream
+    \draw[return] (7, -10) -- node[above, font=\tiny] {MJPEG stream} (3.5, -10);
+    \draw[return] (3.5, -10.5) -- node[above, font=\tiny] {Affichage vidéo} (0, -10.5);
+    
+\end{tikzpicture}
+\end{center}
+
+\subsection{Diagramme de Séquence - Surveillance Satellite}
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tikzpicture}[
+    lifeline/.style={dashed, line width=1pt, textGray},
+    message/.style={->, >=stealth, line width=1pt, accentTeal},
+    return/.style={->, >=stealth, dashed, line width=1pt, primaryGreen},
+    actor/.style={rectangle, draw=accentTeal, line width=1.5pt, fill=skyBlue!20, minimum width=1.5cm, minimum height=0.8cm, align=center, font=\footnotesize}
+]
+    % Acteurs
+    \node[actor] (user) at (0, 0) {Admin};
+    \node[actor] (front) at (2.8, 0) {Frontend};
+    \node[actor] (back) at (5.6, 0) {Backend};
+    \node[actor] (sent) at (8.4, 0) {Sentinel\\Hub};
+    \node[actor] (cam) at (11.2, 0) {CAM\\Model};
+    \node[actor] (notif) at (14, 0) {Email\\Service};
+    
+    % Lifelines
+    \draw[lifeline] (0, -0.5) -- (0, -10);
+    \draw[lifeline] (2.8, -0.5) -- (2.8, -10);
+    \draw[lifeline] (5.6, -0.5) -- (5.6, -10);
+    \draw[lifeline] (8.4, -0.5) -- (8.4, -10);
+    \draw[lifeline] (11.2, -0.5) -- (11.2, -10);
+    \draw[lifeline] (14, -0.5) -- (14, -10);
+    
+    % Messages
+    \draw[message] (0, -1.2) -- node[above, font=\tiny] {1: Démarrer scan} (2.8, -1.2);
+    \draw[message] (2.8, -1.7) -- node[above, font=\tiny] {2: POST /start\_monitoring} (5.6, -1.7);
+    
+    % Boucle zones
+    \draw[darkGreen, line width=1pt] (4.8, -2.3) rectangle (14.8, -8);
+    \node[font=\tiny\bfseries, text=darkGreen] at (6.5, -2.1) {loop [pour chaque zone]};
+    
+    \draw[message] (5.6, -3) -- node[above, font=\tiny] {3: get\_image(zone)} (8.4, -3);
+    \draw[return] (8.4, -3.5) -- node[above, font=\tiny] {image satellite} (5.6, -3.5);
+    
+    \draw[message] (5.6, -4.2) -- node[above, font=\tiny] {4: analyze(image)} (11.2, -4.2);
+    \draw[return] (11.2, -4.7) -- node[above, font=\tiny] {prediction, heatmap} (5.6, -4.7);
+    
+    % Condition feu
+    \draw[moroccanRed, line width=1pt] (4.8, -5.3) rectangle (14.8, -7.5);
+    \node[font=\tiny\bfseries, text=moroccanRed] at (6.8, -5.1) {alt [si Fire détecté]};
+    
+    \draw[message] (5.6, -6) -- node[above, font=\tiny] {5: send\_email(details)} (14, -6);
+    \draw[return] (14, -6.5) -- node[above, font=\tiny] {sent OK} (5.6, -6.5);
+    \draw[message] (5.6, -7) -- node[above, font=\tiny] {6: log\_detection()} (5.6, -7);
+    
+    % Retour
+    \draw[return] (5.6, -8.5) -- node[above, font=\tiny] {scan results} (2.8, -8.5);
+    \draw[return] (2.8, -9) -- node[above, font=\tiny] {Affichage rapport} (0, -9);
+    
+\end{tikzpicture}
+\end{center}
+
+\newpage
+\subsection{Diagramme de Classes}
+
+Le diagramme de classes présente la structure statique du système, avec les principales classes et leurs relations.
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tikzpicture}[
+    class/.style={rectangle, draw=primaryGreen, line width=1.5pt, fill=mintGreen!30, rounded corners=3pt, minimum width=4cm, align=left, font=\footnotesize},
+    inherit/.style={->, >=open triangle 60, line width=1pt, primaryGreen},
+    compose/.style={-*, line width=1pt, darkGreen},
+    assoc/.style={-, line width=1pt, textGray}
+]
+    % Classes Services
+    \node[class] (yolo) at (0, 6) {
+        \textbf{\textcolor{darkGreen}{YoloService}}\\
+        \rule{3.8cm}{0.5pt}\\
+        - model: YOLO\\
+        - class\_names: list\\
+        - confidence: float\\
+        \rule{3.8cm}{0.5pt}\\
+        + load\_model()\\
+        + detect(frame)\\
+        + draw\_boxes()
+    };
+    
+    \node[class] (mobile) at (5, 6) {
+        \textbf{\textcolor{darkGreen}{ClassificationService}}\\
+        \rule{3.8cm}{0.5pt}\\
+        - model: tf.Model\\
+        - img\_size: tuple\\
+        \rule{3.8cm}{0.5pt}\\
+        + load\_model()\\
+        + classify(image)\\
+        + preprocess()
+    };
+    
+    \node[class] (firms) at (10, 6) {
+        \textbf{\textcolor{darkGreen}{FirmsService}}\\
+        \rule{3.8cm}{0.5pt}\\
+        - api\_key: str\\
+        - regions: dict\\
+        \rule{3.8cm}{0.5pt}\\
+        + fetch\_data(region)\\
+        + get\_wind\_data()\\
+        + parse\_hotspots()
+    };
+    
+    \node[class] (sentinel) at (0, 1) {
+        \textbf{\textcolor{darkGreen}{SentinelService}}\\
+        \rule{3.8cm}{0.5pt}\\
+        - client\_id: str\\
+        - client\_secret: str\\
+        - zones: list\\
+        \rule{3.8cm}{0.5pt}\\
+        + authenticate()\\
+        + get\_image(zone)\\
+        + get\_evalscript()
+    };
+    
+    \node[class] (prediction) at (5, 1) {
+        \textbf{\textcolor{darkGreen}{PredictionService}}\\
+        \rule{3.8cm}{0.5pt}\\
+        - base\_radius: float\\
+        \rule{3.8cm}{0.5pt}\\
+        + calculate(params)\\
+        + get\_brightness\_factor()\\
+        + get\_wind\_factor()
+    };
+    
+    \node[class] (monitoring) at (10, 1) {
+        \textbf{\textcolor{darkGreen}{MonitoringService}}\\
+        \rule{3.8cm}{0.5pt}\\
+        - scheduler: APScheduler\\
+        - is\_running: bool\\
+        - interval: int\\
+        \rule{3.8cm}{0.5pt}\\
+        + start()\\
+        + stop()\\
+        + scan\_all\_zones()
+    };
+    
+    \node[class] (notif) at (5, -4) {
+        \textbf{\textcolor{darkGreen}{NotificationService}}\\
+        \rule{3.8cm}{0.5pt}\\
+        - telegram\_token: str\\
+        - email\_config: dict\\
+        - cooldown: int\\
+        \rule{3.8cm}{0.5pt}\\
+        + send\_telegram()\\
+        + send\_email()\\
+        + check\_cooldown()
+    };
+    
+    % Relations
+    \draw[compose] (monitoring) -- (sentinel);
+    \draw[compose] (monitoring) -- (notif);
+    \draw[assoc] (monitoring) -- (firms);
+    \draw[assoc] (prediction) -- (firms);
+    
+\end{tikzpicture}
+\end{center}
+
+\subsection{Diagramme d'Activité - Processus de Détection}
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tikzpicture}[
+    start/.style={circle, fill=darkGreen, minimum size=0.5cm},
+    stop/.style={circle, draw=darkGreen, line width=2pt, fill=darkGreen, minimum size=0.5cm},
+    activity/.style={rectangle, rounded corners=8pt, draw=primaryGreen, line width=1.5pt, fill=mintGreen!50, text width=2.5cm, minimum height=1cm, align=center, font=\small},
+    decision/.style={diamond, draw=alertOrange, line width=1.5pt, fill=sunYellow!30, aspect=2, font=\small},
+    arrow/.style={->, >=stealth, line width=1.5pt, primaryGreen}
+]
+    % Start
+    \node[start] (start) at (0, 0) {};
+    
+    % Activities
+    \node[activity] (a1) at (3, 0) {Initialiser\\caméra};
+    \node[activity] (a2) at (6.5, 0) {Capturer\\frame};
+    \node[activity] (a3) at (10, 0) {Prétraiter\\image};
+    \node[activity] (a4) at (13.5, 0) {Inférence\\YOLO};
+    
+    \node[decision] (d1) at (13.5, -2.5) {Feu?};
+    
+    \node[activity] (a5) at (10, -2.5) {Dessiner\\boxes};
+    \node[activity] (a6) at (16.5, -2.5) {Envoyer\\alerte};
+    
+    \node[activity] (a7) at (6.5, -2.5) {Encoder\\MJPEG};
+    \node[activity] (a8) at (3, -2.5) {Streamer\\vers client};
+    
+    \node[decision] (d2) at (3, -5) {Stop?};
+    
+    \node[stop] (stop) at (0, -5) {};
+    
+    % Arrows
+    \draw[arrow] (start) -- (a1);
+    \draw[arrow] (a1) -- (a2);
+    \draw[arrow] (a2) -- (a3);
+    \draw[arrow] (a3) -- (a4);
+    \draw[arrow] (a4) -- (d1);
+    \draw[arrow] (d1) -- node[left, font=\tiny] {Non} (a5);
+    \draw[arrow] (d1) -- node[above, font=\tiny] {Oui} (a6);
+    \draw[arrow] (a6) |- (a5);
+    \draw[arrow] (a5) -- (a7);
+    \draw[arrow] (a7) -- (a8);
+    \draw[arrow] (a8) -- (d2);
+    \draw[arrow] (d2) -- node[above, font=\tiny] {Oui} (stop);
+    \draw[arrow] (d2.east) -- ++(1,0) |- node[right, font=\tiny, pos=0.25] {Non} (a2.south);
+    
+\end{tikzpicture}
+\end{center}
+
+\subsection{Diagramme de Déploiement}
+
+Le diagramme de déploiement illustre l'architecture physique du système et la répartition des composants sur les différents nœuds.
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tikzpicture}[
+    node/.style={rectangle, draw=darkGreen, line width=2pt, fill=mintGreen!20, rounded corners=5pt, minimum width=4.5cm, minimum height=3cm},
+    component/.style={rectangle, draw=accentTeal, line width=1pt, fill=skyBlue!20, rounded corners=3pt, minimum width=3.5cm, minimum height=0.7cm, font=\footnotesize},
+    external/.style={rectangle, draw=textGray, line width=1.5pt, fill=softGray, rounded corners=5pt, minimum width=3cm, minimum height=1.5cm},
+    arrow/.style={<->, >=stealth, line width=1.5pt, primaryGreen}
+]
+    % Nœud Client
+    \node[node, label={[font=\small\bfseries, text=darkGreen]above:Client (Browser)}] (client) at (0, 0) {};
+    \node[component] at (0, 0.5) {React Application};
+    \node[component] at (0, -0.4) {Leaflet Maps};
+    \node[component] at (0, -1.3) {TailwindCSS};
+    
+    % Nœud Serveur
+    \node[node, minimum height=5cm, label={[font=\small\bfseries, text=darkGreen]above:Serveur Backend}] (server) at (7, 0) {};
+    \node[component] at (7, 1.5) {FastAPI};
+    \node[component] at (7, 0.6) {TensorFlow};
+    \node[component] at (7, -0.3) {YOLOv8/Ultralytics};
+    \node[component] at (7, -1.2) {APScheduler};
+    \node[component] at (7, -2.1) {SMTP/Telegram};
+    
+    % Services Externes
+    \node[external] (nasa) at (13, 2) {NASA FIRMS};
+    \node[external] (sentinel) at (13, 0) {Sentinel Hub};
+    \node[external] (meteo) at (13, -2) {Open-Meteo};
+    
+    % Connexions
+    \draw[arrow] (client) -- node[above, font=\footnotesize] {HTTP/REST} node[below, font=\footnotesize] {MJPEG} (server);
+    \draw[arrow] (server) -- node[above, font=\tiny] {API} (nasa);
+    \draw[arrow] (server) -- node[above, font=\tiny] {OAuth2} (sentinel);
+    \draw[arrow] (server) -- node[above, font=\tiny] {API} (meteo);
+    
+\end{tikzpicture}
+\end{center}
+
+\vspace{1cm}
+
+% Transition vers le chapitre suivant
+\begin{center}
+\begin{tikzpicture}
+    \node[
+        fill=primaryGreen!10,
+        draw=primaryGreen,
+        line width=1.5pt,
+        rounded corners=12pt,
+        inner sep=20pt,
+        text width=13cm,
+        align=center
+    ] {
+        \textcolor{primaryGreen}{\fontsize{24}{28}\selectfont\faArrowCircleRight}\\[15pt]
+        \large\textbf{Chapitre Suivant}\\[10pt]
+        \normalsize Le prochain chapitre détaille la conception et l'architecture technique\\
+        du système AI Sentinel, incluant l'architecture logicielle,\\
+        la conception des modèles IA et l'interface utilisateur.\\[10pt]
+        \textit{\textcolor{textGray}{Chapitre IV --- Conception et Architecture}}
+    };
+\end{tikzpicture}
+\end{center}

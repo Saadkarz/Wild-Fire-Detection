@@ -164,7 +164,7 @@ class YoloService:
         fps = int(cap.get(cv2.CAP_PROP_FPS))
         
         # Define codec and create VideoWriter
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
+        fourcc = cv2.VideoWriter_fourcc(*'avc1') 
         out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
         
         frame_count = 0

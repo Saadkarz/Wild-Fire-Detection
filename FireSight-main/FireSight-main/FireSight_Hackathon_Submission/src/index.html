@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireSight - Real-Time Wildfire Intelligence</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>FireSight</h1>
+        <div class="status">
+            <span id="lastUpdated">Last updated: Loading...</span>
+            <button id="refreshBtn" title="Get Fresh Satellite Data">🔄 Update</button>
+        </div>
+    </div>
+
+    <!-- User Guidance Panel -->
+    <div id="guidancePanel" class="guidance-panel">
+        <div class="guidance-content">
+            <div class="welcome-header">
+                <h3>🔥 Welcome to FireSight</h3>
+                <p>Track active wildfires around the world</p>
+            </div>
+            <div class="how-to-use">
+                <h4>How to use:</h4>
+                <div class="simple-steps">
+                    <div class="step-item">
+                        <span class="step-icon">🔥</span>
+                        <span>Click fire icons to see details</span>
+                    </div>
+                    <div class="step-item">
+                        <span class="step-icon">📍</span>
+                        <span>Orange circles show spread predictions</span>
+                    </div>
+                    <div class="step-item">
+                        <span class="step-icon">🔄</span>
+                        <span>Update for latest satellite data</span>
+                    </div>
+                </div>
+            </div>
+            <div class="guidance-region">
+                <label for="regionSelect">Choose area to view:</label>
+                <select id="regionSelect">
+                    <option value="california">🇺🇸 California</option>
+                    <option value="australia">🇦🇺 Australia</option>
+                    <option value="global">🌍 Worldwide</option>
+                </select>
+            </div>
+            <button class="close-guidance" onclick="closeGuidance()">Start Exploring</button>
+        </div>
+    </div>
+
+    <!-- Map Container -->
+    <div id="leafletContainer" class="map-container"></div>
+
+    <!-- Info Panel -->
+    <div id="infoPanel" class="info-panel">
+        <button class="close-btn">&times;</button>
+        <h2>Hotspot Details</h2>
+        <div id="infoPanelContent"></div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+        <div class="empty-content">
+            <div class="empty-icon">🔥</div>
+            <h2>Ready to Track Wildfires</h2>
+            <p>Click the <strong>🔄 Update</strong> button above to get the latest wildfire data from NASA satellites</p>
+            <button onclick="fetchFreshData()" class="get-data-btn">🛰️ Get Live Satellite Data</button>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h3>Fetching Latest Satellite Data...</h3>
+            <p id="loadingStatus">Connecting to NASA FIRMS...</p>
+            
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <div class="progress-text">
+                    <span id="progressPercent">0%</span>
+                    <span id="progressStep">Initializing...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Banner -->
+    <div id="errorBanner" class="error-banner" style="display: none;">
+        <span id="errorMessage"></span>
+        <button onclick="fetchFreshData()">🔄 Try Again</button>
+        <button onclick="loadDemoData()" style="margin-left: 10px;">📊 Load Demo Data</button>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Application JS -->
+    <script src="app.js"></script>
+</body>
+</html> 

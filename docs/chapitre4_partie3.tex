@@ -1,0 +1,356 @@
+% ============================================
+% CHAPITRE IV - PARTIE 3 : CONCEPTION DU FRONTEND
+% ============================================
+
+\newpage
+\section{Conception du Frontend}
+
+Le frontend d'AI Sentinel est développé avec \textbf{React 18} et \textbf{TypeScript}, offrant une interface utilisateur moderne, réactive et intuitive. L'architecture frontend est conçue pour maximiser la réutilisabilité des composants et faciliter la maintenance à long terme.
+
+\subsection{Structure des Composants}
+
+L'organisation du code frontend suit les meilleures pratiques de développement React, avec une séparation claire entre les composants, les pages, les services et les hooks personnalisés.
+
+\begin{techbox}{Arborescence du Frontend}
+\begin{verbatim}
+frontend/src/
+├── components/                 # Composants réutilisables
+│   ├── Layout/
+│   │   ├── Navbar.tsx          # Barre de navigation principale
+│   │   ├── Sidebar.tsx         # Menu latéral
+│   │   └── Footer.tsx          # Pied de page
+│   ├── Detection/
+│   │   ├── VideoStream.tsx     # Lecteur flux MJPEG
+│   │   ├── AlertBanner.tsx     # Bandeau d'alerte
+│   │   └── DetectionStats.tsx  # Statistiques temps réel
+│   ├── Map/
+│   │   ├── HotspotMap.tsx      # Carte Leaflet principale
+│   │   ├── HotspotMarker.tsx   # Marqueur hotspot
+│   │   ├── SpreadRadius.tsx    # Cercle de propagation
+│   │   └── HotspotCard.tsx     # Carte info hotspot
+│   └── Satellite/
+│       ├── ZoneCard.tsx        # Carte zone satellite
+│       ├── ScanControls.tsx    # Contrôles du scan
+│       └── ResultDisplay.tsx   # Affichage résultats
+├── pages/                      # Pages de l'application
+│   ├── LandingPage.tsx         # Page d'accueil
+│   ├── Dashboard.tsx           # Tableau de bord principal
+│   ├── RealTimeDetection.tsx   # Détection temps réel
+│   ├── UploadDetection.tsx     # Upload et analyse
+│   ├── RealTimePrevention.tsx  # Carte des hotspots
+│   ├── PredictionDashboard.tsx # Prédiction propagation
+│   ├── SatelliteMonitoring.tsx # Surveillance satellite
+│   └── FireWeatherIndex.tsx    # Indices météo FWI
+├── services/
+│   └── api.ts                  # Client API (Axios/Fetch)
+├── hooks/
+│   ├── useDetection.ts         # Hook détection
+│   └── useHotspots.ts          # Hook données FIRMS
+├── context/
+│   └── AlertContext.tsx        # Contexte alertes global
+├── types/
+│   └── index.ts                # Types TypeScript
+└── styles/
+    └── index.css               # Styles globaux TailwindCSS
+\end{verbatim}
+\end{techbox}
+
+\subsubsection{Principes de Conception des Composants}
+
+\begin{greenbox}[\faCode\ Bonnes Pratiques React Appliquées]
+
+\textbf{Composants Atomiques}
+
+Chaque composant est conçu pour être \textbf{autonome} et \textbf{réutilisable}. Par exemple, le composant \texttt{HotspotMarker} peut être utilisé aussi bien sur la carte de prévention que sur le dashboard de prédiction.
+
+\vspace{0.3cm}
+
+\textbf{Séparation Logique/Présentation}
+
+Les composants de présentation (UI pure) sont séparés des composants conteneurs (logique métier). Cette séparation facilite les tests et la réutilisation.
+
+\vspace{0.3cm}
+
+\textbf{TypeScript Strict}
+
+Tous les composants utilisent TypeScript avec typage strict, garantissant la détection des erreurs à la compilation et améliorant l'autocomplétion.
+
+\vspace{0.3cm}
+
+\textbf{Hooks Personnalisés}
+
+La logique complexe est extraite dans des hooks réutilisables (\texttt{useDetection}, \texttt{useHotspots}) pour éviter la duplication de code.
+\end{greenbox}
+
+\subsection{Wireframes des Interfaces Principales}
+
+Les wireframes suivants illustrent la structure des principales pages de l'application.
+
+\subsubsection{Page Détection Temps Réel}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={rectangle, draw=primaryGreen, line width=1pt, minimum width=3cm, minimum height=1.5cm, align=center, font=\footnotesize},
+    header/.style={rectangle, draw=darkGreen, line width=2pt, fill=primaryGreen!20, minimum width=14cm, minimum height=0.8cm, align=center}
+]
+    % Header
+    \node[header] (hd) at (0, 4) {};
+    \node[font=\small] at (-6, 4) {\faFire\ WildFire Detection};
+    \node[font=\footnotesize] at (4, 4) {[Dashboard] [Detection] [Map] [Satellite]};
+    
+    % Cadre principal
+    \draw[darkGreen, line width=2pt, rounded corners=5pt] (-7.5, -3.5) rectangle (7.5, 3.5);
+    
+    % Flux vidéo
+    \draw[accentTeal, line width=1.5pt] (-7, -2) rectangle (-0.5, 3);
+    \node[font=\bfseries\small, text=accentTeal] at (-3.75, 2.5) {VIDEO STREAM};
+    \node[font=\footnotesize, text=textGray] at (-3.75, 1) {(Flux MJPEG en temps réel)};
+    \node[font=\footnotesize, text=textGray] at (-3.75, 0) {[Bounding Boxes]};
+    \node[font=\footnotesize, text=textGray] at (-3.75, -1) {Fire: 92\% | Smoke: 78\%};
+    
+    % Stats panel
+    \draw[leafGreen, line width=1.5pt] (0, 0.5) rectangle (7, 3);
+    \node[font=\bfseries\small, text=leafGreen] at (3.5, 2.5) {DETECTION STATS};
+    
+    % Stat boxes
+    \draw[primaryGreen, line width=1pt, fill=mintGreen!50] (0.5, 1) rectangle (2.5, 2.2);
+    \node[font=\large, text=moroccanRed] at (1.5, 1.8) {\faFire};
+    \node[font=\bfseries] at (1.5, 1.3) {12};
+    
+    \draw[primaryGreen, line width=1pt, fill=mintGreen!50] (3, 1) rectangle (5, 2.2);
+    \node[font=\large, text=textGray] at (4, 1.8) {\faCloud};
+    \node[font=\bfseries] at (4, 1.3) {8};
+    
+    \node[font=\footnotesize] at (3.5, 0.7) {Confidence: 94.2\%};
+    
+    % Boutons contrôle
+    \draw[leafGreen, line width=1.5pt] (0, -2) rectangle (7, 0);
+    \node[font=\bfseries\small, text=leafGreen] at (3.5, -0.3) {CONTROLS};
+    \node[font=\footnotesize, fill=primaryGreen, text=white, rounded corners=3pt, inner sep=5pt] at (2, -1.2) {Start Detection};
+    \node[font=\footnotesize, fill=moroccanRed!70, text=white, rounded corners=3pt, inner sep=5pt] at (5, -1.2) {Stop};
+    
+    % Alert banner
+    \draw[alertOrange, line width=2pt, fill=sunYellow!30] (-7, -3.3) rectangle (7, -2.3);
+    \node[font=\small] at (0, -2.8) {\faExclamationTriangle\ ALERT: Fire detected at 14:32:05 - Zone Alpha};
+    
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Page Carte des Hotspots (Prévention)}
+
+\begin{center}
+\begin{tikzpicture}[
+    header/.style={rectangle, draw=darkGreen, line width=2pt, fill=primaryGreen!20, minimum width=14cm, minimum height=0.8cm, align=center}
+]
+    % Header
+    \node[header] (hd) at (0, 4) {};
+    \node[font=\small] at (-5, 4) {\faMapMarkerAlt\ Real-Time Prevention};
+    \node[font=\footnotesize] at (5, 4) {[Filters] [Refresh] [Zoom]};
+    
+    % Cadre principal
+    \draw[darkGreen, line width=2pt, rounded corners=5pt] (-7.5, -4) rectangle (7.5, 3.5);
+    
+    % Carte Leaflet
+    \draw[accentTeal, line width=1.5pt, fill=skyBlue!10] (-7, -3) rectangle (5, 3);
+    \node[font=\bfseries\small, text=accentTeal] at (-1, 2.5) {\faMap\ LEAFLET MAP};
+    
+    % Hotspots simulés
+    \fill[moroccanRed] (-4, 1) circle (6pt);
+    \node[font=\tiny, text=moroccanRed] at (-4, 0.5) {High};
+    
+    \fill[alertOrange] (-1, -0.5) circle (5pt);
+    \node[font=\tiny, text=alertOrange] at (-1, -1) {Nominal};
+    
+    \fill[sunYellow] (2, 1.5) circle (4pt);
+    \node[font=\tiny, text=warmBrown] at (2, 1) {Low};
+    
+    % Cercle de propagation
+    \draw[moroccanRed!50, line width=1pt, dashed] (-4, 1) circle (25pt);
+    
+    % Panel latéral
+    \draw[leafGreen, line width=1.5pt] (5.5, -3) rectangle (7, 3);
+    \node[font=\footnotesize\bfseries, text=leafGreen, rotate=90] at (6.25, 0) {FILTERS};
+    
+    % Info bar
+    \draw[primaryGreen, line width=1pt, fill=mintGreen!30] (-7, -3.8) rectangle (5, -3.2);
+    \node[font=\tiny] at (-1, -3.5) {Selected: Hotspot \#1 | Brightness: 352K | Wind: 15km/h NE | Spread: 5.2km};
+    
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Page Surveillance Satellite}
+
+\begin{center}
+\begin{tikzpicture}[
+    header/.style={rectangle, draw=darkGreen, line width=2pt, fill=primaryGreen!20, minimum width=14cm, minimum height=0.8cm, align=center},
+    zone/.style={rectangle, draw=accentTeal, line width=1pt, fill=skyBlue!10, minimum width=3cm, minimum height=2cm, rounded corners=5pt}
+]
+    % Header
+    \node[header] (hd) at (0, 4.5) {};
+    \node[font=\small] at (-5, 4.5) {\faSatellite\ Satellite Monitoring};
+    \node[font=\footnotesize] at (5, 4.5) {[Start Scan] [Stop] [Settings]};
+    
+    % Cadre principal
+    \draw[darkGreen, line width=2pt, rounded corners=5pt] (-7.5, -3.5) rectangle (7.5, 4);
+    
+    % Zone cards grid
+    \node[zone] (z1) at (-5.5, 2) {};
+    \node[font=\footnotesize\bfseries, text=accentTeal] at (-5.5, 2.7) {North};
+    \node[font=\tiny, text=primaryGreen] at (-5.5, 2) {\faCheckCircle\ Safe};
+    \node[font=\tiny] at (-5.5, 1.5) {Last: 10:32};
+    
+    \node[zone] (z2) at (-1.8, 2) {};
+    \node[font=\footnotesize\bfseries, text=accentTeal] at (-1.8, 2.7) {Rif};
+    \node[font=\tiny, text=moroccanRed] at (-1.8, 2) {\faFire\ Fire Detected};
+    \node[font=\tiny] at (-1.8, 1.5) {Last: 10:28};
+    
+    \node[zone] (z3) at (1.8, 2) {};
+    \node[font=\footnotesize\bfseries, text=accentTeal] at (1.8, 2.7) {Oriental};
+    \node[font=\tiny, text=primaryGreen] at (1.8, 2) {\faCheckCircle\ Safe};
+    \node[font=\tiny] at (1.8, 1.5) {Last: 10:25};
+    
+    \node[zone] (z4) at (5.5, 2) {};
+    \node[font=\footnotesize\bfseries, text=accentTeal] at (5.5, 2.7) {Casablanca};
+    \node[font=\tiny, text=textGray] at (5.5, 2) {\faSpinner\ Scanning...};
+    \node[font=\tiny] at (5.5, 1.5) {0\%};
+    
+    % Image preview section
+    \draw[leafGreen, line width=1.5pt] (-7, -3) rectangle (0, 0.5);
+    \node[font=\bfseries\small, text=leafGreen] at (-3.5, 0.1) {SATELLITE IMAGE};
+    \node[font=\footnotesize, text=textGray] at (-3.5, -1) {(Preview with CAM heatmap)};
+    \node[font=\tiny, text=textGray] at (-3.5, -2) {Zone: Rif | Confidence: 87\%};
+    
+    % Results panel
+    \draw[primaryGreen, line width=1.5pt] (0.5, -3) rectangle (7, 0.5);
+    \node[font=\bfseries\small, text=primaryGreen] at (3.75, 0.1) {ANALYSIS RESULTS};
+    \node[font=\footnotesize, align=left] at (3.75, -1) {
+        Status: \textcolor{moroccanRed}{\textbf{FIRE DETECTED}}\\
+        Confidence: 87.3\%\\
+        Coords: 34.50°N, -5.00°W
+    };
+    \node[font=\tiny, fill=accentTeal, text=white, rounded corners=3pt, inner sep=4pt] at (3.75, -2.5) {View on Google Maps};
+    
+\end{tikzpicture}
+\end{center}
+
+\subsection{Design System}
+
+Le design system d'AI Sentinel définit les standards visuels garantissant une expérience utilisateur cohérente à travers toute l'application.
+
+\subsubsection{Palette de Couleurs}
+
+\begin{center}
+\begin{tikzpicture}
+    % Couleurs primaires
+    \node[font=\bfseries\large, text=darkGreen] at (0, 3) {Palette Principale - Thème Nature};
+    
+    % Swatches
+    \fill[primaryGreen] (0, 2) rectangle (2, 1);
+    \node[font=\footnotesize, text=white] at (1, 1.5) {Primary};
+    \node[font=\tiny] at (1, 0.7) {\#2E7D32};
+    
+    \fill[lightGreen] (2.5, 2) rectangle (4.5, 1);
+    \node[font=\footnotesize, text=darkGreen] at (3.5, 1.5) {Light};
+    \node[font=\tiny] at (3.5, 0.7) {\#81C784};
+    
+    \fill[darkGreen] (5, 2) rectangle (7, 1);
+    \node[font=\footnotesize, text=white] at (6, 1.5) {Dark};
+    \node[font=\tiny] at (6, 0.7) {\#1B5E20};
+    
+    \fill[mintGreen] (7.5, 2) rectangle (9.5, 1);
+    \node[font=\footnotesize, text=darkGreen] at (8.5, 1.5) {Mint};
+    \node[font=\tiny] at (8.5, 0.7) {\#E8F5E9};
+    
+    % Couleurs secondaires
+    \fill[accentTeal] (0, -0.5) rectangle (2, -1.5);
+    \node[font=\footnotesize, text=white] at (1, -1) {Teal};
+    \node[font=\tiny] at (1, -1.8) {\#009688};
+    
+    \fill[moroccanRed] (2.5, -0.5) rectangle (4.5, -1.5);
+    \node[font=\footnotesize, text=white] at (3.5, -1) {Alert};
+    \node[font=\tiny] at (3.5, -1.8) {\#C1272D};
+    
+    \fill[alertOrange] (5, -0.5) rectangle (7, -1.5);
+    \node[font=\footnotesize, text=white] at (6, -1) {Warning};
+    \node[font=\tiny] at (6, -1.8) {\#FFA726};
+    
+    \fill[textGray] (7.5, -0.5) rectangle (9.5, -1.5);
+    \node[font=\footnotesize, text=white] at (8.5, -1) {Text};
+    \node[font=\tiny] at (8.5, -1.8) {\#424242};
+    
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Typographie}
+
+\begin{table}[H]
+\centering
+\caption{Système typographique}
+\label{tab:typography}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{l l l l}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Élément}} & \textcolor{white}{\textbf{Police}} & \textcolor{white}{\textbf{Taille}} & \textcolor{white}{\textbf{Poids}} \\
+\midrule
+Titre H1 & Inter & 2.5rem (40px) & Bold (700) \\
+Titre H2 & Inter & 2rem (32px) & Semibold (600) \\
+Titre H3 & Inter & 1.5rem (24px) & Semibold (600) \\
+Corps & Inter & 1rem (16px) & Regular (400) \\
+Small & Inter & 0.875rem (14px) & Regular (400) \\
+Caption & Inter & 0.75rem (12px) & Regular (400) \\
+Code & JetBrains Mono & 0.875rem (14px) & Regular (400) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Composants Réutilisables}
+
+\begin{infobox}{Bibliothèque de Composants}
+Le design system inclut des composants standardisés :
+
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item \textbf{Buttons :} Primary, Secondary, Danger, Ghost
+    \item \textbf{Cards :} Standard, Elevated, Interactive
+    \item \textbf{Inputs :} Text, Select, Slider, File Upload
+    \item \textbf{Feedback :} Toast, Alert Banner, Loading Spinner
+    \item \textbf{Data Display :} Table, Stat Card, Progress Bar
+    \item \textbf{Navigation :} Navbar, Sidebar, Breadcrumbs, Tabs
+\end{itemize}
+\end{infobox}
+
+\subsubsection{Animations (Framer Motion)}
+
+L'application utilise \textbf{Framer Motion} pour des animations fluides et performantes :
+
+\begin{techbox}{Exemples d'Animations}
+\begin{verbatim}
+// Animation d'entrée pour les cartes
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.3, ease: "easeOut" }
+  }
+};
+
+// Animation de pulsation pour les alertes
+const pulseVariants = {
+  pulse: {
+    scale: [1, 1.05, 1],
+    transition: { duration: 0.5, repeat: Infinity }
+  }
+};
+
+// Animation du cercle de propagation
+const spreadAnimation = {
+  initial: { scale: 0, opacity: 0.8 },
+  animate: { 
+    scale: 1, 
+    opacity: 0.3,
+    transition: { duration: 1.5, ease: "easeOut" }
+  }
+};
+\end{verbatim}
+\end{techbox}

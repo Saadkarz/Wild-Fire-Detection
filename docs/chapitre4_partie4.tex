@@ -1,0 +1,384 @@
+% ============================================
+% CHAPITRE IV - PARTIE 4 : NOTIFICATIONS ET STOCKAGE
+% ============================================
+
+\newpage
+\section{Conception du Système de Notifications}
+
+Le système de notifications d'AI Sentinel assure la transmission rapide et fiable des alertes vers les opérateurs et intervenants. Cette composante est critique car elle transforme une détection technique en information actionnable.
+
+\subsection{Diagramme de Flux des Alertes}
+
+Le flux d'alertes suit un processus en plusieurs étapes, de la détection initiale jusqu'à la réception par l'utilisateur final.
+
+\begin{center}
+\begin{tikzpicture}[
+    step/.style={rectangle, rounded corners=8pt, draw=#1, line width=2pt, fill=#1!20, text width=2.5cm, minimum height=1.5cm, align=center},
+    channel/.style={rectangle, rounded corners=5pt, draw=accentTeal, line width=1.5pt, fill=skyBlue!20, text width=2cm, minimum height=1.2cm, align=center, font=\small},
+    arrow/.style={->, >=stealth, line width=2pt, color=primaryGreen},
+    darrow/.style={->, >=stealth, line width=1.5pt, color=accentTeal}
+]
+    % Étapes principales
+    \node[step=moroccanRed] (detect) at (0, 0) {\faFire\\Détection\\Fire/Smoke};
+    
+    \node[step=alertOrange] (eval) at (4, 0) {\faBalanceScale\\Évaluation\\Seuils};
+    
+    \node[step=leafGreen] (dispatch) at (8, 0) {\faPaperPlane\\Dispatch\\Alertes};
+    
+    % Canaux
+    \node[channel] (email) at (4, -3) {\faEnvelope\\Email\\(SMTP)};
+    
+    \node[channel] (telegram) at (8, -3) {\faTelegram\\Telegram\\Bot};
+    
+    \node[channel] (dashboard) at (12, -3) {\faDesktop\\Dashboard\\Real-time};
+    
+    % Cooldown check
+    \node[step=warmBrown, text width=2cm, minimum height=1cm] (cooldown) at (12, 0) {\faClock\\Cooldown\\Check};
+    
+    % Flèches principales
+    \draw[arrow] (detect) -- (eval);
+    \draw[arrow] (eval) -- (dispatch);
+    \draw[arrow] (dispatch) -- (cooldown);
+    
+    % Flèches vers canaux
+    \draw[darrow] (dispatch) -- (email);
+    \draw[darrow] (dispatch) -- (telegram);
+    \draw[darrow] (cooldown) -- (dashboard);
+    
+    % Labels
+    \node[font=\tiny, text=textGray] at (2, 0.5) {confidence > 0.5};
+    \node[font=\tiny, text=textGray] at (6, 0.5) {fire detected};
+    \node[font=\tiny, text=textGray] at (10, 0.5) {30s cooldown};
+    
+\end{tikzpicture}
+\end{center}
+
+\subsection{Template Email HTML}
+
+Les alertes email sont envoyées au format HTML avec un design professionnel et toutes les informations nécessaires à une intervention rapide.
+
+\begin{techbox}{Structure du Template Email}
+\begin{verbatim}
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .container { max-width: 600px; margin: 0 auto; }
+    .header { background: #2E7D32; color: white; padding: 20px; }
+    .alert-badge { background: #C1272D; padding: 10px; }
+    .content { padding: 20px; }
+    .map-link { background: #009688; color: white; padding: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔥 AI Sentinel - Fire Alert</h1>
+    </div>
+    <div class="alert-badge">
+      <strong>⚠️ FIRE DETECTED</strong>
+    </div>
+    <div class="content">
+      <h2>Detection Details</h2>
+      <table>
+        <tr><td>Zone:</td><td>{{zone_name}}</td></tr>
+        <tr><td>Coordinates:</td><td>{{lat}}, {{lng}}</td></tr>
+        <tr><td>Confidence:</td><td>{{confidence}}%</td></tr>
+        <tr><td>Brightness:</td><td>{{brightness}} K</td></tr>
+        <tr><td>Predicted Spread:</td><td>{{radius}} km</td></tr>
+        <tr><td>Timestamp:</td><td>{{timestamp}}</td></tr>
+      </table>
+      <img src="cid:satellite_image" alt="Satellite Image"/>
+      <a href="{{google_maps_link}}" class="map-link">
+        📍 View on Google Maps
+      </a>
+    </div>
+  </div>
+</body>
+</html>
+\end{verbatim}
+\end{techbox}
+
+\subsubsection{Contenu de l'Email}
+
+\begin{table}[H]
+\centering
+\caption{Éléments inclus dans l'email d'alerte}
+\label{tab:email-content}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{>{\bfseries}p{3.5cm} p{9.5cm}}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Élément}} & \textcolor{white}{\textbf{Description}} \\
+\midrule
+En-tête & Logo AI Sentinel, titre d'alerte avec niveau de sévérité \\
+Badge d'alerte & Indicateur visuel coloré (rouge pour feu) \\
+Zone géographique & Nom de la région concernée (ex: "Rif", "Middle Atlas") \\
+Coordonnées GPS & Latitude et longitude précises du point détecté \\
+Score de confiance & Pourcentage de certitude du modèle (ex: 87.3\%) \\
+Luminosité & Température en Kelvin si disponible (données FIRMS) \\
+Rayon de propagation & Estimation calculée par l'algorithme de prédiction \\
+Horodatage & Date et heure exactes de la détection \\
+Image satellite & Image Sentinel-2 avec heatmap CAM intégrée \\
+Lien Google Maps & URL directe pour localisation sur le terrain \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Format Message Telegram}
+
+Les messages Telegram sont formatés pour une lecture rapide sur mobile, avec emojis pour une identification visuelle immédiate.
+
+\begin{greenbox}[\faTelegram\ Structure du Message Telegram]
+\begin{verbatim}
+🔥🔥🔥 ALERTE FEU DÉTECTÉ 🔥🔥🔥
+
+📍 Zone: Rif
+🌡️ Confiance: 87.3%
+📐 Propagation estimée: 5.2 km
+⏰ Détecté à: 14:32:05
+
+Coordonnées: 34.5000°N, -5.0000°W
+
+🗺️ Google Maps:
+https://maps.google.com/?q=34.5,-5.0
+
+[📷 Image satellite jointe]
+
+---
+AI Sentinel - Système de Surveillance
+\end{verbatim}
+\end{greenbox}
+
+\subsubsection{Configuration Telegram Bot}
+
+\begin{techbox}{Paramètres du Bot Telegram}
+\begin{verbatim}
+# Configuration du bot
+TELEGRAM_BOT_TOKEN = "123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
+TELEGRAM_CHAT_ID = "-1001234567890"  # ID du groupe/channel
+
+# Fonctionnalités
+- Envoi de messages texte formatés (Markdown)
+- Envoi d'images (satellite + heatmap)
+- Boutons inline (optionnel) pour actions rapides
+- Support des groupes et channels publics/privés
+- Rate limiting pour éviter le spam
+
+# API Endpoint
+POST https://api.telegram.org/bot{TOKEN}/sendPhoto
+{
+    "chat_id": CHAT_ID,
+    "photo": image_file,
+    "caption": formatted_message,
+    "parse_mode": "Markdown"
+}
+\end{verbatim}
+\end{techbox}
+
+\subsection{Gestion du Cooldown Anti-Spam}
+
+Pour éviter de submerger les opérateurs avec des alertes répétitives, un mécanisme de cooldown est implémenté.
+
+\begin{infobox}{Mécanisme de Cooldown}
+\textbf{Principe :}
+
+Après l'envoi d'une alerte pour une zone donnée, le système attend un délai configurable (par défaut 30 secondes) avant d'envoyer une nouvelle alerte pour la même zone.
+
+\textbf{Implémentation :}
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item Dictionnaire en mémoire : \texttt{\{zone\_id: last\_alert\_timestamp\}}
+    \item Vérification avant chaque envoi
+    \item Reset du timer à chaque envoi réussi
+    \item Configurable par zone (zones critiques = cooldown plus court)
+\end{itemize}
+
+\textbf{Paramètres :}
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item Cooldown par défaut : 30 secondes
+    \item Cooldown minimum : 5 secondes
+    \item Cooldown maximum : 300 secondes (5 minutes)
+\end{itemize}
+\end{infobox}
+
+% ============================================
+\newpage
+\section{Base de Données et Stockage}
+% ============================================
+
+Bien que le système AI Sentinel fonctionne principalement en mode \textbf{stateless} (sans base de données persistante pour les données opérationnelles), plusieurs aspects de stockage sont néanmoins gérés.
+
+\subsection{Schéma de Données}
+
+Pour une future évolution vers une version avec persistance, voici le schéma de données envisagé :
+
+\begin{center}
+\begin{tikzpicture}[
+    table/.style={rectangle, draw=primaryGreen, line width=1.5pt, fill=mintGreen!30, rounded corners=5pt, minimum width=4cm, align=left, font=\footnotesize, inner sep=8pt},
+    relation/.style={->, >=stealth, line width=1pt, color=accentTeal}
+]
+    % Tables
+    \node[table] (detections) at (0, 3) {
+        \textbf{\textcolor{darkGreen}{Detections}}\\
+        \rule{3.5cm}{0.5pt}\\
+        id: UUID (PK)\\
+        timestamp: DateTime\\
+        zone\_id: FK\\
+        latitude: Float\\
+        longitude: Float\\
+        confidence: Float\\
+        source: Enum\\
+        image\_path: String
+    };
+    
+    \node[table] (zones) at (6, 3) {
+        \textbf{\textcolor{darkGreen}{Zones}}\\
+        \rule{3.5cm}{0.5pt}\\
+        id: UUID (PK)\\
+        name: String\\
+        lat\_center: Float\\
+        lng\_center: Float\\
+        radius\_km: Float\\
+        risk\_level: Enum
+    };
+    
+    \node[table] (alerts) at (0, -1) {
+        \textbf{\textcolor{darkGreen}{Alerts}}\\
+        \rule{3.5cm}{0.5pt}\\
+        id: UUID (PK)\\
+        detection\_id: FK\\
+        channel: Enum\\
+        sent\_at: DateTime\\
+        status: Enum\\
+        recipient: String
+    };
+    
+    \node[table] (predictions) at (6, -1) {
+        \textbf{\textcolor{darkGreen}{Predictions}}\\
+        \rule{3.5cm}{0.5pt}\\
+        id: UUID (PK)\\
+        detection\_id: FK\\
+        radius\_km: Float\\
+        area\_km2: Float\\
+        wind\_speed: Float\\
+        wind\_direction: Float
+    };
+    
+    % Relations
+    \draw[relation] (detections) -- node[above, font=\tiny] {1:N} (zones);
+    \draw[relation] (alerts) -- node[left, font=\tiny] {N:1} (detections);
+    \draw[relation] (predictions) -- node[right, font=\tiny] {1:1} (detections);
+    
+\end{tikzpicture}
+\end{center}
+
+\subsection{Gestion des Fichiers Temporaires}
+
+Le système gère plusieurs types de fichiers temporaires qui nécessitent une gestion appropriée.
+
+\begin{table}[H]
+\centering
+\caption{Types de fichiers temporaires}
+\label{tab:temp-files}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{>{\bfseries}p{3.5cm} p{4cm} p{3cm} p{3cm}}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Type}} & \textcolor{white}{\textbf{Description}} & \textcolor{white}{\textbf{Rétention}} & \textcolor{white}{\textbf{Nettoyage}} \\
+\midrule
+Images uploadées & Images soumises pour classification & Session & Fin de requête \\
+Images satellites & Images téléchargées de Sentinel Hub & 24 heures & Scheduler journalier \\
+Vidéos traitées & Vidéos annotées en sortie & 1 heure & Après téléchargement \\
+Frames extraites & Frames individuelles de vidéos & Immédiat & Fin de traitement \\
+Heatmaps CAM & Images de heatmaps générées & 24 heures & Scheduler journalier \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{techbox}{Stratégie de Nettoyage}
+\begin{verbatim}
+import os
+import time
+from pathlib import Path
+
+TEMP_DIR = Path("./temp")
+MAX_AGE_HOURS = 24
+
+def cleanup_temp_files():
+    """Nettoie les fichiers temporaires anciens."""
+    current_time = time.time()
+    max_age_seconds = MAX_AGE_HOURS * 3600
+    
+    for file_path in TEMP_DIR.glob("**/*"):
+        if file_path.is_file():
+            file_age = current_time - file_path.stat().st_mtime
+            if file_age > max_age_seconds:
+                file_path.unlink()
+                print(f"Deleted: {file_path}")
+
+# Exécuté par APScheduler toutes les heures
+scheduler.add_job(cleanup_temp_files, 'interval', hours=1)
+\end{verbatim}
+\end{techbox}
+
+\subsection{Cache et Optimisations}
+
+Pour améliorer les performances, plusieurs mécanismes de cache sont implémentés.
+
+\begin{greenbox}[\faRocket\ Stratégies de Cache]
+
+\textbf{Cache des Modèles IA}
+
+Les modèles sont chargés une seule fois au démarrage de l'application et conservés en mémoire :
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item MobileNetV2 : ~50 MB en mémoire
+    \item YOLOv8 : ~25 MB en mémoire (GPU si disponible)
+    \item CAM Model : ~10 MB en mémoire
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Cache des Données FIRMS}
+
+Les données NASA FIRMS sont mises en cache avec un TTL (Time To Live) pour éviter des appels API répétés :
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item TTL : 5 minutes par zone
+    \item Stockage : Dictionnaire en mémoire
+    \item Invalidation : Automatique après expiration
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Cache des Tokens Sentinel Hub}
+
+Les tokens OAuth2 de Sentinel Hub sont réutilisés jusqu'à expiration :
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item Durée de validité : Typiquement 1 heure
+    \item Refresh automatique avant expiration
+    \item Stockage sécurisé en mémoire
+\end{itemize}
+\end{greenbox}
+
+\vspace{1cm}
+
+% Transition vers le chapitre suivant
+\begin{center}
+\begin{tikzpicture}
+    \node[
+        fill=primaryGreen!10,
+        draw=primaryGreen,
+        line width=1.5pt,
+        rounded corners=12pt,
+        inner sep=20pt,
+        text width=13cm,
+        align=center
+    ] {
+        \textcolor{primaryGreen}{\fontsize{24}{28}\selectfont\faArrowCircleRight}\\[15pt]
+        \large\textbf{Chapitre Suivant}\\[10pt]
+        \normalsize Le prochain chapitre présente la réalisation et l'implémentation\\
+        technique du système AI Sentinel, incluant l'environnement\\
+        de développement, le code source et les défis rencontrés.\\[10pt]
+        \textit{\textcolor{textGray}{Chapitre V --- Réalisation et Implémentation}}
+    };
+\end{tikzpicture}
+\end{center}

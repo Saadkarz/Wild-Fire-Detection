@@ -4,7 +4,8 @@ import type { Variants } from 'framer-motion';
 import { motion, useInView, useMotionValue, useTransform, animate } from 'framer-motion';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents, Circle, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L, { LeafletMouseEvent } from 'leaflet';
+import L from 'leaflet';
+import type { LeafletMouseEvent } from 'leaflet';
 
 // Fix Leaflet marker icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -109,12 +110,10 @@ const FireWeatherIndex = () => {
     const [coords, setCoords] = useState({ lat: 31.7917, lng: -7.0926 });
     const [fireData, setFireData] = useState<FireData | null>(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const [analysisMode, setAnalysisMode] = useState<'single' | 'scan'>('scan');
 
     const fetchData = async () => {
         setLoading(true);
-        setError(null);
         setFireData(null);
 
         try {
@@ -217,7 +216,6 @@ const FireWeatherIndex = () => {
 
         } catch (err: any) {
             console.error("API Error:", err);
-            setError(err.message || "Failed to fetch weather data");
         } finally {
             setLoading(false);
         }
@@ -274,7 +272,8 @@ const FireWeatherIndex = () => {
                     <div className="hidden md:flex items-center gap-6">
                         <Link className="text-white hover:text-primary transition-colors text-sm font-medium leading-normal" to="/dashboard">Dashboard</Link>
                         <span className="text-primary text-sm font-medium leading-normal">Analysis</span>
-                        <Link to="/detection" className="text-white hover:text-primary transition-colors text-sm font-medium leading-normal">Detection</Link>
+                        <Link className="text-white hover:text-primary transition-colors text-sm font-medium leading-normal" to="/realtime">Monitoring</Link>
+                        <Link className="text-white hover:text-primary transition-colors text-sm font-medium leading-normal" to="/prevention">Prevention</Link>
                     </div>
                 </div>
             </header>

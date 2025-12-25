@@ -129,7 +129,7 @@ const DetectionConsole = () => {
                     <div className="flex items-center gap-9">
                         <Link className="text-gray-300 hover:text-primary transition-colors text-sm font-medium leading-normal" to="/dashboard">Dashboard</Link>
                         <Link className="text-gray-300 hover:text-primary transition-colors text-sm font-medium leading-normal" to="/fwi">Fire Weather</Link>
-                        <a className="text-gray-300 hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Settings</a>
+                        <Link className="text-gray-300 hover:text-primary transition-colors text-sm font-medium leading-normal" to="/prevention">Prevention</Link>
                     </div>
                     <motion.button
                         whileHover={{ scale: 1.05 }}
@@ -333,8 +333,8 @@ const DetectionConsole = () => {
                                     <p className="text-white text-lg font-bold">
                                         {prediction ? (prediction.confidence > 0.8 ? "High Probability" : "Moderate") : "Waiting..."}
                                     </p>
-                                    <p className={`${prediction?.confidence > 0.8 ? "text-red-400" : "text-gray-500"} text-xs`}>
-                                        {prediction?.confidence > 0.8 ? "Critical Threshold Met" : "Analysis Pending"}
+                                    <p className={`${prediction && prediction.confidence > 0.8 ? "text-red-400" : "text-gray-500"} text-xs`}>
+                                        {prediction && prediction.confidence > 0.8 ? "Critical Threshold Met" : "Analysis Pending"}
                                     </p>
                                 </div>
                             </motion.div>

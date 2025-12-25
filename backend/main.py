@@ -127,6 +127,130 @@ async def detect_video(file: UploadFile = File(...)):
         
     return FileResponse(output_filename, media_type="video/mp4", filename=output_filename)
 
+
+from prediction_service import prediction_service
+from firms_service import firms_service
+from pydantic import BaseModel
+
+class PredictionRequest(BaseModel):
+    latitude: float
+    longitude: float
+    brightness: float
+    confidence: str
+
+@app.post("/predict/wildfire")
+def predict_wildfire(data: PredictionRequest):
+    result = prediction_service.calculate_spread(data.brightness, data.confidence)
+    return {
+        "location": {"lat": data.latitude, "lng": data.longitude},
+        "prediction": result
+    }
+
+@app.get("/api/wildfire/realtime")
+def get_realtime_wildfire(region: str = "global"):
+    """
+    Get real-time wildfire data from NASA FIRMS.
+    """
+    return firms_service.get_realtime_data(region)
+
+
+# ============================================================
+# SATELLITE MONITORING ENDPOINTS
+# ============================================================
+
+from sentinel_service import sentinel_service
+from email_service import email_service
+from monitoring_service import monitoring_service
+from typing import Optional, List
+
+class SatelliteScanRequest(BaseModel):
+    zone_name: Optional[str] = None
+    use_fire_script: bool = True
+
+class MonitoringStartRequest(BaseModel):
+    interval_hours: float = 6.0
+    
+class EmailTestRequest(BaseModel):
+    recipient: str
+
+@app.get("/api/satellite/status")
+def get_satellite_status():
+    """Get satellite monitoring status and service availability."""
+    return monitoring_service.get_status()
+
+@app.get("/api/satellite/zones")
+def get_satellite_zones():
+    """Get list of available Morocco scan zones."""
+    return {
+        "zones": sentinel_service.get_zones(),
+        "service_available": sentinel_service.is_available()
+    }
+
+@app.post("/api/satellite/scan")
+def scan_satellite(request: SatelliteScanRequest = None):
+    """
+    Manually trigger a satellite scan.
+    If zone_name provided, scans single zone. Otherwise scans all zones.
+    """
+    if not sentinel_service.is_available():
+        return {"error": "Sentinel Hub not configured. Check credentials in .env"}
+    
+    if request and request.zone_name:
+        result = monitoring_service.scan_zone_for_fire(request.zone_name)
+        return {"scan_type": "single", "result": result}
+    else:
+        results = monitoring_service.run_full_scan()
+        fires_detected = [r for r in results if r.get("is_fire")]
+        return {
+            "scan_type": "full",
+            "zones_scanned": len(results),
+            "fires_detected": len(fires_detected),
+            "results": results
+        }
+
+@app.post("/api/satellite/start")
+def start_satellite_monitoring(request: MonitoringStartRequest = None):
+    """Start automated satellite monitoring."""
+    interval = request.interval_hours if request else 6.0
+    return monitoring_service.start_monitoring(interval_hours=interval)
+
+@app.post("/api/satellite/stop")
+def stop_satellite_monitoring():
+    """Stop automated satellite monitoring."""
+    return monitoring_service.stop_monitoring()
+
+@app.get("/api/satellite/history")
+def get_satellite_history(limit: int = 10):
+    """Get recent detection history."""
+    return {
+        "history": monitoring_service.get_history(limit),
+        "total_scans": len(monitoring_service.detection_history)
+    }
+
+@app.post("/api/satellite/test-email")
+def test_email_notification(request: EmailTestRequest):
+    """Send a test email to verify notification settings."""
+    if not email_service.is_available():
+        return {"error": "Email service not configured. Check SMTP settings in .env"}
+    return email_service.send_test_email(request.recipient)
+
+@app.get("/api/satellite/image/{zone_name}")
+def get_zone_image(zone_name: str, fire_script: bool = False):
+    """Get satellite image for a specific zone."""
+    if not sentinel_service.is_available():
+        return {"error": "Sentinel Hub not configured"}
+    
+    result = sentinel_service.scan_zone(zone_name, use_fire_script=fire_script)
+    
+    if "error" in result:
+        return result
+    
+    return {
+        "zone": zone_name,
+        "image_base64": result.get("image_base64"),
+        "metadata": result.get("metadata")
+    }
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
 

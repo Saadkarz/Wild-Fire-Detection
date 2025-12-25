@@ -1,0 +1,366 @@
+% ============================================
+% CHAPITRE IV - PARTIE 2 : CONCEPTION DES MODÈLES IA
+% ============================================
+
+\newpage
+\section{Conception des Modèles IA}
+
+Les modèles d'intelligence artificielle constituent le cœur technologique du système AI Sentinel. Cette section détaille l'architecture et le fonctionnement de chacun des trois modèles utilisés : \textbf{MobileNetV2} pour la classification d'images, \textbf{YOLOv8} pour la détection en temps réel, et le modèle \textbf{CAM} pour l'analyse satellite.
+
+\subsection{Modèle MobileNetV2 - Architecture Détaillée}
+
+\textbf{MobileNetV2} est une architecture de réseau de neurones convolutifs conçue par Google, optimisée pour les appareils mobiles et les environnements à ressources limitées. Dans AI Sentinel, nous utilisons cette architecture comme \textbf{backbone} (extracteur de caractéristiques) avec une tête de classification personnalisée.
+
+\subsubsection{Principe du Transfer Learning}
+
+Le transfer learning permet de tirer parti des connaissances acquises sur un grand dataset (ImageNet, 14 millions d'images) pour les appliquer à notre problème spécifique (détection de feux). Cette approche offre plusieurs avantages :
+
+\begin{greenbox}[\faBrain\ Avantages du Transfer Learning]
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Réduction du temps d'entraînement :} De semaines à quelques heures
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Moins de données nécessaires :} Efficace avec ~30k images vs millions
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Meilleures performances :} Caractéristiques de base déjà apprises
+    \item[\textcolor{primaryGreen}{\faCheckCircle}] \textbf{Généralisation améliorée :} Moins de risque de sur-apprentissage
+\end{itemize}
+\end{greenbox}
+
+\subsubsection{Architecture du Modèle}
+
+\begin{center}
+\begin{tikzpicture}[
+    block/.style={rectangle, rounded corners=8pt, draw=#1, line width=2pt, fill=#1!20, text width=10cm, minimum height=1.5cm, align=center},
+    arrow/.style={->, >=stealth, line width=2pt, color=primaryGreen}
+]
+    % Input
+    \node[block=textGray] (input) at (0, 8) {
+        \textbf{INPUT}\\
+        \footnotesize Image RGB (224 × 224 × 3)
+    };
+    
+    % Backbone
+    \node[block=accentTeal, minimum height=3cm] (backbone) at (0, 5.5) {
+        \textbf{BACKBONE : MobileNetV2 (ImageNet)}\\[5pt]
+        \footnotesize Conv2D (32 filters, 3×3, stride=2)\\
+        $\downarrow$\\
+        \footnotesize Inverted Residual Blocks × 17\\
+        (Depthwise Separable Convolutions)\\
+        $\downarrow$\\
+        \footnotesize Conv2D (1280 filters, 1×1)
+    };
+    \node[font=\footnotesize\bfseries, text=moroccanRed] at (6.5, 5.5) {Poids gelés\\(Phase 1)};
+    
+    % Head
+    \node[block=leafGreen, minimum height=3.5cm] (head) at (0, 1.5) {
+        \textbf{CLASSIFICATION HEAD (Custom)}\\[8pt]
+        \footnotesize GlobalAveragePooling2D\\
+        $\downarrow$\\
+        \footnotesize Dropout (rate=0.3)\\
+        $\downarrow$\\
+        \footnotesize Dense (128 units, ReLU)\\
+        $\downarrow$\\
+        \footnotesize Dense (3 units, Softmax)
+    };
+    \node[font=\footnotesize\bfseries, text=primaryGreen] at (6.5, 1.5) {Entraînable};
+    
+    % Output
+    \node[block=primaryGreen] (output) at (0, -1.5) {
+        \textbf{OUTPUT}\\
+        \footnotesize [Smoke: 0.05, Fire: 0.92, Non-Fire: 0.03]
+    };
+    
+    % Flèches
+    \draw[arrow] (input) -- (backbone);
+    \draw[arrow] (backbone) -- (head);
+    \draw[arrow] (head) -- (output);
+    
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Stratégie d'Entraînement en Deux Phases}
+
+L'entraînement du modèle s'effectue en deux phases distinctes pour optimiser les résultats :
+
+\begin{table}[H]
+\centering
+\caption{Phases d'entraînement MobileNetV2}
+\label{tab:training-phases}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{>{\bfseries}p{2.5cm} p{5cm} p{3cm} p{3cm}}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Phase}} & \textcolor{white}{\textbf{Description}} & \textcolor{white}{\textbf{Paramètres}} & \textcolor{white}{\textbf{Époques}} \\
+\midrule
+Phase 1 : Feature Extraction & Backbone gelé, seule la tête de classification est entraînée & LR: 0.001, Optimizer: Adam & 10 époques \\
+Phase 2 : Fine-tuning & Backbone partiellement dégelé (100 dernières couches), entraînement complet & LR: 0.0001, Optimizer: Adam & 5 époques \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Spécifications Techniques}
+
+\begin{techbox}{Configuration du Modèle MobileNetV2}
+\begin{verbatim}
+# Architecture
+Input Shape:      (224, 224, 3)
+Backbone:         MobileNetV2 (weights='imagenet', include_top=False)
+Pooling:          GlobalAveragePooling2D
+Regularization:   Dropout(0.3)
+Hidden Layer:     Dense(128, activation='relu')
+Output Layer:     Dense(3, activation='softmax')
+
+# Training
+Optimizer:        Adam
+Loss Function:    Categorical Crossentropy
+Metrics:          Accuracy, Precision, Recall
+Batch Size:       32
+Total Params:     2,422,211 (2.26M trainable after fine-tune)
+
+# Dataset
+Training:         ~32,000 images
+Validation:       ~8,000 images
+Test:             ~10,000 images
+Classes:          ['Smoke', 'Fire', 'Non-Fire']
+\end{verbatim}
+\end{techbox}
+
+\subsection{Modèle YOLOv8 - Pipeline de Détection}
+
+\textbf{YOLO} (You Only Look Once) représente une famille d'algorithmes de détection d'objets en temps réel. La version 8 (YOLOv8), développée par Ultralytics, constitue l'état de l'art en matière de compromis vitesse/précision.
+
+\subsubsection{Principe de Fonctionnement}
+
+Contrairement aux approches de détection en deux étapes (comme R-CNN), YOLO traite l'image en une seule passe, d'où son nom. L'image est divisée en une grille et chaque cellule est responsable de prédire les objets dont le centre tombe dans cette cellule.
+
+\begin{infobox}{Pourquoi YOLOv8 pour AI Sentinel ?}
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item \textbf{Vitesse exceptionnelle :} 30+ FPS sur GPU, permettant une détection véritablement temps réel
+    \item \textbf{Architecture moderne :} Anchor-free detection, meilleure précision sur petits objets
+    \item \textbf{Facilité d'utilisation :} API Python simple via Ultralytics
+    \item \textbf{Transfer learning :} Pré-entraîné sur COCO, adaptable à notre dataset
+    \item \textbf{Export multi-format :} ONNX, TensorRT, CoreML pour déploiement optimisé
+\end{itemize}
+\end{infobox}
+
+\subsubsection{Architecture YOLOv8}
+
+\begin{center}
+\begin{tikzpicture}[
+    stage/.style={rectangle, rounded corners=8pt, draw=#1, line width=2pt, fill=#1!20, text width=12cm, minimum height=2cm, align=center},
+    arrow/.style={->, >=stealth, line width=2pt, color=primaryGreen}
+]
+    % Input
+    \node[stage=textGray, minimum height=1cm] (input) at (0, 9) {
+        \textbf{INPUT} : Frame Vidéo (640 × 640 × 3)
+    };
+    
+    % Backbone
+    \node[stage=accentTeal] (backbone) at (0, 6.5) {
+        \textbf{BACKBONE : CSPDarknet}\\[5pt]
+        \footnotesize Extraction de caractéristiques multi-échelles\\
+        Conv → C2f Blocks → SPPF (Spatial Pyramid Pooling Fast)
+    };
+    
+    % Neck
+    \node[stage=leafGreen] (neck) at (0, 4) {
+        \textbf{NECK : PANet (Path Aggregation Network)}\\[5pt]
+        \footnotesize Feature Pyramid Network pour fusion top-down et bottom-up\\
+        Connexions multi-échelles : P3, P4, P5
+    };
+    
+    % Head
+    \node[stage=alertOrange] (head) at (0, 1.5) {
+        \textbf{HEAD : Decoupled Head (Anchor-Free)}\\[5pt]
+        \footnotesize Pour chaque cellule de grille :\\
+        \footnotesize • Coordonnées bbox (x, y, w, h) • Score objectness\\
+        \footnotesize • Probabilités classes [Smoke: 0.15, Fire: 0.85]
+    };
+    
+    % Post-processing
+    \node[stage=primaryGreen, minimum height=1.2cm] (post) at (0, -0.8) {
+        \textbf{POST-PROCESSING : Non-Maximum Suppression (NMS)}\\
+        \footnotesize Filtrage des détections redondantes → Bounding Boxes Finales
+    };
+    
+    % Flèches
+    \draw[arrow] (input) -- (backbone);
+    \draw[arrow] (backbone) -- (neck);
+    \draw[arrow] (neck) -- (head);
+    \draw[arrow] (head) -- (post);
+    
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Entraînement Personnalisé}
+
+Le modèle YOLOv8 a été entraîné sur un dataset personnalisé de feux et fumées forestiers :
+
+\begin{table}[H]
+\centering
+\caption{Configuration d'entraînement YOLOv8}
+\label{tab:yolo-training}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{>{\bfseries}p{4cm} p{9cm}}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Paramètre}} & \textcolor{white}{\textbf{Valeur}} \\
+\midrule
+Modèle de base & YOLOv8n (nano) ou YOLOv8s (small) \\
+Input Size & 640 × 640 pixels \\
+Classes & 2 : ['Fire', 'Smoke'] \\
+Époques & 100 (early stopping patience=10) \\
+Batch Size & 16 \\
+Optimizer & SGD (lr=0.01, momentum=0.937) \\
+Augmentations & HSV, Flip, Mosaic, MixUp \\
+IoU Threshold (NMS) & 0.7 \\
+Confidence Threshold & 0.5 (configurable) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Format de Sortie}
+
+\begin{techbox}{Structure des Détections YOLOv8}
+\begin{verbatim}
+# Pour chaque détection retournée par model.predict()
+detection = {
+    'bbox': [x1, y1, x2, y2],    # Coordonnées du rectangle
+    'confidence': 0.87,           # Score de confiance (0-1)
+    'class_id': 0,                # 0=Fire, 1=Smoke
+    'class_name': 'Fire'          # Nom de la classe
+}
+
+# Exemple de sortie complète
+results = [
+    {'bbox': [120, 80, 340, 280], 'confidence': 0.92, 'class': 'Fire'},
+    {'bbox': [400, 50, 580, 200], 'confidence': 0.78, 'class': 'Smoke'}
+]
+\end{verbatim}
+\end{techbox}
+
+\subsection{Modèle CAM pour Imagerie Satellite}
+
+Le modèle \textbf{CAM} (Class Activation Map) est spécifiquement conçu pour l'analyse des images satellites Sentinel-2. Il combine classification et localisation spatiale, permettant non seulement de détecter la présence de feu mais aussi de visualiser les régions de l'image qui ont contribué à cette décision.
+
+\subsubsection{Principe des Class Activation Maps}
+
+Les CAM exploitent les dernières couches convolutives du réseau pour générer une carte de chaleur indiquant les régions importantes pour la classification. Cette technique offre une \textbf{explicabilité} précieuse dans un contexte critique comme la détection d'incendies.
+
+\begin{greenbox}[\faMapMarkerAlt\ Avantages du Modèle CAM]
+\begin{itemize}[leftmargin=0.5cm, itemsep=5pt]
+    \item \textbf{Double sortie :} Classification + Localisation spatiale simultanées
+    \item \textbf{Explicabilité :} Visualisation des zones ayant déclenché la détection
+    \item \textbf{Validation humaine :} Permet à l'opérateur de vérifier la pertinence
+    \item \textbf{Adapté au satellite :} Conçu pour images multi-spectrales
+\end{itemize}
+\end{greenbox}
+
+\subsubsection{Architecture du Modèle CAM}
+
+\begin{center}
+\begin{tikzpicture}[
+    block/.style={rectangle, rounded corners=8pt, draw=#1, line width=1.5pt, fill=#1!20, text width=4cm, minimum height=1.2cm, align=center, font=\small},
+    arrow/.style={->, >=stealth, line width=1.5pt, color=primaryGreen}
+]
+    % Input
+    \node[block=textGray] (input) at (0, 5) {INPUT\\(224×224×3)};
+    
+    % Conv layers
+    \node[block=accentTeal] (conv) at (0, 3) {Conv2D Layers\\Feature Extraction};
+    
+    % Feature maps
+    \node[block=leafGreen] (features) at (-3, 1) {Feature Maps\\(10×10×64)};
+    
+    % GAP + Classification
+    \node[block=alertOrange] (gap) at (3, 1) {GAP + Dense\\Classification};
+    
+    % Outputs
+    \node[block=primaryGreen] (cam) at (-3, -1) {CAM Output\\Heatmap};
+    \node[block=primaryGreen] (class) at (3, -1) {Classification\\[Fire, No Fire]};
+    
+    % Flèches
+    \draw[arrow] (input) -- (conv);
+    \draw[arrow] (conv) -- (features);
+    \draw[arrow] (conv) -- (gap);
+    \draw[arrow] (features) -- (cam);
+    \draw[arrow] (gap) -- (class);
+    
+    % Cadre dual output
+    \draw[dashed, primaryGreen, line width=1pt, rounded corners=10pt] (-5.5, -2) rectangle (5.5, 0);
+    \node[font=\footnotesize\bfseries, text=primaryGreen] at (0, -2.5) {DUAL OUTPUT : Localisation + Classification};
+    
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Spécifications Techniques}
+
+\begin{table}[H]
+\centering
+\caption{Configuration du modèle CAM pour images satellites}
+\label{tab:cam-config}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{>{\bfseries}p{4cm} p{9cm}}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Paramètre}} & \textcolor{white}{\textbf{Valeur}} \\
+\midrule
+Input Shape & (224, 224, 3) - RGB normalisé \\
+Output 1 (CAM) & (10, 10, 64) - Feature maps spatiales \\
+Output 2 (Class) & (2,) - [Fire probability, No Fire probability] \\
+Total Parameters & 172,322 \\
+Preprocessing & Normalisation 0-1, Resize bilinéaire \\
+Classes & 2 : Fire, No Fire \\
+Source Images & Sentinel-2 L2A (True Color ou Fire Detection) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Génération de la Heatmap}
+
+La heatmap est générée en combinant les feature maps avec les poids de la couche de classification :
+
+\begin{techbox}{Algorithme de Génération CAM}
+\begin{verbatim}
+def generate_cam_heatmap(model, image):
+    # 1. Obtenir les feature maps et la prédiction
+    cam_output, prediction = model.predict(image)
+    
+    # 2. Redimensionner les feature maps à la taille de l'image
+    heatmap = cv2.resize(cam_output[0], (224, 224))
+    
+    # 3. Normaliser entre 0 et 1
+    heatmap = (heatmap - heatmap.min()) / (heatmap.max() - heatmap.min())
+    
+    # 4. Appliquer une colormap (jet)
+    heatmap_colored = cv2.applyColorMap(
+        np.uint8(255 * heatmap), cv2.COLORMAP_JET
+    )
+    
+    # 5. Superposer sur l'image originale
+    overlay = cv2.addWeighted(image, 0.6, heatmap_colored, 0.4, 0)
+    
+    return overlay, prediction
+\end{verbatim}
+\end{techbox}
+
+\subsection{Comparaison des Modèles}
+
+\begin{table}[H]
+\centering
+\caption{Comparaison des trois modèles IA d'AI Sentinel}
+\label{tab:model-comparison}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{l c c c}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Caractéristique}} & \textcolor{white}{\textbf{MobileNetV2}} & \textcolor{white}{\textbf{YOLOv8}} & \textcolor{white}{\textbf{CAM}} \\
+\midrule
+Tâche & Classification & Détection temps réel & Classification + Localisation \\
+Input & Image statique & Flux vidéo & Image satellite \\
+Output & 3 classes + confiance & Bounding boxes & 2 classes + heatmap \\
+Temps d'inférence & ~150ms & ~33ms (30 FPS) & ~200ms \\
+Précision cible & $\geq$ 97\% & mAP $\geq$ 85\% & $\geq$ 90\% \\
+Taille modèle & ~9 MB (.h5) & ~6 MB (.pt) & ~2 MB (.h5) \\
+Framework & TensorFlow/Keras & Ultralytics/PyTorch & TensorFlow/Keras \\
+\bottomrule
+\end{tabular}
+\end{table}

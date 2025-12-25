@@ -1,0 +1,429 @@
+% ============================================
+% CHAPITRE III - ANALYSE ET SPÉCIFICATION DES BESOINS
+% ============================================
+\chapter{Analyse et Spécification des Besoins}
+\thispagestyle{fancy}
+
+\section{Présentation du Projet}
+
+\lettrine[lines=3, lhang=0.15, loversize=0.1, findent=3pt]{\textcolor{primaryGreen}{L}}{a phase} d'analyse et de spécification des besoins constitue une étape fondamentale dans tout projet de développement logiciel. Elle permet de définir avec précision ce que le système doit accomplir, comment il doit se comporter, et quelles contraintes il doit respecter. Dans le cadre du projet \textbf{AI Sentinel}, cette phase revêt une importance particulière compte tenu de la criticité du domaine d'application : la détection précoce des incendies de forêt, où chaque minute gagnée peut sauver des vies et préserver des hectares de forêt.
+
+Ce chapitre présente une analyse exhaustive des besoins fonctionnels et non fonctionnels du système, accompagnée d'une modélisation UML détaillée permettant de visualiser les interactions entre les différents acteurs et composants du système.
+
+\subsection{Vision Globale}
+
+Le projet \textbf{AI Sentinel} s'inscrit dans une vision ambitieuse : créer un écosystème technologique complet capable de détecter, surveiller, prédire et alerter en temps réel sur les risques d'incendies de forêt. Cette vision se concrétise à travers une plateforme web full-stack qui intègre les technologies les plus avancées en matière d'intelligence artificielle et de traitement d'images.
+
+\begin{greenbox}[\faEye\ Vision du Projet AI Sentinel]
+Notre ambition va au-delà de la simple détection : nous souhaitons fournir aux autorités et gestionnaires forestiers un \textbf{outil d'aide à la décision} complet qui leur permette d'anticiper les risques, d'optimiser leurs ressources, et d'intervenir de manière proactive plutôt que réactive.
+
+La plateforme AI Sentinel se positionne comme un \textbf{hub centralisé} intégrant :
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item[\textcolor{primaryGreen}{\faVideo}] L'analyse vidéo en temps réel par intelligence artificielle
+    \item[\textcolor{primaryGreen}{\faSatellite}] La surveillance satellite à couverture globale
+    \item[\textcolor{primaryGreen}{\faChartLine}] Les algorithmes prédictifs de propagation des feux
+    \item[\textcolor{primaryGreen}{\faBell}] Un système d'alertes multi-canaux réactif
+    \item[\textcolor{primaryGreen}{\faCloudSun}] L'intégration des données météorologiques
+\end{itemize}
+\end{greenbox}
+
+\vspace{0.5cm}
+
+L'objectif principal est de réduire significativement le \textbf{temps de détection} des incendies, facteur critique dans la limitation des dégâts. Les études montrent qu'une intervention dans les 15 premières minutes suivant le départ d'un feu permet de contenir 90\% des incendies avant qu'ils ne deviennent incontrôlables.
+
+\begin{center}
+\begin{tikzpicture}[
+    block/.style={rectangle, rounded corners=10pt, draw=primaryGreen, line width=2pt, fill=mintGreen, text width=3cm, minimum height=2cm, align=center, font=\small},
+    arrow/.style={->, >=stealth, line width=2pt, color=leafGreen}
+]
+    % Blocs
+    \node[block] (detect) at (0,0) {\textcolor{darkGreen}{\faSearch}\\[5pt]\textbf{Détection}\\Rapide};
+    \node[block] (analyse) at (4,0) {\textcolor{darkGreen}{\faBrain}\\[5pt]\textbf{Analyse}\\IA};
+    \node[block] (predict) at (8,0) {\textcolor{darkGreen}{\faChartArea}\\[5pt]\textbf{Prédiction}\\Propagation};
+    \node[block] (alert) at (12,0) {\textcolor{darkGreen}{\faBell}\\[5pt]\textbf{Alerte}\\Instantanée};
+    
+    % Flèches
+    \draw[arrow] (detect) -- (analyse);
+    \draw[arrow] (analyse) -- (predict);
+    \draw[arrow] (predict) -- (alert);
+    
+    % Temps
+    \node[font=\footnotesize, text=textGray] at (2, -1.5) {< 500ms};
+    \node[font=\footnotesize, text=textGray] at (6, -1.5) {< 1s};
+    \node[font=\footnotesize, text=textGray] at (10, -1.5) {< 2s};
+    
+    % Titre
+    \node[font=\bfseries\large, text=darkGreen] at (6, 2) {Chaîne de Traitement AI Sentinel};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Parties Prenantes}
+
+L'identification et la compréhension des parties prenantes sont essentielles pour garantir que le système réponde aux besoins réels de ses utilisateurs. Le projet AI Sentinel implique plusieurs catégories d'acteurs, chacune ayant des attentes et des besoins spécifiques.
+
+\subsubsection{Utilisateurs Finaux}
+
+Les utilisateurs finaux représentent le cœur de notre cible. Ils constituent les bénéficiaires directs du système et leurs besoins orientent l'ensemble des choix de conception.
+
+\begin{infobox}{Profils Utilisateurs Identifiés}
+
+\textbf{\faUserShield\ Autorités de Protection Civile}
+
+Les services de protection civile et les pompiers forestiers représentent les utilisateurs principaux du système. Leur mission consiste à surveiller les zones à risque, coordonner les interventions et gérer les ressources humaines et matérielles. Ils requièrent :
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item Des alertes instantanées et fiables
+    \item Une localisation précise des foyers d'incendie
+    \item Des informations sur la propagation probable
+    \item Un accès rapide aux données météorologiques
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{\faTree\ Gestionnaires Forestiers}
+
+Les agents des Eaux et Forêts et les gestionnaires d'espaces naturels utilisent le système pour la surveillance quotidienne de leurs territoires. Leurs besoins incluent :
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item La surveillance continue des zones forestières
+    \item L'identification des zones à haut risque
+    \item L'historique des incidents pour l'analyse
+    \item La planification préventive des interventions
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{\faCity\ Collectivités Territoriales}
+
+Les communes et régions concernées par les zones forestières peuvent utiliser le système pour :
+\begin{itemize}[leftmargin=0.5cm, itemsep=3pt]
+    \item La coordination avec les services d'urgence
+    \item L'information et l'alerte des populations
+    \item La gestion des évacuations si nécessaire
+\end{itemize}
+\end{infobox}
+
+\subsubsection{Administrateurs Système}
+
+Les administrateurs techniques sont responsables du bon fonctionnement, de la maintenance et de l'évolution du système. Leur rôle est crucial pour garantir la disponibilité et les performances de la plateforme.
+
+\begin{techbox}{Responsabilités des Administrateurs}
+\begin{itemize}[leftmargin=0.5cm, itemsep=8pt]
+    \item[\textcolor{accentTeal}{\faServer}] \textbf{Gestion de l'Infrastructure :} Déploiement, monitoring et maintenance des serveurs backend et frontend
+    
+    \item[\textcolor{accentTeal}{\faCogs}] \textbf{Configuration des Services :} Paramétrage des API externes (NASA FIRMS, Sentinel Hub), gestion des clés API et des quotas
+    
+    \item[\textcolor{accentTeal}{\faBrain}] \textbf{Gestion des Modèles IA :} Mise à jour et réentraînement des modèles de détection (YOLOv8, MobileNetV2)
+    
+    \item[\textcolor{accentTeal}{\faBell}] \textbf{Configuration des Alertes :} Paramétrage des canaux de notification (Telegram, Email) et gestion des destinataires
+    
+    \item[\textcolor{accentTeal}{\faChartBar}] \textbf{Monitoring des Performances :} Suivi des métriques de performance et optimisation continue
+\end{itemize}
+\end{techbox}
+
+\subsubsection{Équipe de Développement}
+
+L'équipe de développement assure la conception, l'implémentation et l'évolution continue du système. Elle est composée de profils complémentaires travaillant en synergie.
+
+\begin{table}[H]
+\centering
+\caption{Composition de l'équipe de développement}
+\label{tab:equipe}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{l l p{7cm}}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Rôle}} & \textcolor{white}{\textbf{Compétences}} & \textcolor{white}{\textbf{Responsabilités}} \\
+\midrule
+Développeur Backend & Python, FastAPI, IA & API REST, intégration modèles IA, services externes \\
+Développeur Frontend & React, TypeScript & Interface utilisateur, cartographie, UX/UI \\
+Ingénieur IA/ML & TensorFlow, PyTorch & Entraînement modèles, optimisation, évaluation \\
+DevOps & Docker, CI/CD & Déploiement, automatisation, monitoring \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tikzpicture}[
+    actor/.style={circle, draw=primaryGreen, line width=2pt, fill=mintGreen, minimum size=2cm, align=center, font=\small},
+    system/.style={rectangle, rounded corners=15pt, draw=darkGreen, line width=3pt, fill=leafGreen!20, minimum width=6cm, minimum height=3cm, align=center}
+]
+    % Système central
+    \node[system] (sys) at (0,0) {\textbf{\large AI Sentinel}\\[5pt]\footnotesize Système de Détection\\des Incendies de Forêt};
+    
+    % Acteurs
+    \node[actor] (user) at (-5, 2) {\faUser\\Utilisateur};
+    \node[actor] (admin) at (5, 2) {\faUserCog\\Admin};
+    \node[actor] (dev) at (-5, -2) {\faCode\\Développeur};
+    \node[actor] (ext) at (5, -2) {\faCloud\\Services\\Externes};
+    
+    % Connexions
+    \draw[->, >=stealth, line width=1.5pt, primaryGreen] (user) -- (sys);
+    \draw[->, >=stealth, line width=1.5pt, primaryGreen] (admin) -- (sys);
+    \draw[->, >=stealth, line width=1.5pt, primaryGreen] (dev) -- (sys);
+    \draw[<->, >=stealth, line width=1.5pt, accentTeal] (ext) -- (sys);
+    
+\end{tikzpicture}
+\end{center}
+
+% ============================================
+\newpage
+\section{Analyse des Besoins Fonctionnels}
+% ============================================
+
+L'analyse des besoins fonctionnels définit ce que le système doit \textbf{faire}. Chaque besoin fonctionnel décrit une fonctionnalité spécifique que le système doit offrir à ses utilisateurs. Dans le cadre d'AI Sentinel, nous avons organisé ces besoins en \textbf{huit modules} distincts, chacun répondant à un aspect particulier de la détection et de la prévention des incendies.
+
+\begin{greenbox}[\faListOl\ Vue d'Ensemble des Modules Fonctionnels]
+\begin{center}
+\begin{tikzpicture}[
+    module/.style={rectangle, rounded corners=8pt, draw=primaryGreen, line width=1.5pt, fill=mintGreen, text width=3.8cm, minimum height=1.8cm, align=center, font=\small}
+]
+    % Ligne 1
+    \node[module] (m1) at (0,0) {\textcolor{darkGreen}{\faVideo}\\[3pt]\textbf{Détection}\\Temps Réel};
+    \node[module] (m2) at (4.5,0) {\textcolor{darkGreen}{\faImage}\\[3pt]\textbf{Classification}\\d'Images};
+    \node[module] (m3) at (9,0) {\textcolor{darkGreen}{\faFilm}\\[3pt]\textbf{Analyse}\\Vidéo};
+    \node[module] (m4) at (13.5,0) {\textcolor{darkGreen}{\faSatellite}\\[3pt]\textbf{Surveillance}\\Satellite};
+    
+    % Ligne 2
+    \node[module] (m5) at (0,-2.5) {\textcolor{darkGreen}{\faMapMarkerAlt}\\[3pt]\textbf{Prévention}\\Hotspots};
+    \node[module] (m6) at (4.5,-2.5) {\textcolor{darkGreen}{\faChartLine}\\[3pt]\textbf{Prédiction}\\Propagation};
+    \node[module] (m7) at (9,-2.5) {\textcolor{darkGreen}{\faBell}\\[3pt]\textbf{Notifications}\\Multi-canaux};
+    \node[module] (m8) at (13.5,-2.5) {\textcolor{darkGreen}{\faCloudSun}\\[3pt]\textbf{FWI}\\Météo};
+\end{tikzpicture}
+\end{center}
+\end{greenbox}
+
+\subsection{Module de Détection en Temps Réel}
+
+Le module de détection en temps réel constitue le \textbf{cœur} du système AI Sentinel. Il permet l'analyse continue de flux vidéo provenant de caméras de surveillance pour détecter instantanément la présence de feu ou de fumée. Ce module exploite la puissance du modèle \textbf{YOLOv8} (You Only Look Once, version 8), un algorithme de détection d'objets state-of-the-art reconnu pour sa rapidité et sa précision.
+
+\subsubsection{Contexte et Justification}
+
+La détection en temps réel répond à un besoin critique : identifier les incendies \textbf{dès leur déclenchement}, avant qu'ils ne se propagent de manière incontrôlable. Les méthodes traditionnelles de surveillance (tours de guet, patrouilles) présentent des limitations importantes en termes de couverture, de disponibilité 24h/24, et de vitesse de détection. L'utilisation de l'intelligence artificielle permet de surmonter ces obstacles en offrant une surveillance automatisée, continue et objective.
+
+\begin{alertbox}{Importance de la Réactivité}
+Selon les études de l'Office National des Forêts (ONF), un feu de forêt peut doubler de taille toutes les \textbf{15 à 20 minutes} dans des conditions favorables à la propagation (vent fort, végétation sèche). Chaque minute gagnée dans la détection représente potentiellement des hectares de forêt préservés et des vies sauvées.
+\end{alertbox}
+
+\subsubsection{Besoins Fonctionnels Détaillés}
+
+\begin{objectifbox}{RF01 : Capture Vidéo via Caméra/Webcam}
+\textbf{Description :} Le système doit être capable de capturer un flux vidéo en temps réel à partir de différentes sources : webcam connectée, caméra IP, ou fichier vidéo local.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Prise en charge des webcams USB standard via l'index de périphérique
+    \item Support des flux RTSP pour les caméras IP professionnelles
+    \item Capacité à traiter des fichiers vidéo uploadés (MP4, AVI, MOV)
+    \item Résolution supportée : de 480p à 1080p
+    \item Fréquence d'images : 25-30 FPS minimum
+\end{itemize}
+
+\textbf{Critère d'acceptation :} Le système doit démarrer la capture vidéo en moins de 2 secondes après activation par l'utilisateur.
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF02 : Détection Automatique Feu/Fumée}
+\textbf{Description :} Le système doit analyser chaque frame du flux vidéo pour détecter la présence de feu ou de fumée avec une précision élevée.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Utilisation du modèle YOLOv8 personnalisé entraîné sur un dataset de feux de forêt
+    \item Classification en deux classes : \texttt{Fire} (feu) et \texttt{Smoke} (fumée)
+    \item Seuil de confiance configurable (par défaut : 0.5)
+    \item Traitement à minimum 30 FPS sur GPU, 15 FPS sur CPU
+    \item Détection multi-instances (plusieurs feux/fumées simultanés)
+\end{itemize}
+
+\textbf{Critère d'acceptation :} Le modèle doit atteindre une précision de détection $\geq$ 85\% avec un taux de faux positifs < 5\%.
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF03 : Affichage des Bounding Boxes}
+\textbf{Description :} Les objets détectés (feu, fumée) doivent être encadrés visuellement sur le flux vidéo avec des informations contextuelles.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Rectangles de délimitation (bounding boxes) colorés selon la classe
+    \item Code couleur : \textcolor{moroccanRed}{Rouge} pour le feu, \textcolor{textGray}{Gris} pour la fumée
+    \item Affichage du nom de la classe et du score de confiance (ex: "Fire 0.92")
+    \item Épaisseur et taille de police adaptatives selon la résolution
+    \item Mise à jour en temps réel synchronisée avec le flux vidéo
+\end{itemize}
+
+\textbf{Critère d'acceptation :} Les annotations visuelles ne doivent pas dégrader les performances de plus de 5\%.
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF04 : Génération d'Alertes Visuelles}
+\textbf{Description :} Lorsqu'un feu ou une fumée est détecté avec un niveau de confiance suffisant, le système doit générer des alertes visuelles immédiates.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Indicateur visuel clignotant sur l'interface lors d'une détection
+    \item Changement de couleur de l'arrière-plan ou du cadre vidéo
+    \item Notification toast affichant les détails de la détection
+    \item Son d'alerte optionnel (configurable par l'utilisateur)
+    \item Horodatage précis de chaque détection
+\end{itemize}
+
+\textbf{Critère d'acceptation :} L'alerte visuelle doit apparaître dans un délai maximum de 500ms après la détection.
+\end{objectifbox}
+
+\vspace{0.5cm}
+
+\begin{center}
+\begin{tikzpicture}[
+    step/.style={rectangle, rounded corners=5pt, draw=accentTeal, line width=1.5pt, fill=skyBlue!20, text width=2.5cm, minimum height=1.5cm, align=center, font=\footnotesize},
+    arrow/.style={->, >=stealth, line width=1.5pt, color=accentTeal}
+]
+    \node[step] (s1) at (0,0) {\faVideo\\Capture\\Vidéo};
+    \node[step] (s2) at (3.5,0) {\faCropAlt\\Prétraitement\\Frame};
+    \node[step] (s3) at (7,0) {\faBrain\\Inférence\\YOLOv8};
+    \node[step] (s4) at (10.5,0) {\faVectorSquare\\Bounding\\Boxes};
+    \node[step] (s5) at (14,0) {\faBell\\Alerte\\Visuelle};
+    
+    \draw[arrow] (s1) -- (s2);
+    \draw[arrow] (s2) -- (s3);
+    \draw[arrow] (s3) -- (s4);
+    \draw[arrow] (s4) -- (s5);
+    
+    \node[font=\bfseries, text=darkGreen] at (7, 1.5) {Pipeline de Détection Temps Réel};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Module de Classification d'Images}
+
+Le module de classification d'images permet aux utilisateurs d'analyser des photographies statiques pour déterminer si elles contiennent des signes de feu, de fumée, ou aucun des deux. Ce module utilise l'architecture \textbf{MobileNetV2} avec transfer learning, offrant un excellent compromis entre précision et performance.
+
+\subsubsection{Contexte et Justification}
+
+Complémentaire à la détection temps réel, la classification d'images répond à plusieurs cas d'usage importants :
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item \textbf{Vérification manuelle :} Confirmation par l'opérateur d'une image suspecte
+    \item \textbf{Analyse rétrospective :} Examen d'images historiques
+    \item \textbf{Traitement hors ligne :} Analyse sans connexion caméra en direct
+    \item \textbf{Rapports et documentation :} Génération de preuves visuelles
+\end{itemize}
+
+\subsubsection{Besoins Fonctionnels Détaillés}
+
+\begin{objectifbox}{RF05 : Upload d'Images}
+\textbf{Description :} L'utilisateur doit pouvoir soumettre une ou plusieurs images au système pour analyse.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Formats supportés : JPEG, PNG, WebP, BMP
+    \item Taille maximale par image : 10 MB
+    \item Interface drag-and-drop intuitive
+    \item Prévisualisation de l'image avant soumission
+    \item Upload multiple avec file d'attente de traitement
+\end{itemize}
+
+\textbf{Critère d'acceptation :} L'upload d'une image de 5 MB doit se terminer en moins de 3 secondes sur une connexion standard.
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF06 : Classification Multi-Classes}
+\textbf{Description :} Le système doit classifier l'image uploadée dans l'une des trois catégories : Fire, Smoke, ou Non-Fire.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Modèle MobileNetV2 pré-entraîné sur ImageNet, fine-tuné sur dataset feu
+    \item Trois classes de sortie avec probabilités associées
+    \item Prétraitement automatique (redimensionnement 224×224, normalisation)
+    \item Temps d'inférence < 500ms par image
+    \item Précision globale $\geq$ 97\% sur le jeu de test
+\end{itemize}
+
+\textbf{Critère d'acceptation :} Le système doit retourner la classe prédite avec son score de confiance en moins de 1 seconde.
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF07 : Affichage du Score de Confiance}
+\textbf{Description :} Le résultat de la classification doit inclure un score de confiance permettant à l'utilisateur d'évaluer la fiabilité de la prédiction.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Score de confiance exprimé en pourcentage (0-100\%)
+    \item Affichage visuel avec code couleur (vert > 80\%, orange 50-80\%, rouge < 50\%)
+    \item Distribution des probabilités pour les trois classes
+    \item Indicateur visuel du niveau de certitude du modèle
+    \item Recommandation d'action basée sur le niveau de confiance
+\end{itemize}
+
+\textbf{Critère d'acceptation :} L'interface doit afficher clairement le résultat avec les probabilités pour chaque classe.
+\end{objectifbox}
+
+\vspace{0.5cm}
+
+\begin{table}[H]
+\centering
+\caption{Exemple de sortie du module de classification}
+\label{tab:classification}
+\rowcolors{2}{mintGreen!30}{white}
+\begin{tabular}{l c l}
+\toprule
+\rowcolor{primaryGreen}
+\textcolor{white}{\textbf{Classe}} & \textcolor{white}{\textbf{Probabilité}} & \textcolor{white}{\textbf{Interprétation}} \\
+\midrule
+\textbf{Fire} & 92.3\% & \textcolor{moroccanRed}{Détection confirmée} \\
+Smoke & 5.1\% & Trace possible \\
+Non-Fire & 2.6\% & Négligeable \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Module d'Analyse Vidéo}
+
+Le module d'analyse vidéo étend les capacités de détection aux fichiers vidéo préenregistrés. Il permet un traitement exhaustif frame par frame et génère une vidéo annotée avec les détections.
+
+\subsubsection{Besoins Fonctionnels Détaillés}
+
+\begin{objectifbox}{RF08 : Upload de Vidéos}
+\textbf{Description :} L'utilisateur doit pouvoir soumettre des fichiers vidéo pour analyse complète.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Formats supportés : MP4, AVI, MOV, MKV, WebM
+    \item Taille maximale : 500 MB (configurable)
+    \item Barre de progression de l'upload
+    \item Validation du format avant traitement
+    \item Support des différentes résolutions (480p à 4K)
+\end{itemize}
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF09 : Traitement Frame par Frame}
+\textbf{Description :} Chaque frame de la vidéo doit être analysée individuellement par le modèle de détection.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Extraction et analyse de chaque frame
+    \item Affichage de la progression du traitement
+    \item Statistiques en temps réel (frames traitées, détections)
+    \item Possibilité d'annuler le traitement en cours
+    \item Traitement asynchrone pour ne pas bloquer l'interface
+\end{itemize}
+\end{objectifbox}
+
+\vspace{0.3cm}
+
+\begin{objectifbox}{RF10 : Export Vidéo Annotée}
+\textbf{Description :} Le système doit générer une version annotée de la vidéo avec les détections superposées.
+
+\textbf{Spécifications détaillées :}
+\begin{itemize}[leftmargin=1cm, itemsep=5pt]
+    \item Génération d'une nouvelle vidéo avec bounding boxes
+    \item Conservation de la résolution et du framerate d'origine
+    \item Téléchargement direct du fichier résultat
+    \item Rapport JSON des détections (timestamps, coordonnées, classes)
+    \item Prévisualisation avant téléchargement
+\end{itemize}
+\end{objectifbox}

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1000" height="800" xmlns="http://www.w3.org/2000/svg">
+  <title>Future Advanced Fire Spread Prediction Model</title>
+  
+  <!-- Background -->
+  <rect width="1000" height="800" fill="#FAFAFA"/>
+  
+  <!-- Title -->
+  <text x="500" y="40" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="#2C3E50">
+    🔬 Future Advanced Fire Spread Prediction Model
+  </text>
+  
+  <!-- Input Data Sources -->
+  <rect x="50" y="80" width="900" height="100" fill="#FFF3E0" stroke="#333" stroke-width="2" rx="10"/>
+  <text x="70" y="105" font-family="Arial" font-size="16" font-weight="bold">📊 Enhanced Multi-Source Data</text>
+  
+  <rect x="80" y="120" width="110" height="50" fill="#FFE5B4" stroke="#333" rx="5"/>
+  <text x="135" y="140" text-anchor="middle" font-family="Arial" font-size="10">🛰️ Multi-Satellite</text>
+  <text x="135" y="155" text-anchor="middle" font-family="Arial" font-size="9">MODIS/VIIRS/Landsat</text>
+  
+  <rect x="210" y="120" width="110" height="50" fill="#B4E5FF" stroke="#333" rx="5"/>
+  <text x="265" y="140" text-anchor="middle" font-family="Arial" font-size="10">🌤️ Weather APIs</text>
+  <text x="265" y="155" text-anchor="middle" font-family="Arial" font-size="9">NOAA/ECMWF</text>
+  
+  <rect x="340" y="120" width="110" height="50" fill="#B4FFB4" stroke="#333" rx="5"/>
+  <text x="395" y="140" text-anchor="middle" font-family="Arial" font-size="10">🗻 Terrain Data</text>
+  <text x="395" y="155" text-anchor="middle" font-family="Arial" font-size="9">USGS + Vegetation</text>
+  
+  <rect x="470" y="120" width="110" height="50" fill="#FFB4B4" stroke="#333" rx="5"/>
+  <text x="525" y="140" text-anchor="middle" font-family="Arial" font-size="10">📚 Fire History</text>
+  <text x="525" y="155" text-anchor="middle" font-family="Arial" font-size="9">ML Training Data</text>
+  
+  <rect x="600" y="120" width="110" height="50" fill="#E5B4FF" stroke="#333" rx="5"/>
+  <text x="655" y="140" text-anchor="middle" font-family="Arial" font-size="10">🏢 IoT Sensors</text>
+  <text x="655" y="155" text-anchor="middle" font-family="Arial" font-size="9">Ground Truth</text>
+  
+  <rect x="730" y="120" width="110" height="50" fill="#FFFFB4" stroke="#333" rx="5"/>
+  <text x="785" y="140" text-anchor="middle" font-family="Arial" font-size="10">🚁 Drone Data</text>
+  <text x="785" y="155" text-anchor="middle" font-family="Arial" font-size="9">Real-time Verify</text>
+  
+  <!-- Physics Models -->
+  <rect x="50" y="210" width="900" height="130" fill="#F1F3F4" stroke="#333" stroke-width="2" rx="10"/>
+  <text x="70" y="235" font-family="Arial" font-size="16" font-weight="bold">🔬 Advanced Physics Models</text>
+  
+  <rect x="80" y="250" width="200" height="80" fill="#FF6B6B" stroke="#333" stroke-width="2" rx="8"/>
+  <text x="180" y="275" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="white">🔥 Rothermel Model</text>
+  <text x="180" y="290" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Scientific Fire Physics</text>
+  <text x="180" y="305" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Wind + Slope + Fuel</text>
+  <text x="180" y="320" text-anchor="middle" font-family="Arial" font-size="9" fill="white">Research-grade equations</text>
+  
+  <rect x="300" y="250" width="200" height="80" fill="#4ECDC4" stroke="#333" stroke-width="2" rx="8"/>
+  <text x="400" y="275" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="white">💧 Fuel Moisture</text>
+  <text x="400" y="290" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Live/Dead Analysis</text>
+  <text x="400" y="305" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Weather Integration</text>
+  <text x="400" y="320" text-anchor="middle" font-family="Arial" font-size="9" fill="white">NFDRS compatible</text>
+  
+  <rect x="520" y="250" width="200" height="80" fill="#96CEB4" stroke="#333" stroke-width="2" rx="8"/>
+  <text x="620" y="275" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="white">🌪️ CFD Wind Model</text>
+  <text x="620" y="290" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Computational Dynamics</text>
+  <text x="620" y="305" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Terrain-modified winds</text>
+  <text x="620" y="320" text-anchor="middle" font-family="Arial" font-size="9" fill="white">Turbulence effects</text>
+  
+  <rect x="740" y="250" width="160" height="80" fill="#6C5CE7" stroke="#333" stroke-width="2" rx="8"/>
+  <text x="820" y="275" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="white">⛰️ Topographic</text>
+  <text x="820" y="290" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Slope Effects</text>
+  <text x="820" y="305" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Solar Radiation</text>
+  <text x="820" y="320" text-anchor="middle" font-family="Arial" font-size="9" fill="white">Aspect influence</text>
+  
+  <!-- AI Enhancement -->
+  <rect x="50" y="370" width="900" height="110" fill="#FFF8E1" stroke="#333" stroke-width="2" rx="10"/>
+  <text x="70" y="395" font-family="Arial" font-size="16" font-weight="bold">🤖 AI Enhancement Layer</text>
+  
+  <rect x="80" y="410" width="170" height="60" fill="#FF6B6B" stroke="#333" stroke-width="2" rx="8"/>
+  <text x="165" y="435" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">🧠 Neural Networks</text>
+  <text x="165" y="450" text-anchor="middle" font-family="Arial" font-size="9" fill="white">Deep Learning Models</text>
+  <text x="165" y="465" text-anchor="middle" font-family="Arial" font-size="9" fill="white">Pattern Recognition</text>
+  
+  <rect x="270" y="410" width="170" height="60" fill="#4ECDC4" stroke="#333" stroke-width="2" rx="8"/>
+  <text x="355" y="435" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">📊 Data Fusion</text>
+  <text x="355" y="450" text-anchor="middle" font-family="Arial" font-size="9" fill="white">Multi-source Integration</text>
+  <text x="355" y="465" text-anchor="middle" font-family="Arial" font-size="9" fill="white">Uncertainty Analysis</text>
+  
+  <rect x="460" y="410" width="170" height="60" fill="#96CEB4" stroke="#333" stroke-width="2" rx="8"/>
+  <text x="545" y="435" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">🎯 Ensemble Models</text>
+  <text x="545" y="450" text-anchor="middle" font-family="Arial" font-size="9" fill="white">Multiple Predictions</text>
+  <text x="545" y="465" text-anchor="middle" font-family="Arial" font-size="9" fill="white">Confidence Intervals</text>
+  
+  <rect x="650" y="410" width="170" height="60" fill="#6C5CE7" stroke="#333" stroke-width="2" rx="8"/>
+  <text x="735" y="435" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">🔄 Adaptive Learning</text>
+  <text x="735" y="450" text-anchor="middle" font-family="Arial" font-size="9" fill="white">Real-time Calibration</text>
+  <text x="735" y="465" text-anchor="middle" font-family="Arial" font-size="9" fill="white">Self-improvement</text>
+  
+  <!-- Advanced Outputs -->
+  <rect x="50" y="510" width="900" height="120" fill="#E8F5E8" stroke="#333" stroke-width="2" rx="10"/>
+  <text x="70" y="535" font-family="Arial" font-size="16" font-weight="bold">🎯 Advanced Prediction Outputs</text>
+  
+  <!-- Elliptical Spread -->
+  <g transform="translate(150, 580)">
+    <ellipse cx="0" cy="0" rx="25" ry="12" fill="none" stroke="#FF6B6B" stroke-width="3"/>
+    <circle cx="0" cy="0" r="3" fill="#FF6B6B"/>
+    <text x="0" y="35" text-anchor="middle" font-family="Arial" font-size="10">🎯 Elliptical</text>
+    <text x="0" y="50" text-anchor="middle" font-family="Arial" font-size="9">Wind-driven shape</text>
+  </g>
+  
+  <!-- Multi-Timeline -->
+  <g transform="translate(350, 580)">
+    <rect x="-30" y="-10" width="60" height="20" fill="#B4E5FF" stroke="#333" rx="3"/>
+    <text x="0" y="5" text-anchor="middle" font-family="Arial" font-size="9">3h|6h|12h|24h</text>
+    <text x="0" y="35" text-anchor="middle" font-family="Arial" font-size="10">⏰ Multi-Timeline</text>
+    <text x="0" y="50" text-anchor="middle" font-family="Arial" font-size="9">Multiple horizons</text>
+  </g>
+  
+  <!-- Probability Maps -->
+  <g transform="translate(550, 580)">
+    <rect x="-20" y="-10" width="40" height="20" fill="#FF6B6B" opacity="0.7"/>
+    <rect x="-15" y="-5" width="30" height="10" fill="#FFD93D" opacity="0.5"/>
+    <text x="0" y="35" text-anchor="middle" font-family="Arial" font-size="10">🔥 Heat Maps</text>
+    <text x="0" y="50" text-anchor="middle" font-family="Arial" font-size="9">Risk zones 10-90%</text>
+  </g>
+  
+  <!-- Impact Analysis -->
+  <g transform="translate(750, 580)">
+    <rect x="-25" y="-10" width="50" height="20" fill="#E5B4FF" stroke="#333" rx="3"/>
+    <text x="0" y="5" text-anchor="middle" font-family="Arial" font-size="9">Property Risk</text>
+    <text x="0" y="35" text-anchor="middle" font-family="Arial" font-size="10">🏠 Impact Zone</text>
+    <text x="0" y="50" text-anchor="middle" font-family="Arial" font-size="9">Population analysis</text>
+  </g>
+  
+  <!-- Performance Comparison -->
+  <rect x="100" y="660" width="800" height="100" fill="#F3E5F5" stroke="#9C27B0" stroke-width="3" rx="10"/>
+  <text x="500" y="685" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold">📊 Model Performance Evolution</text>
+  
+  <rect x="150" y="700" width="250" height="50" fill="#FFEBEE" stroke="#F44336" stroke-width="2" rx="5"/>
+  <text x="275" y="720" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">Current v1.0</text>
+  <text x="275" y="735" text-anchor="middle" font-family="Arial" font-size="10">Circular • Simple wind • ±30% accuracy</text>
+  
+  <rect x="450" y="700" width="250" height="50" fill="#E8F5E8" stroke="#4CAF50" stroke-width="2" rx="5"/>
+  <text x="575" y="720" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold">Future v2.0+</text>
+  <text x="575" y="735" text-anchor="middle" font-family="Arial" font-size="10">Physics-based • AI-enhanced • 95%+ accuracy</text>
+  
+  <text x="500" y="780" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="#1B5E20">
+    🚀 From Simple Circles to AI-Enhanced Physics: The Future of Fire Science
+  </text>
+</svg> 

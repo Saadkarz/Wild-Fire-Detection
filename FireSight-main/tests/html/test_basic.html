@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Basic Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>FireSight Basic Test</h1>
+    <div id="status">Loading...</div>
+    
+    <script>
+        console.log('Basic test page loaded');
+        document.getElementById('status').innerHTML = '<span class="success">✅ Page loads correctly</span>';
+        
+        // Test data fetch
+        fetch('data/wildfires.geojson')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('status').innerHTML += '<br><span class="success">✅ Data loads: ' + data.features.length + ' features</span>';
+            })
+            .catch(error => {
+                document.getElementById('status').innerHTML += '<br><span class="error">❌ Data error: ' + error.message + '</span>';
+            });
+    </script>
+</body>
+</html> 
